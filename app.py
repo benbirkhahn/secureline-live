@@ -29,6 +29,13 @@ LIVE_AIRPORTS = {
     "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED"},
     "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
 }
+AIRPORT_FACTORS = {
+    "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
+    "EWR": 1.2, "FLL": 0.9, "HNL": 0.85, "IAH": 1.1, "JFK": 1.35, "LAS": 1.15,
+    "LAX": 1.4, "LGA": 1.25, "MCO": 1.1, "MDW": 0.9, "MIA": 1.25, "MSP": 1.0,
+    "ORD": 1.3, "PHL": 1.1, "PHX": 1.0, "SEA": 1.1, "SFO": 1.25, "SLC": 0.9,
+    "TPA": 0.9, "JAX": 0.9,
+}
 
 PIPELINE_AIRPORTS = [
     {
@@ -78,6 +85,50 @@ def start_runtime_once() -> None:
 
 def utc_now() -> datetime:
     return datetime.now(tz=APP_TZ)
+
+
+def clamp_wait_minutes(v: float) -> float:
+    return max(0.0, min(float(v), 180.0))
+
+
+def wait_description(minutes: float) -> str:
+    m = int(round(minutes))
+    if m <= 0:
+        return "Closed"
+    return f"{m} minutes"
+
+
+def estimated_wait_for_hour(hour: int, factor: float) -> float:
+    if hour < 5:
+        base = 8
+    elif hour < 7:
+        base = 18
+    elif hour < 10:
+        base = 32
+    elif hour < 13:
+        base = 20
+    elif hour < 16:
+        base = 16
+    elif hour < 19:
+        base = 26
+    elif hour < 22:
+        base = 17
+    else:
+        base = 10
+    return clamp_wait_minutes(base * factor)
+
+
+def normalize_hourly_forecast(code: str, current_standard: float) -> List[Dict]:
+    factor = AIRPORT_FACTORS.get(code, 1.0)
+    rows = []
+    for hour in range(24):
+        estimated = estimated_wait_for_hour(hour, factor)
+        blended = clamp_wait_minutes(estimated * 0.75 + current_standard * 0.25)
+        start = datetime(2000, 1, 1, hour, 0)
+        end = start + timedelta(hours=1)
+        label = f"{start.strftime('%-I %p').lower()} - {end.strftime('%-I %p').lower()}"
+        rows.append({"timeslot": label, "waittime": round(blended, 1), "hour": hour})
+    return rows
 
 
 def init_db() -> None:
@@ -344,6 +395,54 @@ def latest_snapshot() -> Dict:
     return out
 
 
+def latest_for_code(airport_code: str) -> List[Dict]:
+    return latest_snapshot().get(airport_code, [])
+
+
+def normalized_current_wait_for_code(code: str) -> Dict:
+    rows = latest_for_code(code)
+    if rows:
+        active = [r for r in rows if float(r.get("wait_minutes", 0)) > 0]
+        sample = active if active else rows
+        values = [clamp_wait_minutes(float(r.get("wait_minutes", 0))) for r in sample]
+        standard = round(sum(values) / len(values), 1) if values else 0.0
+        has_pre = any("pre" in str(r.get("checkpoint", "")).lower() for r in rows)
+        latest_ts = max(rows, key=lambda r: r.get("captured_at", ""))["captured_at"]
+        return {
+            "available": True,
+            "sourceType": "live_direct",
+            "sourceReason": "fresh_live_data",
+            "currentWait": {
+                "standard": standard,
+                "standardDescription": wait_description(standard),
+                "userReported": None,
+                "precheck": has_pre,
+                "timestamp": latest_ts,
+            },
+            "hourlyForecast": normalize_hourly_forecast(code, standard),
+        }
+
+    now = utc_now()
+    estimated = round(estimated_wait_for_hour(now.hour, AIRPORT_FACTORS.get(code, 1.0)), 1)
+    if code in LIVE_AIRPORTS:
+        source_reason = "live_stale_or_unavailable"
+    else:
+        source_reason = "airport_not_live_integrated"
+    return {
+        "available": True,
+        "sourceType": "estimated_fallback",
+        "sourceReason": source_reason,
+        "currentWait": {
+            "standard": estimated,
+            "standardDescription": wait_description(estimated),
+            "userReported": None,
+            "precheck": False,
+            "timestamp": now.isoformat(),
+        },
+        "hourlyForecast": normalize_hourly_forecast(code, estimated),
+    }
+
+
 def history_for_airport(airport_code: str, hours: int = 12) -> List[Dict]:
     cutoff = (utc_now() - timedelta(hours=hours)).isoformat()
     conn = sqlite3.connect(DB_PATH)
@@ -411,6 +510,21 @@ def api_history():
             "rows": history_for_airport(code, hours=hours),
         }
     )
+
+@app.route("/api/tsa-wait-times")
+def api_tsa_wait_times():
+    code = request.args.get("code", "").upper().strip()
+    if not re.fullmatch(r"[A-Z]{3}", code):
+        return jsonify(
+            {
+                "code": code,
+                "available": False,
+                "error": "Invalid Airport Code",
+                "timestamp": utc_now().isoformat(),
+            }
+        ), 400
+    payload = normalized_current_wait_for_code(code)
+    return jsonify({"code": code, **payload, "timestamp": utc_now().isoformat()})
 
 
 @app.route("/api/pipeline")
