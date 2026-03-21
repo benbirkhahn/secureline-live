@@ -10,6 +10,11 @@
   --green: #22c55e;
   --amber: #f59e0b;
 }
+.chart-empty {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 8px;
+}
 
 * { box-sizing: border-box; }
 body {
@@ -66,6 +71,50 @@ body {
   border-radius: 16px;
   box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
   padding: 16px;
+}
+.lookup-card { margin-bottom: 12px; }
+.lookup-controls {
+  display: grid;
+  gap: 10px;
+}
+.airport-search {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #0f172a;
+  font-size: 14px;
+  padding: 12px;
+  outline: none;
+}
+.airport-search:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+.airport-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.airport-chip {
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.airport-chip.active {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+.selection-summary {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #64748b;
 }
 .card-head {
   display: flex;
