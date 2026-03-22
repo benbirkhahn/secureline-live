@@ -124,11 +124,12 @@ def build_page_seo(title: str, description: str, canonical_path: str) -> Dict:
 
 
 def home_page_seo() -> Dict:
+    codes = " · ".join(LIVE_AIRPORTS.keys())
     return build_page_seo(
-        title="Live TSA Wait Times by Airport (PHL, MIA, ORD) | SecureLine",
+        title=f"Live TSA Wait Times — {codes} | SecureLine",
         description=(
-            "Track live TSA wait times for major US airports with source-labeled feeds, trend charts, "
-            "and fast airport lookup."
+            "Track live TSA wait times for major US airports including PHL, MIA, ORD, CLT, MCO, JAX and DFW. "
+            "Source-labeled feeds, trend charts, and fast airport lookup."
         ),
         canonical_path="/",
     )
@@ -160,10 +161,17 @@ def legal_page_seo(slug: str) -> Dict:
 
 
 def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
+    is_airport_page = bool(initial_airport_code and initial_airport_code in LIVE_AIRPORTS)
+    airport_display_name = ""
+    if is_airport_page:
+        raw_name = LIVE_AIRPORTS[initial_airport_code]["name"]
+        airport_display_name = raw_name.split("(")[0].strip()
     return {
         "live_airports": LIVE_AIRPORTS,
         "pipeline_airports": PIPELINE_AIRPORTS,
         "initial_airport_code": initial_airport_code,
+        "is_airport_page": is_airport_page,
+        "airport_display_name": airport_display_name,
         "airport_pages": [{"code": c, "href": airport_seo_slug(c), "name": v["name"]} for c, v in LIVE_AIRPORTS.items()],
         "seo": seo,
         "monetization": {
@@ -877,14 +885,20 @@ def robots_txt():
 
 @app.route("/sitemap.xml")
 def sitemap_xml():
-    urls = ["/"] + [airport_seo_slug(c) for c in LIVE_AIRPORTS.keys()]
     now = utc_now().date().isoformat()
+    pages = (
+        [("/", "1.0", "hourly")]
+        + [(airport_seo_slug(c), "0.9", "always") for c in LIVE_AIRPORTS.keys()]
+        + [("/privacy", "0.3", "monthly"), ("/terms", "0.3", "monthly"), ("/contact", "0.4", "monthly")]
+    )
     entries = []
-    for p in urls:
+    for path, priority, changefreq in pages:
         entries.append(
             "<url>"
-            f"<loc>{SITE_URL}{p}</loc>"
+            f"<loc>{SITE_URL}{path}</loc>"
             f"<lastmod>{now}</lastmod>"
+            f"<changefreq>{changefreq}</changefreq>"
+            f"<priority>{priority}</priority>"
             "</url>"
         )
     body = (

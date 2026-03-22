@@ -28,13 +28,48 @@
       <div class="header-title">SecureLine</div>
       <div class="header-sub">Real-time TSA checkpoint wait times</div>
     </div>
-    <div class="header-badge">LIVE: PHL · MIA · ORD · CLT · MCO</div>
+    <div class="header-badge">LIVE: {% for code in live_airports %}{{ code }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
   </header>
 
   <main class="main">
+    {% if is_airport_page %}
     <section class="card content-card">
       <div class="card-head">
-        <h2>Live TSA Wait Times for Major U.S. Airports</h2>
+        <h1>{{ initial_airport_code }} TSA Wait Times — {{ airport_display_name }}</h1>
+      </div>
+      <p class="muted">
+        SecureLine provides live TSA checkpoint wait times for {{ airport_display_name }} ({{ initial_airport_code }}).
+        Data is sourced directly from official airport security feeds and refreshes approximately every 2 minutes.
+      </p>
+      <p class="muted">
+        Wait times vary by checkpoint, terminal, and time of day. Use the live data below to plan your security
+        timing, and review the trend chart for recent line volatility at {{ initial_airport_code }}.
+      </p>
+      <div class="content-columns">
+        <div>
+          <h3>How to use this page</h3>
+          <ul class="content-list">
+            <li>Live checkpoint waits load automatically for {{ initial_airport_code }} below.</li>
+            <li>Review trend history to understand line volatility over recent hours.</li>
+            <li>Source labels indicate whether data is a live feed or a fallback estimate.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Other live airports</h3>
+          <ul class="content-list">
+            {% for code, info in live_airports.items() %}
+            {% if code != initial_airport_code %}
+            <li><a href="{{ airport_pages | selectattr('code', 'equalto', code) | map(attribute='href') | first }}">{{ code }} TSA wait times</a></li>
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
+    {% else %}
+    <section class="card content-card">
+      <div class="card-head">
+        <h1>Live TSA Wait Times for Major U.S. Airports</h1>
       </div>
       <p class="muted">
         SecureLine publishes checkpoint wait-time guidance for travelers using official airport security data feeds where available,
@@ -56,13 +91,14 @@
         <div>
           <h3>Current live airports</h3>
           <ul class="content-list">
-            {% for code, info in live_airports.items() %}
-            <li><strong>{{ code }}</strong> — {{ info.name }}</li>
+            {% for p in airport_pages %}
+            <li><a href="{{ p.href }}">{{ p.code }} TSA wait times</a> — {{ live_airports[p.code].name }}</li>
             {% endfor %}
           </ul>
         </div>
       </div>
     </section>
+    {% endif %}
     <section class="card lookup-card">
       <div class="card-head">
         <h2>Find Your Airport</h2>
@@ -166,6 +202,27 @@
       }
     }
   </script>
+  {% if is_airport_page %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "{{ seo.title }}",
+      "description": "{{ seo.description }}",
+      "url": "{{ seo.canonical_url }}",
+      "about": {
+        "@type": "Airport",
+        "name": "{{ airport_display_name }}",
+        "iataCode": "{{ initial_airport_code }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "SecureLine",
+        "url": "{{ seo.site_url }}"
+      }
+    }
+  </script>
+  {% endif %}
   {% if monetization.enable_adsense %}
   <script>
     (adsbygoogle = window.adsbygoogle || []).push({
