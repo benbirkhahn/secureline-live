@@ -35,6 +35,7 @@ LIVE_AIRPORTS = {
     "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED"},
     "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
     "CLT": {"name": "Charlotte Douglas International (CLT)", "mode": "LIVE_KEY_REQUIRED"},
+    "MCO": {"name": "Orlando International (MCO)", "mode": "LIVE_KEY_REQUIRED"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -45,12 +46,6 @@ AIRPORT_FACTORS = {
 }
 
 PIPELINE_AIRPORTS = [
-    {
-        "code": "MCO",
-        "name": "Orlando International",
-        "status": "IN_RESEARCH",
-        "notes": "No public callable live JSON endpoint confirmed yet.",
-    },
     {
         "code": "JAX",
         "name": "Jacksonville International",
@@ -66,6 +61,11 @@ _clt_cache = {
     "version": None,
     "endpoint": "https://api.cltairport.mobi/wait-times/checkpoint/CLT",
     "fetched_at": None,
+}
+_mco_cache = {
+    "endpoint": "https://api.goaa.aero/wait-times/checkpoint/MCO",
+    "key": os.getenv("MCO_API_KEY", "8eaac7209c824616a8fe58d22268cd59"),
+    "version": os.getenv("MCO_API_VERSION", "140"),
 }
 _poll_lock = threading.Lock()
 _runtime_started = False
@@ -202,6 +202,43 @@ def normalize_hourly_forecast(code: str, current_standard: float) -> List[Dict]:
         end = start + timedelta(hours=1)
         label = f"{start.strftime('%-I %p').lower()} - {end.strftime('%-I %p').lower()}"
         rows.append({"timeslot": label, "waittime": round(blended, 1), "hour": hour})
+    return rows
+
+
+def fetch_mco_rows() -> List[Dict]:
+    endpoint = _mco_cache["endpoint"]
+    headers = {
+        **UA,
+        "accept": "application/json, text/plain, */*",
+        "content-type": "application/json",
+        "api-key": _mco_cache["key"],
+        "api-version": str(_mco_cache["version"]),
+        "referer": "https://flymco.com/",
+    }
+    resp = requests.get(endpoint, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+    rows = []
+    stamp = utc_now().isoformat()
+    for rec in payload.get("data", {}).get("wait_times", []):
+        if not rec.get("isDisplayable", True):
+            continue
+        wait_seconds = rec.get("waitSeconds")
+        if wait_seconds is None:
+            continue
+        wait_minutes = max(0.0, float(wait_seconds) / 60.0)
+        name = str(rec.get("name", "Checkpoint")).strip() or "Checkpoint"
+        lane = str(rec.get("lane", "")).strip()
+        checkpoint = f"{name} ({lane})" if lane else name
+        rows.append(
+            {
+                "airport_code": "MCO",
+                "checkpoint": checkpoint,
+                "wait_minutes": wait_minutes,
+                "source": endpoint,
+                "captured_at": stamp,
+            }
+        )
     return rows
 
 
@@ -495,6 +532,7 @@ def collect_once() -> Dict:
         ("MIA", fetch_mia_rows),
         ("ORD", fetch_ord_rows),
         ("CLT", fetch_clt_rows),
+        ("MCO", fetch_mco_rows),
     ]
     all_rows = []
     for code, fn in collectors:
