@@ -34,6 +34,7 @@ LIVE_AIRPORTS = {
     "PHL": {"name": "Philadelphia International (PHL)", "mode": "LIVE_PUBLIC"},
     "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED"},
     "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
+    "CLT": {"name": "Charlotte Douglas International (CLT)", "mode": "LIVE_KEY_REQUIRED"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -44,12 +45,6 @@ AIRPORT_FACTORS = {
 }
 
 PIPELINE_AIRPORTS = [
-    {
-        "code": "CLT",
-        "name": "Charlotte Douglas International",
-        "status": "IN_RESEARCH",
-        "notes": "No public callable live JSON endpoint confirmed yet.",
-    },
     {
         "code": "MCO",
         "name": "Orlando International",
@@ -66,6 +61,12 @@ PIPELINE_AIRPORTS = [
 
 app = Flask(__name__)
 _mia_cache = {"key": None, "endpoint": None, "fetched_at": None}
+_clt_cache = {
+    "key": None,
+    "version": None,
+    "endpoint": "https://api.cltairport.mobi/wait-times/checkpoint/CLT",
+    "fetched_at": None,
+}
 _poll_lock = threading.Lock()
 _runtime_started = False
 logging.basicConfig(
@@ -201,6 +202,90 @@ def normalize_hourly_forecast(code: str, current_standard: float) -> List[Dict]:
         end = start + timedelta(hours=1)
         label = f"{start.strftime('%-I %p').lower()} - {end.strftime('%-I %p').lower()}"
         rows.append({"timeslot": label, "waittime": round(blended, 1), "hour": hour})
+    return rows
+
+
+def refresh_clt_api_config_if_needed(force: bool = False) -> None:
+    now = utc_now()
+    if not force and _clt_cache["key"] and _clt_cache["version"] and _clt_cache["fetched_at"]:
+        age = now - _clt_cache["fetched_at"]
+        if age < timedelta(hours=6):
+            return
+
+    page = requests.get("https://www.cltairport.com/airport-info/security/", headers=UA, timeout=20).text
+    js_paths = re.findall(r'<script[^>]+src=["\']([^"\']*/_next/static/chunks/[^"\']+\.js)["\']', page, re.I)
+    js_urls = []
+    for p in js_paths:
+        if p.startswith("http"):
+            js_urls.append(p)
+        else:
+            js_urls.append("https://www.cltairport.com" + p)
+
+    found_key = None
+    found_version = None
+    for js_url in js_urls:
+        try:
+            js = requests.get(js_url, headers=UA, timeout=20).text
+        except Exception:
+            continue
+        if "api.cltairport.mobi" not in js and "Api-Key" not in js:
+            continue
+        key_match = re.search(r'Api-Key":"([a-f0-9]{32})"', js, re.I)
+        version_match = re.search(r'Api-Version":"([0-9]+)"', js, re.I)
+        if key_match:
+            found_key = key_match.group(1)
+        if version_match:
+            found_version = version_match.group(1)
+        if found_key and found_version:
+            break
+
+    _clt_cache["key"] = os.getenv("CLT_API_KEY", found_key or _clt_cache["key"])
+    _clt_cache["version"] = os.getenv("CLT_API_VERSION", found_version or _clt_cache["version"] or "150")
+    if not _clt_cache["key"]:
+        raise RuntimeError("CLT API key not found")
+    _clt_cache["fetched_at"] = now
+
+
+def fetch_clt_rows() -> List[Dict]:
+    refresh_clt_api_config_if_needed()
+    endpoint = _clt_cache["endpoint"]
+    headers = {
+        **UA,
+        "accept": "application/json, text/plain, */*",
+        "api-key": _clt_cache["key"],
+        "api-version": str(_clt_cache["version"]),
+        "referer": "https://www.cltairport.com/",
+    }
+    resp = requests.get(endpoint, headers=headers, timeout=20)
+    if resp.status_code in (400, 401, 403):
+        refresh_clt_api_config_if_needed(force=True)
+        headers["api-key"] = _clt_cache["key"]
+        headers["api-version"] = str(_clt_cache["version"])
+        resp = requests.get(endpoint, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+    rows = []
+    stamp = utc_now().isoformat()
+    for rec in payload.get("data", {}).get("wait_times", []):
+        if not rec.get("isDisplayable", True):
+            continue
+        wait_seconds = rec.get("waitSeconds")
+        if wait_seconds is None:
+            continue
+        wait_minutes = max(0.0, float(wait_seconds) / 60.0)
+        checkpoint_name = str(rec.get("name", "Checkpoint")).strip() or "Checkpoint"
+        lane = str(rec.get("lane", "")).strip()
+        if lane:
+            checkpoint_name = f"{checkpoint_name} ({lane})"
+        rows.append(
+            {
+                "airport_code": "CLT",
+                "checkpoint": checkpoint_name,
+                "wait_minutes": wait_minutes,
+                "source": endpoint,
+                "captured_at": stamp,
+            }
+        )
     return rows
 
 
@@ -409,6 +494,7 @@ def collect_once() -> Dict:
         ("PHL", fetch_phl_rows),
         ("MIA", fetch_mia_rows),
         ("ORD", fetch_ord_rows),
+        ("CLT", fetch_clt_rows),
     ]
     all_rows = []
     for code, fn in collectors:
