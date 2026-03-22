@@ -703,7 +703,6 @@ def latest_snapshot() -> Dict:
             {
                 "checkpoint": checkpoint,
                 "wait_minutes": wait_minutes,
-                "source": source,
                 "captured_at": captured_at,
             }
         )
@@ -817,10 +816,11 @@ def contact():
 
 @app.route("/api/live")
 def api_live():
+    public_airports = {code: {"name": meta["name"]} for code, meta in LIVE_AIRPORTS.items()}
     return jsonify(
         {
             "generated_at": utc_now().isoformat(),
-            "live_airports": LIVE_AIRPORTS,
+            "live_airports": public_airports,
             "data": latest_snapshot(),
         }
     )
