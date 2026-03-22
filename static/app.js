@@ -85,7 +85,7 @@ function renderPipeline(rows) {
     el.innerHTML = `
       <div><strong>${row.code}</strong> — ${row.name}</div>
       <div style="margin-top:6px;"><span class="status-badge">${row.status}</span></div>
-      <div class="muted" style="margin-top:8px;">${row.notes}</div>
+      ${row.note ? `<div class="muted" style="margin-top:8px;">${row.note}</div>` : ""}
     `;
     host.appendChild(el);
   });

@@ -52,22 +52,21 @@ PIPELINE_AIRPORTS = [
         "code": "ATL",
         "name": "Hartsfield-Jackson Atlanta International",
         "status": "IN_RESEARCH",
-        "notes": "atl.com/times/ blocked by Cloudflare challenge (all endpoints 403). Requires headless browser or alternative data source.",
+        "public_note": "Live integration coming soon.",
+        # internal: atl.com/times/ blocked by Cloudflare challenge (all endpoints 403).
+        # Requires headless browser or alternative data source.
+        # See airport_research/pipeline/ATL.md for full investigation log.
     },
     {
         "code": "DEN",
         "name": "Denver International",
         "status": "IN_RESEARCH",
-        "notes": (
-            "api.denverairport.com is DEN's live Elixir/Phoenix API middleware and the route "
-            "/wait-times/checkpoint/DEN exists — but currently returns "
-            "{\"success\":true,\"msg\":\"Missing Backfil URL\"}, meaning DEN has not yet wired "
-            "their upstream wait-time source into the system. flydenver.com itself is fully "
-            "Cloudflare-blocked (403 on all paths including robots.txt). Re-probe "
-            "api.denverairport.com periodically; once DEN configures their backend the "
-            "endpoint should return live checkpoint data with no further changes needed. "
-            "See airport_research/pipeline/DEN.md for full investigation log."
-        ),
+        "public_note": "Live integration coming soon.",
+        # internal: api.denverairport.com exists and handles /wait-times/checkpoint/DEN
+        # but returns {"success":true,"msg":"Missing Backfil URL"} — DEN hasn't wired their
+        # upstream source yet. flydenver.com is fully Cloudflare-blocked.
+        # Re-probe periodically; should go live once DEN configures their backend.
+        # See airport_research/pipeline/DEN.md for full investigation log.
     },
 ]
 
@@ -859,7 +858,11 @@ def api_tsa_wait_times():
 
 @app.route("/api/pipeline")
 def api_pipeline():
-    return jsonify({"generated_at": utc_now().isoformat(), "airports": PIPELINE_AIRPORTS})
+    public = [
+        {"code": a["code"], "name": a["name"], "status": a["status"], "note": a.get("public_note", "")}
+        for a in PIPELINE_AIRPORTS
+    ]
+    return jsonify({"generated_at": utc_now().isoformat(), "airports": public})
 
 
 @app.route("/robots.txt")
