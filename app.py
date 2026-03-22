@@ -36,6 +36,7 @@ LIVE_AIRPORTS = {
     "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
     "CLT": {"name": "Charlotte Douglas International (CLT)", "mode": "LIVE_KEY_REQUIRED"},
     "MCO": {"name": "Orlando International (MCO)", "mode": "LIVE_KEY_REQUIRED"},
+    "JAX": {"name": "Jacksonville International (JAX)", "mode": "LIVE_PUBLIC"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -45,14 +46,7 @@ AIRPORT_FACTORS = {
     "TPA": 0.9, "JAX": 0.9,
 }
 
-PIPELINE_AIRPORTS = [
-    {
-        "code": "JAX",
-        "name": "Jacksonville International",
-        "status": "IN_RESEARCH",
-        "notes": "Checkpoint info visible, but no live wait JSON endpoint exposed.",
-    },
-]
+PIPELINE_AIRPORTS = []
 
 app = Flask(__name__)
 _mia_cache = {"key": None, "endpoint": None, "fetched_at": None}
@@ -525,6 +519,67 @@ def fetch_ord_rows() -> List[Dict]:
     return rows
 
 
+def _parse_jax_wait_minutes(bold_text: str) -> float:
+    """Convert JAX HTML bold wait-time text to minutes."""
+    t = bold_text.strip().lower()
+    if "less than" in t:
+        return 0.5
+    m = re.search(r"(\d+(?:\.\d+)?)", t)
+    if m:
+        return max(0.0, float(m.group(1)))
+    return 0.0
+
+
+def fetch_jax_rows() -> List[Dict]:
+    url = "https://www.flyjacksonville.com/content.aspx?id=3583"
+    resp = requests.get(url, headers=UA, timeout=20)
+    resp.raise_for_status()
+    html = resp.text
+
+    # Each checkpoint block: <div class="label...">NAME</div> … <span class="bold ml-1">TIME</span>
+    # Use a single regex over the wait-times section to find label→bold pairs.
+    section_match = re.search(
+        r'class="wait-times".*?</div>\s*</div>\s*</div>',
+        html,
+        re.S | re.I,
+    )
+    section = section_match.group(0) if section_match else html
+
+    block_pattern = re.compile(
+        r'<div\s+class="label[^"]*"[^>]*>\s*'
+        r'([\w /-]+?)'                          # checkpoint label text (before any child tags)
+        r'\s*(?:<[^>]+>\s*)*</div>'             # optional child tags (e.g. <img>)
+        r'.*?'
+        r'<span\s+class="bold[^"]*"[^>]*>(.*?)</span>',
+        re.S | re.I,
+    )
+
+    rows = []
+    stamp = utc_now().isoformat()
+    for m in block_pattern.finditer(section):
+        raw_label = re.sub(r"\s+", " ", m.group(1)).strip()
+        raw_time = m.group(2).strip()
+        if not raw_label or not raw_time:
+            continue
+        # Skip the rotating "Military/Premier/Special Needs" slot — it shares one lane
+        # with Standard; label it as "Standard/Priority" to avoid duplicate counting.
+        if raw_label.lower() in ("military in uniform", "premier", "special needs"):
+            raw_label = "Priority Lane"
+        wait_minutes = _parse_jax_wait_minutes(raw_time)
+        rows.append(
+            {
+                "airport_code": "JAX",
+                "checkpoint": raw_label,
+                "wait_minutes": wait_minutes,
+                "source": url,
+                "captured_at": stamp,
+            }
+        )
+    if not rows:
+        raise RuntimeError("JAX: no checkpoint rows parsed from page")
+    return rows
+
+
 def collect_once() -> Dict:
     result = {"ok": [], "errors": []}
     collectors = [
@@ -533,6 +588,7 @@ def collect_once() -> Dict:
         ("ORD", fetch_ord_rows),
         ("CLT", fetch_clt_rows),
         ("MCO", fetch_mco_rows),
+        ("JAX", fetch_jax_rows),
     ]
     all_rows = []
     for code, fn in collectors:
