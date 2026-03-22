@@ -32,6 +32,37 @@
   </header>
 
   <main class="main">
+    <section class="card content-card">
+      <div class="card-head">
+        <h2>Live TSA Wait Times for Major U.S. Airports</h2>
+      </div>
+      <p class="muted">
+        SecureLine publishes checkpoint wait-time guidance for travelers using official airport security data feeds where available,
+        with transparent source labeling when fallback estimates are used.
+      </p>
+      <p class="muted">
+        Data updates on a frequent polling cycle and is intended for trip planning support only. Always allow additional airport time,
+        especially during peak departures, weather disruption windows, and holiday travel periods.
+      </p>
+      <div class="content-columns">
+        <div>
+          <h3>How this page works</h3>
+          <ul class="content-list">
+            <li>Search or select an airport to load checkpoint-level waits.</li>
+            <li>Review trend history to understand line volatility.</li>
+            <li>Use source labels to distinguish live feeds from fallback estimates.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Current live airports</h3>
+          <ul class="content-list">
+            {% for code, info in live_airports.items() %}
+            <li><strong>{{ code }}</strong> — {{ info.name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </section>
     <section class="card lookup-card">
       <div class="card-head">
         <h2>Find Your Airport</h2>
@@ -49,16 +80,6 @@
       </div>
       <div id="selection-summary" class="selection-summary">No airport selected yet.</div>
       <div id="selection-source-status" class="selection-source-status"></div>
-    </section>
-    <section class="ad-slot top-ad">
-      <div class="ad-label">Advertisement</div>
-      {% if monetization.enable_adsense %}
-      <div class="adsense-auto-note">Google Auto Ads enabled for this page.</div>
-      {% else %}
-      <a class="sponsor-cta" href="{{ monetization.sponsor_cta_url }}" target="_blank" rel="noopener">
-        {{ monetization.sponsor_cta_text }} — Reach travelers now
-      </a>
-      {% endif %}
     </section>
 
     <div class="grid">
@@ -84,6 +105,17 @@
         <canvas id="history-chart" height="135"></canvas>
       </section>
     </div>
+
+    <section class="ad-slot top-ad">
+      <div class="ad-label">Advertisement</div>
+      {% if monetization.enable_adsense %}
+      <div class="adsense-auto-note">Google Auto Ads enabled for this page.</div>
+      {% else %}
+      <a class="sponsor-cta" href="{{ monetization.sponsor_cta_url }}" target="_blank" rel="noopener">
+        {{ monetization.sponsor_cta_text }} — Reach travelers now
+      </a>
+      {% endif %}
+    </section>
 
     <section class="card pipeline-card">
       <div class="card-head">

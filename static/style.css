@@ -73,6 +73,27 @@ body {
   padding: 16px;
 }
 .lookup-card { margin-bottom: 12px; }
+.content-card { margin-bottom: 12px; }
+.content-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.content-columns h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #1e293b;
+}
+.content-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #334155;
+  line-height: 1.55;
+  font-size: 13px;
+}
+@media (max-width: 840px) {
+  .content-columns { grid-template-columns: 1fr; }
+}
 .lookup-controls {
   display: grid;
   gap: 10px;
