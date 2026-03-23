@@ -91,6 +91,60 @@ PIPELINE_AIRPORTS = [
         # No public JSON API or skydive/mobi endpoint found. Drupal site, no Next.js bundle.
         # See airport_research/pipeline/SFO.md for full investigation log.
     },
+    {
+        "code": "IAH",
+        "name": "George Bush Intercontinental (IAH)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: fly2houston.com/iah/security renders wait times dynamically (JS/AJAX).
+        # No public JSON API or skydive/mobi endpoint found. Wait-time data loaded client-side.
+        # See airport_research/pipeline/IAH.md for full investigation log.
+    },
+    {
+        "code": "LAS",
+        "name": "Harry Reid International (LAS)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: harryreidairport.com/Flights/Security renders wait times dynamically.
+        # No public JSON API found. Requires headless browser or XHR interception.
+        # See airport_research/pipeline/LAS.md for full investigation log.
+    },
+    {
+        "code": "BWI",
+        "name": "Baltimore/Washington International (BWI)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: bwiairport.com/at-bwi/airport-security renders wait times dynamically.
+        # No public JSON API found. Requires headless browser or XHR interception.
+        # See airport_research/pipeline/BWI.md for full investigation log.
+    },
+    {
+        "code": "DTW",
+        "name": "Detroit Metropolitan (DTW)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: metroairport.com/at-the-airport/security renders wait times dynamically.
+        # No public JSON API found. Requires headless browser or XHR interception.
+        # See airport_research/pipeline/DTW.md for full investigation log.
+    },
+    {
+        "code": "IAD",
+        "name": "Washington Dulles International (IAD)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: flydulles.com and mwaa.com both render wait times dynamically.
+        # No public JSON API found. Both are MWAA-operated (same backend).
+        # See airport_research/pipeline/IAD.md for full investigation log.
+    },
+    {
+        "code": "DCA",
+        "name": "Ronald Reagan Washington National (DCA)",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: flyreagan.com and mwaa.com both render wait times dynamically.
+        # No public JSON API found. Both are MWAA-operated (same backend as IAD).
+        # See airport_research/pipeline/DCA.md for full investigation log.
+    },
 ]
 
 app = Flask(__name__)
