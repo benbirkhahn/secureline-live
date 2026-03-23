@@ -15,8 +15,12 @@ Reference for every airport we've investigated — how we get live TSA wait data
 | MCO | Orlando International | ✅ Live | Static key (env / bundle) |
 | JAX | Jacksonville International | ✅ Live | Public |
 | DFW | Dallas/Fort Worth | ✅ Live | Static key (embedded in bundle) |
+| LAX | Los Angeles International | ✅ Live | Public (HTML table scrape) |
+| JFK | John F. Kennedy International | ✅ Live | Public (GraphQL, PANYNJ) |
 | ATL | Hartsfield-Jackson Atlanta | 🔬 Research | Cloudflare-blocked (all paths) |
 | DEN | Denver International | 🔬 Research | API middleware found; upstream not yet configured |
+| SEA | Seattle-Tacoma International | 🔬 Research | No public endpoint; seaspotsaver.com unreachable |
+| SFO | San Francisco International | 🔬 Research | Wait times page exists but data is JS-rendered |
 
 ---
 

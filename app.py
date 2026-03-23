@@ -38,6 +38,8 @@ LIVE_AIRPORTS = {
     "MCO": {"name": "Orlando International (MCO)", "mode": "LIVE_KEY_REQUIRED"},
     "JAX": {"name": "Jacksonville International (JAX)", "mode": "LIVE_PUBLIC"},
     "DFW": {"name": "Dallas/Fort Worth International (DFW)", "mode": "LIVE_KEY_EMBEDDED"},
+    "LAX": {"name": "Los Angeles International (LAX)", "mode": "LIVE_PUBLIC"},
+    "JFK": {"name": "John F. Kennedy International (JFK)", "mode": "LIVE_PUBLIC"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -67,6 +69,26 @@ PIPELINE_AIRPORTS = [
         # upstream source yet. flydenver.com is fully Cloudflare-blocked.
         # Re-probe periodically; should go live once DEN configures their backend.
         # See airport_research/pipeline/DEN.md for full investigation log.
+    },
+    {
+        "code": "SEA",
+        "name": "Seattle-Tacoma International",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: portseattle.org security page is Drupal/static — no JSON API found.
+        # seaspotsaver.com (their wait-time notification service) does not resolve externally.
+        # No skydive/mobi API domain exists. Re-probe if Port of Seattle launches a public API.
+        # See airport_research/pipeline/SEA.md for full investigation log.
+    },
+    {
+        "code": "SFO",
+        "name": "San Francisco International",
+        "status": "IN_RESEARCH",
+        "public_note": "Live integration coming soon.",
+        # internal: flysfo.com/flight-info/alerts-advisories/tsa-lines-normal-wait-times
+        # returns 200 but wait-time data is loaded dynamically (JS/AJAX) — not in static HTML.
+        # No public JSON API or skydive/mobi endpoint found. Drupal site, no Next.js bundle.
+        # See airport_research/pipeline/SFO.md for full investigation log.
     },
 ]
 
@@ -649,6 +671,73 @@ def fetch_dfw_rows() -> List[Dict]:
     return rows
 
 
+def fetch_lax_rows() -> List[Dict]:
+    """HTML table scrape from flylax.com/wait-times.
+    Page is server-rendered Drupal — table columns: Terminal | Boarding Type | Wait Time.
+    """
+    resp = requests.get("https://www.flylax.com/wait-times", headers=UA, timeout=20)
+    resp.raise_for_status()
+    stamp = utc_now().isoformat()
+    rows: List[Dict] = []
+    for row in re.findall(r"<tr[^>]*>(.*?)</tr>", resp.text, re.S):
+        cells = re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.S)
+        cells = [re.sub(r"<[^>]+>", "", c).strip() for c in cells]
+        cells = [c for c in cells if c]
+        if len(cells) < 3:
+            continue
+        terminal, boarding_type, wait_str = cells[0], cells[1], cells[2].lower()
+        # Skip header rows
+        if terminal.lower() in ("terminal", "security wait times"):
+            continue
+        m = re.search(r"(\d+(?:\.\d+)?)", wait_str)
+        wait_minutes = float(m.group(1)) if m else 0.0
+        rows.append({
+            "airport_code": "LAX",
+            "checkpoint": f"{terminal} — {boarding_type}",
+            "wait_minutes": wait_minutes,
+            "source": "https://www.flylax.com/wait-times",
+            "captured_at": stamp,
+        })
+    if not rows:
+        raise RuntimeError("LAX: no checkpoint rows parsed from HTML table")
+    return rows
+
+
+_JFK_GQL = "https://api.jfkairport.com/graphql"
+_JFK_QUERY = '{ securityWaitTimes(airportCode: "JFK") { checkPoint waitTime terminal } }'
+
+
+def fetch_jfk_rows() -> List[Dict]:
+    """GraphQL endpoint operated by PANYNJ (Port Authority of NY/NJ).
+    No authentication required. waitTime field is already in minutes.
+    """
+    resp = requests.post(
+        _JFK_GQL,
+        json={"query": _JFK_QUERY},
+        headers={**UA, "Content-Type": "application/json", "Accept": "application/json"},
+        timeout=20,
+    )
+    resp.raise_for_status()
+    items = resp.json().get("data", {}).get("securityWaitTimes", [])
+    if not items:
+        raise RuntimeError("JFK: empty securityWaitTimes in response")
+    stamp = utc_now().isoformat()
+    rows: List[Dict] = []
+    for item in items:
+        terminal = item.get("terminal", "")
+        checkpoint = item.get("checkPoint", "Checkpoint")
+        wait_minutes = float(item.get("waitTime") or 0)
+        label = f"Terminal {terminal} — {checkpoint}" if terminal else checkpoint
+        rows.append({
+            "airport_code": "JFK",
+            "checkpoint": label,
+            "wait_minutes": wait_minutes,
+            "source": _JFK_GQL,
+            "captured_at": stamp,
+        })
+    return rows
+
+
 def collect_once() -> Dict:
     result = {"ok": [], "errors": []}
     collectors = [
@@ -659,6 +748,8 @@ def collect_once() -> Dict:
         ("MCO", fetch_mco_rows),
         ("JAX", fetch_jax_rows),
         ("DFW", fetch_dfw_rows),
+        ("LAX", fetch_lax_rows),
+        ("JFK", fetch_jfk_rows),
     ]
     all_rows = []
     for code, fn in collectors:
