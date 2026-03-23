@@ -149,9 +149,9 @@ def build_page_seo(title: str, description: str, canonical_path: str) -> Dict:
 def home_page_seo() -> Dict:
     codes = " · ".join(LIVE_AIRPORTS.keys())
     return build_page_seo(
-        title=f"Live TSA Wait Times — {codes} | SecureLine",
+        title=f"Live TSA Wait Times — {codes} | TSA Tracker",
         description=(
-            "Track live TSA wait times for major US airports including PHL, MIA, ORD, CLT, MCO, JAX and DFW. "
+            "Track live TSA wait times for major US airports including PHL, MIA, ORD, CLT, MCO, JAX, DFW, LAX, JFK and EWR. "
             "Source-labeled feeds, trend charts, and fast airport lookup."
         ),
         canonical_path="/",
@@ -161,7 +161,7 @@ def home_page_seo() -> Dict:
 def airport_page_seo(code: str, airport_name: str) -> Dict:
     clean_name = airport_name.split("(")[0].strip()
     return build_page_seo(
-        title=f"{code} TSA Wait Times (Live) | {clean_name} | SecureLine",
+        title=f"{code} TSA Wait Times (Live) | {clean_name} | TSA Tracker",
         description=(
             f"Live TSA wait times for {code} ({clean_name}) with checkpoint-level updates and recent trend history."
         ),
@@ -171,13 +171,13 @@ def airport_page_seo(code: str, airport_name: str) -> Dict:
 
 def legal_page_seo(slug: str) -> Dict:
     mapping = {
-        "privacy": ("Privacy Policy", "Read SecureLine's privacy policy and data handling details."),
-        "terms": ("Terms of Service", "Read SecureLine's terms for using TSA wait-time services."),
-        "contact": ("Contact", "Contact SecureLine for support, data questions, or partnerships."),
+        "privacy": ("Privacy Policy", "Read TSA Tracker's privacy policy and data handling details."),
+        "terms": ("Terms of Service", "Read TSA Tracker's terms for using TSA wait-time services."),
+        "contact": ("Contact", "Contact TSA Tracker for support, data questions, or partnerships."),
     }
     title, description = mapping[slug]
     return build_page_seo(
-        title=f"{title} | SecureLine",
+        title=f"{title} | TSA Tracker",
         description=description,
         canonical_path=f"/{slug}",
     )
@@ -906,6 +906,16 @@ def airport_page(airport_slug: str):
     if not meta:
         return jsonify({"error": "Airport page unavailable"}), 404
     return render_template("index.html", **index_template_context(code, airport_page_seo(code, meta["name"])))
+
+
+@app.route("/about")
+def about_page():
+    seo = build_page_seo(
+        title="About | TSA Tracker",
+        description="TSA Tracker shows live TSA checkpoint wait times for major US airports. Learn how it works and which airports are covered.",
+        canonical_path="/about",
+    )
+    return render_template("legal.html", page_title="About TSA Tracker", slug="about", seo=seo)
 
 
 @app.route("/privacy")

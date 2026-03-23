@@ -24,12 +24,16 @@
 <body>
   <header class="header">
     <a href="/" class="header-home-link">
-      <div class="logo-shield">🛡️</div>
+      <div class="logo-shield">✈️</div>
       <div>
-        <div class="header-title">SecureLine</div>
+        <div class="header-title">TSA Tracker</div>
         <div class="header-sub">Live TSA wait times</div>
       </div>
     </a>
+    <nav class="header-nav">
+      <a href="/" class="header-nav-link">Home</a>
+      <a href="/about" class="header-nav-link">About</a>
+    </nav>
     <div class="header-badge">LIVE: {% for code in live_airports %}{{ code }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
   </header>
 
@@ -112,7 +116,7 @@
     {% if is_airport_page %}
     <section class="card content-card">
       <h2>About {{ initial_airport_code }} Security Wait Times</h2>
-      <p class="muted">SecureLine shows live TSA checkpoint wait times for {{ airport_display_name }} ({{ initial_airport_code }}). Data comes directly from official airport security feeds and refreshes every ~2 minutes.</p>
+      <p class="muted">TSA Tracker provides live checkpoint wait times for {{ airport_display_name }} ({{ initial_airport_code }}). Data comes directly from official airport security feeds and refreshes every ~2 minutes.</p>
       <p class="muted">Wait times vary by checkpoint and time of day. Use the live data above to decide when to head to the airport.</p>
       <div class="content-columns">
         <div>
@@ -137,8 +141,8 @@
     </section>
     {% else %}
     <section class="card content-card">
-      <h2>About SecureLine</h2>
-      <p class="muted">SecureLine shows live TSA security line wait times for major US airports. Data comes directly from official airport security feeds and updates approximately every 2 minutes.</p>
+      <h2>About TSA Tracker</h2>
+      <p class="muted">TSA Tracker shows live TSA security line wait times for major US airports. Data comes directly from official airport security feeds and updates approximately every 2 minutes.</p>
       <div class="content-columns">
         <div>
           <h3>How it works</h3>
@@ -181,7 +185,7 @@
   </main>
 
   <footer class="footer">
-    <div>SecureLine helps travelers plan around security lines. Data refreshes every ~2 minutes.</div>
+    <div>TSA Tracker helps travelers plan around security lines. Data refreshes every ~2 minutes.</div>
     <div class="footer-links">
       <a href="/privacy">Privacy</a>
       <span>•</span>
@@ -200,7 +204,7 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "SecureLine",
+      "name": "TSA Tracker",
       "url": "{{ seo.site_url }}",
       "potentialAction": {
         "@type": "SearchAction",
@@ -224,7 +228,7 @@
       },
       "publisher": {
         "@type": "Organization",
-        "name": "SecureLine",
+        "name": "TSA Tracker",
         "url": "{{ seo.site_url }}"
       }
     }

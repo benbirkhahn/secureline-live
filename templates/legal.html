@@ -10,28 +10,60 @@
 </head>
 <body>
   <header class="header">
-    <div class="logo-shield">🛡️</div>
-    <div>
-      <div class="header-title">SecureLine</div>
-      <div class="header-sub">Real-time TSA checkpoint wait times</div>
-    </div>
-    <div class="header-badge"><a class="header-link" href="/">Back to Live Wait Times</a></div>
+    <a href="/" class="header-home-link">
+      <div class="logo-shield">✈️</div>
+      <div>
+        <div class="header-title">TSA Tracker</div>
+        <div class="header-sub">Live TSA wait times</div>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="header-nav-link">Home</a>
+      <a href="/about" class="header-nav-link">About</a>
+    </nav>
+    <div class="header-badge"><a class="header-link" href="/">Live Wait Times</a></div>
   </header>
   <main class="main">
     <section class="card legal-card">
       <div class="card-head">
         <h2>{{ page_title }}</h2>
       </div>
-      {% if slug == "privacy" %}
-      <p class="muted">SecureLine collects operational analytics and airport wait-time data to improve service quality.</p>
+      {% if slug == "about" %}
+      <p class="muted">TSA Tracker shows live TSA security checkpoint wait times for major US airports. Data comes directly from official airport security feeds and refreshes approximately every 2 minutes — no guessing, no stale numbers.</p>
+      <h3 style="margin:16px 0 6px;font-size:16px;">How it works</h3>
+      <ul class="legal-list">
+        <li>We connect directly to each airport's public security data feed.</li>
+        <li>Wait times update every ~2 minutes and are displayed by checkpoint.</li>
+        <li>Color coding makes it instant: green = short, yellow = moderate, red = long.</li>
+        <li>The trend chart shows the last 12 hours so you can pick the best time to arrive.</li>
+      </ul>
+      <h3 style="margin:16px 0 6px;font-size:16px;">Live airports</h3>
+      <ul class="legal-list">
+        <li>PHL — Philadelphia International</li>
+        <li>MIA — Miami International</li>
+        <li>ORD — Chicago O'Hare International</li>
+        <li>CLT — Charlotte Douglas International</li>
+        <li>MCO — Orlando International</li>
+        <li>JAX — Jacksonville International</li>
+        <li>DFW — Dallas/Fort Worth International</li>
+        <li>LAX — Los Angeles International</li>
+        <li>JFK — John F. Kennedy International</li>
+        <li>EWR — Newark Liberty International</li>
+      </ul>
+      <h3 style="margin:16px 0 6px;font-size:16px;">Contact</h3>
+      <ul class="legal-list">
+        <li>Questions or feedback: <a href="mailto:ben@benbirkhahn.com">ben@benbirkhahn.com</a></li>
+      </ul>
+      {% elif slug == "privacy" %}
+      <p class="muted">TSA Tracker collects operational analytics and airport wait-time data to improve service quality.</p>
       <ul class="legal-list">
         <li>We do not sell personal information.</li>
         <li>Basic usage analytics may be collected for performance and reliability.</li>
         <li>Advertising providers may use cookies according to their policies.</li>
-        <li>Questions: <a href="/contact">Contact SecureLine</a>.</li>
+        <li>Questions: <a href="/contact">Contact us</a>.</li>
       </ul>
       {% elif slug == "terms" %}
-      <p class="muted">By using SecureLine, you agree to these service terms.</p>
+      <p class="muted">By using TSA Tracker, you agree to these service terms.</p>
       <ul class="legal-list">
         <li>Wait times are provided as informational guidance, not travel guarantees.</li>
         <li>Data may include live direct feeds and estimated fallback values.</li>
@@ -48,8 +80,10 @@
     </section>
   </main>
   <footer class="footer">
-    <div>SecureLine helps travelers plan around unpredictable checkpoint lines.</div>
+    <div>TSA Tracker helps travelers plan around security lines. Data refreshes every ~2 minutes.</div>
     <div class="footer-links">
+      <a href="/about">About</a>
+      <span>•</span>
       <a href="/privacy">Privacy</a>
       <span>•</span>
       <a href="/terms">Terms</a>
