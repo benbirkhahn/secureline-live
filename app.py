@@ -428,6 +428,18 @@ def fetch_clt_rows() -> List[Dict]:
     return rows
 
 
+def normalize_lane_type(raw: str) -> str:
+    """Normalize a raw boarding-type/lane string to a canonical lane_type key."""
+    s = raw.strip().lower()
+    if "clear" in s and ("pre" in s or "tsa" in s):
+        return "CLEAR_PRECHECK"
+    if "clear" in s:
+        return "CLEAR"
+    if "pre" in s or "tsa pre" in s or "precheck" in s:
+        return "PRECHECK"
+    return "STANDARD"
+
+
 def init_db() -> None:
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
@@ -439,10 +451,16 @@ def init_db() -> None:
             checkpoint TEXT NOT NULL,
             wait_minutes REAL NOT NULL,
             source TEXT NOT NULL,
-            captured_at TEXT NOT NULL
+            captured_at TEXT NOT NULL,
+            lane_type TEXT NOT NULL DEFAULT 'STANDARD'
         )
         """
     )
+    # Migrate existing DBs that don't yet have lane_type
+    try:
+        cur.execute("ALTER TABLE samples ADD COLUMN lane_type TEXT NOT NULL DEFAULT 'STANDARD'")
+    except Exception:
+        pass  # column already exists
     cur.execute(
         """
         CREATE INDEX IF NOT EXISTS idx_samples_airport_time
@@ -460,8 +478,8 @@ def db_insert_rows(rows: List[Dict]) -> None:
     cur = conn.cursor()
     cur.executemany(
         """
-        INSERT INTO samples (airport_code, checkpoint, wait_minutes, source, captured_at)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO samples (airport_code, checkpoint, wait_minutes, source, captured_at, lane_type)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
         [
             (
@@ -470,6 +488,7 @@ def db_insert_rows(rows: List[Dict]) -> None:
                 float(r["wait_minutes"]),
                 r["source"],
                 r["captured_at"],
+                r.get("lane_type", "STANDARD"),
             )
             for r in rows
         ],
@@ -749,8 +768,9 @@ def fetch_lax_rows() -> List[Dict]:
         wait_minutes = float(m.group(1)) if m else 0.0
         rows.append({
             "airport_code": "LAX",
-            "checkpoint": f"{terminal} — {boarding_type}",
+            "checkpoint": terminal,
             "wait_minutes": wait_minutes,
+            "lane_type": normalize_lane_type(boarding_type),
             "source": "https://www.flylax.com/wait-times",
             "captured_at": stamp,
         })
@@ -763,7 +783,12 @@ _PANYNJ_GQL = "https://api.jfkairport.com/graphql"
 
 
 def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
-    """Shared PANYNJ GraphQL fetcher for JFK, EWR, and LGA."""
+    """Shared PANYNJ GraphQL fetcher for JFK, EWR, and LGA.
+
+    PANYNJ returns 2 rows per terminal checkpoint: the first is the Standard lane,
+    the second is the PreCheck lane. Lane type is inferred from occurrence order
+    since the API has no explicit lane_type field.
+    """
     query = f'{{ securityWaitTimes(airportCode: "{airport_code}") {{ checkPoint waitTime terminal }} }}'
     resp = requests.post(
         _PANYNJ_GQL,
@@ -777,15 +802,21 @@ def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
         raise RuntimeError(f"{airport_code}: empty securityWaitTimes in response")
     stamp = utc_now().isoformat()
     rows: List[Dict] = []
+    terminal_seen: Dict[str, int] = {}
     for item in items:
         terminal = item.get("terminal", "")
         checkpoint = item.get("checkPoint", "Checkpoint")
         wait_minutes = float(item.get("waitTime") or 0)
-        label = f"Terminal {terminal} — {checkpoint}" if terminal else checkpoint
+        label = f"Terminal {terminal}" if terminal else checkpoint
+        # Infer lane: first occurrence per terminal = Standard, second = PreCheck
+        count = terminal_seen.get(terminal, 0)
+        terminal_seen[terminal] = count + 1
+        lane_type = "PRECHECK" if count >= 1 else "STANDARD"
         rows.append({
             "airport_code": airport_code,
             "checkpoint": label,
             "wait_minutes": wait_minutes,
+            "lane_type": lane_type,
             "source": _PANYNJ_GQL,
             "captured_at": stamp,
         })
@@ -850,22 +881,22 @@ def latest_snapshot() -> Dict:
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT airport_code, checkpoint, wait_minutes, source, captured_at
+        SELECT airport_code, checkpoint, wait_minutes, source, captured_at,
+               COALESCE(lane_type, 'STANDARD') AS lane_type
         FROM samples
         WHERE captured_at >= ?
         ORDER BY captured_at DESC
-        """
-        ,
+        """,
         (cutoff,),
     )
     rows = cur.fetchall()
     conn.close()
     out: Dict[str, List[Dict]] = {}
     seen = set()
-    for airport_code, checkpoint, wait_minutes, source, captured_at in rows:
+    for airport_code, checkpoint, wait_minutes, source, captured_at, lane_type in rows:
         if airport_code == "ORD":
             checkpoint = ord_friendly_checkpoint(checkpoint)
-        key = (airport_code, checkpoint)
+        key = (airport_code, checkpoint, lane_type)
         if key in seen:
             continue
         seen.add(key)
@@ -873,6 +904,7 @@ def latest_snapshot() -> Dict:
             {
                 "checkpoint": checkpoint,
                 "wait_minutes": wait_minutes,
+                "lane_type": lane_type,
                 "captured_at": captured_at,
             }
         )

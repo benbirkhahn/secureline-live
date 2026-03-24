@@ -203,41 +203,80 @@ body {
   gap: 0;
 }
 
-/* ── WAIT TIME ROWS — big colored blocks, easy to read ── */
+/* ── CHECKPOINT GROUPS & LANE ROWS ── */
 .airport-card {
   border: none;
   background: transparent;
   padding: 0;
   width: 100%;
 }
-.airport-card h3 {
-  margin: 0 0 14px;
-  font-size: 17px;
+
+/* One card per physical checkpoint (e.g. Terminal A) */
+.checkpoint-group {
+  border-radius: 16px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1.5px solid rgba(0,0,0,0.06);
+}
+.checkpoint-group.tier-low      { border-color: #86efac; }
+.checkpoint-group.tier-med      { border-color: #fde047; }
+.checkpoint-group.tier-high     { border-color: #fb923c; }
+.checkpoint-group.tier-critical { border-color: #f87171; }
+.checkpoint-group.tier-closed   { border-color: #cbd5e1; }
+
+/* Group header: checkpoint/terminal name */
+.checkpoint-group-header {
+  padding: 11px 18px 9px;
+  font-size: 14px;
   font-weight: 700;
   color: #1e293b;
+  background: rgba(255,255,255,0.85);
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
-.checkpoint-row {
+
+/* List of lane rows inside the group */
+.lane-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+/* Individual lane row — colored by that lane's own tier */
+.lane-row {
+  display: flex;
   align-items: center;
-  border-radius: 14px;
-  padding: 14px 20px;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  padding: 12px 18px;
   gap: 12px;
 }
-.checkpoint-row.tier-low      { background: #dcfce7; }
-.checkpoint-row.tier-med      { background: #fef9c3; }
-.checkpoint-row.tier-high     { background: #ffedd5; }
-.checkpoint-row.tier-critical { background: #fee2e2; }
-.checkpoint-row.tier-closed   { background: #f1f5f9; }
-.checkpoint-name {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 600;
-  color: #1e293b;
-  min-width: 0;
-  word-break: break-word;
+.lane-row + .lane-row { border-top: 1px solid rgba(0,0,0,0.05); }
+.lane-row--single { padding: 12px 18px; }
+
+.lane-row.tier-low      { background: #dcfce7; }
+.lane-row.tier-med      { background: #fef9c3; }
+.lane-row.tier-high     { background: #ffedd5; }
+.lane-row.tier-critical { background: #fee2e2; }
+.lane-row.tier-closed   { background: #f8fafc; }
+
+/* Lane type badge pill */
+.lane-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
+.lane-standard  { background: #e2e8f0; color: #475569; }
+.lane-precheck  { background: #1e3a5f; color: #ffffff; }
+.lane-clear     { background: #d97706; color: #ffffff; }
+.lane-clear-pre { background: #065f46; color: #ffffff; }
+
+/* Wait time display */
 .wait-display {
   display: flex;
   align-items: baseline;
@@ -250,15 +289,16 @@ body {
   color: #0f172a;
   line-height: 1;
 }
+.wait-number--sm { font-size: 24px; }
 .wait-unit {
   font-size: 13px;
   font-weight: 700;
   color: #475569;
 }
 .wait-closed-label {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: #64748b;
+  color: #94a3b8;
 }
 .updated-meta {
   margin-top: 4px;
@@ -433,5 +473,6 @@ select {
 @media (max-width: 480px) {
   .hero-section { padding: 32px 16px 24px; }
   .card { padding: 16px; }
-  .checkpoint-row { padding: 12px 14px; }
+  .lane-row { padding: 10px 14px; }
+  .checkpoint-group-header { padding: 9px 14px 7px; }
 }

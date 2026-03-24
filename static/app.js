@@ -37,6 +37,25 @@ function latestCapturedAt(rows) {
   return ts[0] || null;
 }
 
+// Lane display config: label, badge CSS class, sort priority (lower = first)
+const LANE_CONFIG = {
+  STANDARD:       { label: "Regular",          cls: "lane-standard",  order: 0 },
+  PRECHECK:       { label: "TSA Pre\u2714",     cls: "lane-precheck",  order: 1 },
+  CLEAR:          { label: "CLEAR",             cls: "lane-clear",     order: 2 },
+  CLEAR_PRECHECK: { label: "CLEAR + Pre\u2714", cls: "lane-clear-pre", order: 3 },
+};
+
+function laneConfig(lane_type) {
+  return LANE_CONFIG[lane_type] || LANE_CONFIG.STANDARD;
+}
+
+function waitHtml(wait_minutes) {
+  const mins = fmtMinutes(wait_minutes);
+  if (mins === null) return `<span class="wait-closed-label">Closed</span>`;
+  if (mins === 0)    return `<div class="wait-display"><span class="wait-number wait-number--sm">&lt;1</span><span class="wait-unit">min</span></div>`;
+  return `<div class="wait-display"><span class="wait-number">${mins}</span><span class="wait-unit">${mins === 1 ? "min" : "mins"}</span></div>`;
+}
+
 function renderLiveCards(payload, selectedCode) {
   const host = document.getElementById("live-cards");
   host.innerHTML = "";
@@ -50,47 +69,94 @@ function renderLiveCards(payload, selectedCode) {
     return;
   }
 
+  const rows = data[selectedCode] || [];
+
+  if (!rows.length) {
+    const empty = document.createElement("div");
+    empty.className = "airport-card";
+    empty.innerHTML = `<div class="muted">No data yet — check back in a minute.</div>`;
+    host.appendChild(empty);
+    return;
+  }
+
+  // Group rows by checkpoint name
+  const grouped = {};
+  const groupOrder = [];
+  rows.forEach((row) => {
+    const key = cleanCheckpointLabel(row.checkpoint);
+    if (!grouped[key]) { grouped[key] = []; groupOrder.push(key); }
+    grouped[key].push(row);
+  });
+
+  // Sort checkpoints: worst Standard wait first
+  groupOrder.sort((a, b) => {
+    const worstWait = (lanes) => Math.max(...lanes.map(r => Number(r.wait_minutes) || 0));
+    const stdWait = (lanes) => {
+      const std = lanes.find(r => (r.lane_type || "STANDARD") === "STANDARD");
+      return std ? Number(std.wait_minutes) || 0 : worstWait(lanes);
+    };
+    return stdWait(grouped[b]) - stdWait(grouped[a]);
+  });
+
   const card = document.createElement("div");
   card.className = "airport-card";
 
-  const list = (data[selectedCode] || [])
-    .sort((a, b) => b.wait_minutes - a.wait_minutes)
-    .slice(0, 10);
+  groupOrder.forEach((cpName) => {
+    const lanes = grouped[cpName]
+      .slice()
+      .sort((a, b) => laneConfig(a.lane_type).order - laneConfig(b.lane_type).order);
 
-  if (!list.length) {
-    card.innerHTML = `<div class="muted">No data yet — check back in a minute.</div>`;
-  } else {
-    list.forEach((row) => {
-      const el = document.createElement("div");
-      const tier = waitTierClass(row.wait_minutes);
-      el.className = `checkpoint-row ${tier}`;
-      const mins = fmtMinutes(row.wait_minutes);
-      const waitHtml = (mins === null)
-        ? `<span class="wait-closed-label">Closed</span>`
-        : mins === 0
-          ? `<div class="wait-display">
-               <span class="wait-number" style="font-size:22px">&lt;1</span>
-               <span class="wait-unit">min</span>
-             </div>`
-          : `<div class="wait-display">
-               <span class="wait-number">${mins}</span>
-               <span class="wait-unit">${mins === 1 ? "min" : "mins"}</span>
-             </div>`;
-      el.innerHTML = `
-        <div class="checkpoint-name">${cleanCheckpointLabel(row.checkpoint)}</div>
-        ${waitHtml}
-      `;
-      card.appendChild(el);
-    });
+    // Determine overall tier from the Standard lane (or worst)
+    const stdRow = lanes.find(r => (r.lane_type || "STANDARD") === "STANDARD") || lanes[0];
+    const groupTier = waitTierClass(stdRow.wait_minutes);
+    const multiLane = lanes.length > 1;
 
-    const updatedAt = latestCapturedAt(list);
-    if (updatedAt) {
-      const foot = document.createElement("div");
-      foot.className = "updated-meta";
-      foot.textContent = `Last updated: ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-      card.appendChild(foot);
+    const group = document.createElement("div");
+    group.className = `checkpoint-group ${groupTier}`;
+
+    // Header: checkpoint name
+    const header = document.createElement("div");
+    header.className = "checkpoint-group-header";
+    header.textContent = cpName;
+    group.appendChild(header);
+
+    if (!multiLane) {
+      // Single lane — simple layout
+      const lCfg = laneConfig(lanes[0].lane_type);
+      group.innerHTML += `
+        <div class="lane-row lane-row--single">
+          <span class="lane-badge ${lCfg.cls}">${lCfg.label}</span>
+          ${waitHtml(lanes[0].wait_minutes)}
+        </div>`;
+    } else {
+      // Multi-lane — sub-rows
+      const laneList = document.createElement("div");
+      laneList.className = "lane-list";
+      lanes.forEach((row) => {
+        const lCfg = laneConfig(row.lane_type);
+        const tier = waitTierClass(row.wait_minutes);
+        const laneEl = document.createElement("div");
+        laneEl.className = `lane-row ${tier}`;
+        laneEl.innerHTML = `
+          <span class="lane-badge ${lCfg.cls}">${lCfg.label}</span>
+          ${waitHtml(row.wait_minutes)}
+        `;
+        laneList.appendChild(laneEl);
+      });
+      group.appendChild(laneList);
     }
+
+    card.appendChild(group);
+  });
+
+  const updatedAt = latestCapturedAt(rows);
+  if (updatedAt) {
+    const foot = document.createElement("div");
+    foot.className = "updated-meta";
+    foot.textContent = `Updated ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    card.appendChild(foot);
   }
+
   host.appendChild(card);
 }
 
