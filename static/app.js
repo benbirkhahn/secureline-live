@@ -4,15 +4,16 @@ let selectedAirportCode = null;
 
 function fmtMinutes(v) {
   const n = Number(v);
-  if (Number.isNaN(n) || n <= 0) return null; // null = closed
+  if (Number.isNaN(n) || n < 0) return null; // null = truly closed/no data
+  if (n === 0) return 0; // 0 = "< 1 min" — open with no queue
   return Math.max(1, Math.round(n));
 }
 
 // Returns a tier class for the colored row background
 function waitTierClass(waitMinutes) {
   const n = Number(waitMinutes);
-  if (n <= 0)  return "tier-closed";
-  if (n <= 15) return "tier-low";
+  if (Number.isNaN(n) || n < 0) return "tier-closed";
+  if (n <= 15) return "tier-low"; // includes 0 — essentially no wait
   if (n <= 30) return "tier-med";
   if (n <= 45) return "tier-high";
   return "tier-critical";
@@ -66,10 +67,15 @@ function renderLiveCards(payload, selectedCode) {
       const mins = fmtMinutes(row.wait_minutes);
       const waitHtml = (mins === null)
         ? `<span class="wait-closed-label">Closed</span>`
-        : `<div class="wait-display">
-             <span class="wait-number">${mins}</span>
-             <span class="wait-unit">${mins === 1 ? "min" : "mins"}</span>
-           </div>`;
+        : mins === 0
+          ? `<div class="wait-display">
+               <span class="wait-number" style="font-size:22px">&lt;1</span>
+               <span class="wait-unit">min</span>
+             </div>`
+          : `<div class="wait-display">
+               <span class="wait-number">${mins}</span>
+               <span class="wait-unit">${mins === 1 ? "min" : "mins"}</span>
+             </div>`;
       el.innerHTML = `
         <div class="checkpoint-name">${cleanCheckpointLabel(row.checkpoint)}</div>
         ${waitHtml}
