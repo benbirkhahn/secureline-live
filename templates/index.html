@@ -14,6 +14,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ seo.title }}">
   <meta name="twitter:description" content="{{ seo.description }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   {% if monetization.enable_adsense %}
@@ -22,59 +25,73 @@
   {% endif %}
 </head>
 <body>
+
   <header class="header">
     <a href="/" class="header-home-link">
-      <div class="logo-shield">✈️</div>
+      <span class="logo-shield">✈️</span>
       <div>
-        <div class="header-title">TSA Tracker</div>
-        <div class="header-sub">Live TSA wait times</div>
+        <div class="logo-name">TSA Tracker</div>
+        <div class="logo-tag">Live airport data</div>
       </div>
     </a>
     <nav class="header-nav">
       <a href="/" class="header-nav-link">Home</a>
       <a href="/about" class="header-nav-link">About</a>
     </nav>
-    <div class="header-badge">LIVE: {% for code in live_airports %}{{ code }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
   </header>
 
   <main class="main">
 
-    <!-- ── HERO: search front and center ── -->
+    <!-- ── HERO ── -->
     <section class="hero-section">
-      {% if is_airport_page %}
-      <h1 class="hero-headline">{{ initial_airport_code }} TSA Wait Times</h1>
-      <p class="hero-sub">How long is the security line at {{ airport_display_name }}? Updated every ~2 minutes.</p>
-      {% else %}
-      <h1 class="hero-headline">How long is the TSA line?</h1>
-      <p class="hero-sub">Pick your airport and see current security wait times — updated every ~2 minutes.</p>
-      {% endif %}
-      <div class="hero-search-wrap">
-        <input id="airport-search" class="airport-search-hero" type="search"
-               placeholder="🔍  Search by airport name or code…" autocomplete="off">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        {{ live_airports|length }} airports · real-time
       </div>
+      {% if is_airport_page %}
+      <h1 class="hero-headline">{{ initial_airport_code }} TSA <em>Wait Times</em></h1>
+      <p class="hero-sub">How long is the security line at {{ airport_display_name }}? Data pulled directly from airport systems — not estimates. Updated every ~2 minutes.</p>
+      {% else %}
+      <h1 class="hero-headline">How long is<br>the <em>TSA line?</em></h1>
+      <p class="hero-sub">Wait times pulled directly from airport systems — not estimates, not models. Pick your airport.</p>
+      {% endif %}
+
+      <div class="hero-search-wrap">
+        <span class="search-prefix">⌕</span>
+        <input id="airport-search" class="airport-search-hero" type="search"
+               placeholder="Search airports — LAX, JFK, SEA…" autocomplete="off">
+      </div>
+
       <div id="airport-chips" class="airport-chips-hero"></div>
+
       <div class="airport-pages-links">
         {% for p in airport_pages %}
-        <a href="{{ p.href }}">{{ p.code }} wait times</a>
+        <a href="{{ p.href }}">{{ p.code }}</a>
         {% endfor %}
       </div>
     </section>
 
     <!-- ── WAIT TIME RESULTS ── -->
-    <section class="card results-card" id="results-section">
-      <div class="card-head">
-        <h2 id="results-heading">👆 Select an airport above</h2>
-        <span id="live-badge" class="chip chip-live" style="display:none;">● Live</span>
+    <section class="results-card" id="results-section">
+      <!-- Airport header (shown once an airport is selected) -->
+      <div class="airport-header" id="airport-header" style="display:none;">
+        <div>
+          <div class="airport-code-label" id="ap-code"></div>
+          <div class="airport-fullname" id="ap-name"></div>
+        </div>
+        <div class="live-badge">
+          <span class="live-dot"></span> Live
+        </div>
       </div>
       <div id="selection-source-status" class="selection-source-status"></div>
       <div id="selection-summary" style="display:none;"></div>
-      <div id="live-cards" class="card-grid"></div>
+      <div id="live-cards"></div>
     </section>
 
     <!-- ── HISTORY CHART ── -->
     <section class="card card-chart">
       <div class="card-head">
-        <h2>Recent Wait History</h2>
+        <h2>Wait History</h2>
         <span class="chip">Last 12 hours</span>
       </div>
       <div class="controls">
@@ -85,7 +102,7 @@
       <canvas id="history-chart" height="135"></canvas>
     </section>
 
-    <!-- ── TOP AD SLOT (AdSense-compatible) ── -->
+    <!-- ── TOP AD SLOT ── -->
     <section class="ad-slot top-ad">
       <div class="ad-label">Advertisement</div>
       {% if monetization.enable_adsense %}
@@ -105,19 +122,16 @@
 
     <!-- ── COMING SOON (pipeline) ── -->
     <section class="card pipeline-card">
-      <div class="card-head">
-        <h2>✈️ More Airports Coming Soon</h2>
-      </div>
-      <p class="muted">We're working on adding live wait times for these airports.</p>
+      <div class="section-divider">More airports coming soon</div>
       <div id="pipeline-list"></div>
     </section>
 
-    <!-- ── SEO CONTENT — server-rendered for crawlers, friendly for humans ── -->
+    <!-- ── SEO CONTENT ── -->
     {% if is_airport_page %}
     <section class="card content-card">
       <h2>About {{ initial_airport_code }} Security Wait Times</h2>
       <p class="muted">TSA Tracker provides live checkpoint wait times for {{ airport_display_name }} ({{ initial_airport_code }}). Data comes directly from official airport security feeds and refreshes every ~2 minutes.</p>
-      <p class="muted">Wait times vary by checkpoint and time of day. Use the live data above to decide when to head to the airport.</p>
+      <p class="muted" style="margin-top:8px;">Wait times vary by checkpoint and time of day. Use the live data above to decide when to head to the airport.</p>
       <div class="content-columns">
         <div>
           <h3>Tips for {{ initial_airport_code }} travelers</h3>
@@ -164,7 +178,7 @@
     </section>
     {% endif %}
 
-    <!-- ── BOTTOM AD SLOT (AdSense-compatible) ── -->
+    <!-- ── BOTTOM AD SLOT ── -->
     <section class="ad-slot bottom-ad">
       <div class="ad-label">Advertisement</div>
       {% if monetization.enable_adsense %}
@@ -185,12 +199,12 @@
   </main>
 
   <footer class="footer">
-    <div>TSA Tracker helps travelers plan around security lines. Data refreshes every ~2 minutes.</div>
+    <div>TSA Tracker — live security wait times. Data refreshes every ~2 minutes.</div>
     <div class="footer-links">
       <a href="/privacy">Privacy</a>
-      <span>•</span>
+      <span>·</span>
       <a href="/terms">Terms</a>
-      <span>•</span>
+      <span>·</span>
       <a href="/contact">Contact</a>
     </div>
   </footer>
@@ -242,5 +256,6 @@
     });
   </script>
   {% endif %}
+
 </body>
 </html>

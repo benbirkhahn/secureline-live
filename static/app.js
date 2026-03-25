@@ -5,18 +5,18 @@ let selectedAirportCode = null;
 function fmtMinutes(v) {
   const n = Number(v);
   if (Number.isNaN(n) || n < 0) return null; // null = truly closed/no data
-  if (n === 0) return 0; // 0 = "< 1 min" — open with no queue
+  if (n === 0) return 0;                      // 0 = "< 1 min" — open with no queue
   return Math.max(1, Math.round(n));
 }
 
-// Returns a tier class for the colored row background
+// Returns a short tier class (low/med/high/crit/none)
 function waitTierClass(waitMinutes) {
   const n = Number(waitMinutes);
-  if (Number.isNaN(n) || n < 0) return "tier-closed";
-  if (n <= 15) return "tier-low"; // includes 0 — essentially no wait
-  if (n <= 30) return "tier-med";
-  if (n <= 45) return "tier-high";
-  return "tier-critical";
+  if (Number.isNaN(n) || n < 0) return "none";
+  if (n <= 15) return "low";   // includes 0 — essentially no wait
+  if (n <= 30) return "med";
+  if (n <= 45) return "high";
+  return "crit";
 }
 
 function cleanCheckpointLabel(label) {
@@ -37,23 +37,36 @@ function latestCapturedAt(rows) {
   return ts[0] || null;
 }
 
-// Lane display config: label, badge CSS class, sort priority (lower = first)
+// Lane display config: label, badge CSS class, sort priority
 const LANE_CONFIG = {
-  STANDARD:       { label: "Regular",          cls: "lane-standard",  order: 0 },
-  PRECHECK:       { label: "TSA Pre\u2714",     cls: "lane-precheck",  order: 1 },
-  CLEAR:          { label: "CLEAR",             cls: "lane-clear",     order: 2 },
-  CLEAR_PRECHECK: { label: "CLEAR + Pre\u2714", cls: "lane-clear-pre", order: 3 },
+  STANDARD:       { label: "Regular",          cls: "lane-std",    order: 0 },
+  PRECHECK:       { label: "TSA Pre\u2714",     cls: "lane-pre",    order: 1 },
+  CLEAR:          { label: "CLEAR",             cls: "lane-clr",    order: 2 },
+  CLEAR_PRECHECK: { label: "CLEAR + Pre\u2714", cls: "lane-clrpre", order: 3 },
 };
 
 function laneConfig(lane_type) {
   return LANE_CONFIG[lane_type] || LANE_CONFIG.STANDARD;
 }
 
-function waitHtml(wait_minutes) {
+// Build the big-number right side of a cp-block
+function bigNumHtml(wait_minutes, tier) {
   const mins = fmtMinutes(wait_minutes);
-  if (mins === null) return `<span class="wait-closed-label">Closed</span>`;
-  if (mins === 0)    return `<div class="wait-display"><span class="wait-number wait-number--sm">&lt;1</span><span class="wait-unit">min</span></div>`;
-  return `<div class="wait-display"><span class="wait-number">${mins}</span><span class="wait-unit">${mins === 1 ? "min" : "mins"}</span></div>`;
+  if (mins === null) {
+    return `<div class="big-num none">Closed</div>`;
+  }
+  if (mins === 0) {
+    return `<div class="big-num low" style="font-size:38px">&lt;1</div><span class="big-unit">min</span>`;
+  }
+  return `<div class="big-num ${tier}">${mins}</div><span class="big-unit">${mins === 1 ? "min" : "mins"}</span>`;
+}
+
+// Compact inline wait for per-lane display (multi-lane mode)
+function laneWaitText(wait_minutes, tier) {
+  const mins = fmtMinutes(wait_minutes);
+  if (mins === null) return `<span class="lane-wait ${tier}">Closed</span>`;
+  if (mins === 0)    return `<span class="lane-wait low">&lt;1 min</span>`;
+  return `<span class="lane-wait ${tier}">${mins} ${mins === 1 ? "min" : "mins"}</span>`;
 }
 
 function renderLiveCards(payload, selectedCode) {
@@ -64,7 +77,7 @@ function renderLiveCards(payload, selectedCode) {
 
   if (!selectedCode || !liveAirports[selectedCode]) {
     host.innerHTML = `<div class="muted" style="padding:16px 0 4px;">
-      Tap an airport above to see how long the security line is right now.
+      Tap an airport chip above to see live security wait times.
     </div>`;
     return;
   }
@@ -90,10 +103,9 @@ function renderLiveCards(payload, selectedCode) {
 
   // Sort checkpoints: worst Standard wait first
   groupOrder.sort((a, b) => {
-    const worstWait = (lanes) => Math.max(...lanes.map(r => Number(r.wait_minutes) || 0));
     const stdWait = (lanes) => {
       const std = lanes.find(r => (r.lane_type || "STANDARD") === "STANDARD");
-      return std ? Number(std.wait_minutes) || 0 : worstWait(lanes);
+      return std ? Number(std.wait_minutes) || 0 : Math.max(...lanes.map(r => Number(r.wait_minutes) || 0));
     };
     return stdWait(grouped[b]) - stdWait(grouped[a]);
   });
@@ -111,49 +123,37 @@ function renderLiveCards(payload, selectedCode) {
     const groupTier = waitTierClass(stdRow.wait_minutes);
     const multiLane = lanes.length > 1;
 
-    const group = document.createElement("div");
-    group.className = `checkpoint-group ${groupTier}`;
+    // Build lane rows (left side)
+    const laneRowsHtml = lanes.map((row) => {
+      const lCfg = laneConfig(row.lane_type);
+      const laneTier = waitTierClass(row.wait_minutes);
+      const waitInline = multiLane ? laneWaitText(row.wait_minutes, laneTier) : "";
+      return `<div class="lane-row">
+        <span class="lane-badge ${lCfg.cls}">${lCfg.label}</span>
+        ${waitInline}
+      </div>`;
+    }).join("");
 
-    // Header: checkpoint name
-    const header = document.createElement("div");
-    header.className = "checkpoint-group-header";
-    header.textContent = cpName;
-    group.appendChild(header);
+    // Big number (right side) — based on Standard or primary lane
+    const bigHtml = bigNumHtml(stdRow.wait_minutes, groupTier);
 
-    if (!multiLane) {
-      // Single lane — simple layout
-      const lCfg = laneConfig(lanes[0].lane_type);
-      group.innerHTML += `
-        <div class="lane-row lane-row--single">
-          <span class="lane-badge ${lCfg.cls}">${lCfg.label}</span>
-          ${waitHtml(lanes[0].wait_minutes)}
-        </div>`;
-    } else {
-      // Multi-lane — sub-rows
-      const laneList = document.createElement("div");
-      laneList.className = "lane-list";
-      lanes.forEach((row) => {
-        const lCfg = laneConfig(row.lane_type);
-        const tier = waitTierClass(row.wait_minutes);
-        const laneEl = document.createElement("div");
-        laneEl.className = `lane-row ${tier}`;
-        laneEl.innerHTML = `
-          <span class="lane-badge ${lCfg.cls}">${lCfg.label}</span>
-          ${waitHtml(row.wait_minutes)}
-        `;
-        laneList.appendChild(laneEl);
-      });
-      group.appendChild(laneList);
-    }
-
-    card.appendChild(group);
+    const block = document.createElement("div");
+    block.className = `cp-block ${groupTier}`;
+    block.innerHTML = `
+      <div class="cp-left">
+        <div class="cp-name">${cpName}</div>
+        <div class="cp-lanes">${laneRowsHtml}</div>
+      </div>
+      <div class="cp-right">${bigHtml}</div>
+    `;
+    card.appendChild(block);
   });
 
   const updatedAt = latestCapturedAt(rows);
   if (updatedAt) {
     const foot = document.createElement("div");
     foot.className = "updated-meta";
-    foot.textContent = `Updated ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    foot.textContent = `Updated ${updatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · refreshes every 2 min`;
     card.appendChild(foot);
   }
 
@@ -203,21 +203,33 @@ function drawChart(points, airportCode) {
       datasets: [{
         label: `${airportCode} avg wait (mins)`,
         data: points.map((p) => p.value),
-        borderColor: "#2563eb",
+        borderColor: "#f59e0b",
+        backgroundColor: "rgba(245,158,11,0.08)",
         pointRadius: 0,
         borderWidth: 2,
-        tension: 0.2,
-        fill: false,
+        tension: 0.3,
+        fill: true,
       }],
     },
     options: {
       responsive: true,
       scales: {
-        x: { ticks: { color: "#64748b" }, grid: { color: "#e2e8f0" } },
-        y: { ticks: { color: "#64748b" }, grid: { color: "#e2e8f0" },
-             title: { display: true, text: "Minutes", color: "#334155" } },
+        x: {
+          ticks: { color: "#55556a", font: { family: "'IBM Plex Mono'" } },
+          grid: { color: "#22222e" },
+          border: { color: "#22222e" },
+        },
+        y: {
+          ticks: { color: "#55556a", font: { family: "'IBM Plex Mono'" } },
+          grid: { color: "#22222e" },
+          border: { color: "#22222e" },
+          title: { display: true, text: "Minutes", color: "#55556a",
+                   font: { family: "'IBM Plex Mono'", size: 11 } },
+        },
       },
-      plugins: { legend: { labels: { color: "#334155" } } },
+      plugins: {
+        legend: { labels: { color: "#55556a", font: { family: "'IBM Plex Mono'", size: 11 } } },
+      },
     },
   });
 }
@@ -236,9 +248,9 @@ async function loadHistory(airportCode) {
   if (points.length) drawChart(points, airportCode);
 }
 
-// Simple, plain-English source status — no jargon
+// Source status label
 function sourceStatusLabel(sourceType) {
-  if (sourceType === "live_direct")       return ["✓ Live airport data", "is-live"];
+  if (sourceType === "live_direct")        return ["✓ Live airport data", "is-live"];
   if (sourceType === "estimated_fallback") return ["~ Estimated (live data not yet available)", "is-fallback"];
   return ["", "is-unknown"];
 }
@@ -256,12 +268,6 @@ async function updateSelectionSourceStatus(airportCode) {
     el.textContent = "";
     el.className = "selection-source-status is-unknown";
   }
-}
-
-function setSelectionSummary(payload, airportCode) {
-  // kept for API compatibility — hidden in new design; heading updates instead
-  const target = document.getElementById("selection-summary");
-  if (target) target.style.display = "none";
 }
 
 function renderAirportChips(payload, filterText = "") {
@@ -287,24 +293,23 @@ async function selectAirport(code) {
 
   // Update chart dropdown
   const select = document.getElementById("airport-select");
-  select.value = code;
+  if (select) select.value = code;
 
-  // Update results heading with friendly airport name
-  const heading = document.getElementById("results-heading");
+  // Update airport header
   const meta = livePayloadCache.live_airports?.[code];
-  if (heading && meta) heading.textContent = `${code} — ${meta.name}`;
+  const apHeader = document.getElementById("airport-header");
+  if (apHeader) apHeader.style.display = "";
+  const apCode = document.getElementById("ap-code");
+  if (apCode) apCode.textContent = code;
+  const apName = document.getElementById("ap-name");
+  if (apName && meta) apName.textContent = meta.name;
 
-  // Show the "● Live" badge
-  const liveBadge = document.getElementById("live-badge");
-  if (liveBadge) liveBadge.style.display = "";
-
-  setSelectionSummary(livePayloadCache, code);
   await updateSelectionSourceStatus(code);
   renderAirportChips(livePayloadCache, document.getElementById("airport-search").value);
   renderLiveCards(livePayloadCache, code);
   await loadHistory(code);
 
-  // Scroll down so user sees results without hunting for them
+  // Scroll to results
   const resultsEl = document.getElementById("results-section");
   if (resultsEl) {
     resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
