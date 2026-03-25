@@ -19,9 +19,12 @@ Reference for every airport we've investigated — how we get live TSA wait data
 | JFK | John F. Kennedy International | ✅ Live | Public (GraphQL, PANYNJ) |
 | EWR | Newark Liberty International | ✅ Live | Public (GraphQL, PANYNJ) |
 | LGA | LaGuardia Airport | ✅ Live | Public (GraphQL, PANYNJ) |
+| SEA | Seattle-Tacoma International | ✅ Live | Public (Drupal JSON API, portseattle.org) |
 | ATL | Hartsfield-Jackson Atlanta | 🔬 Research | Cloudflare-blocked (all paths) |
-| DEN | Denver International | 🔬 Research | API middleware found; upstream not yet configured |
-| SEA | Seattle-Tacoma International | 🔬 Research | No public endpoint; seaspotsaver.com unreachable |
+| DEN | Denver International | 🔬 Research | 403 Forbidden on direct probe |
+| IAH | Houston Intercontinental | 🔬 Research | Live data confirmed via TTT; Next.js API endpoint not yet found |
+| DTW | Detroit Metro | 🔬 Research | Live data confirmed via TTT; metroairport.com Drupal endpoint not yet found |
+| DCA | Reagan National | 🔬 Research | Live data confirmed via TTT; flyreagan.com endpoint not yet found |
 | SFO | San Francisco International | 🔬 Research | Wait times page exists but data is JS-rendered |
 
 ---

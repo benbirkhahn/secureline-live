@@ -42,6 +42,7 @@ LIVE_AIRPORTS = {
     "JFK": {"name": "John F. Kennedy International (JFK)", "mode": "LIVE_PUBLIC"},
     "EWR": {"name": "Newark Liberty International (EWR)", "mode": "LIVE_PUBLIC"},
     "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC"},
+    "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -71,16 +72,6 @@ PIPELINE_AIRPORTS = [
         # upstream source yet. flydenver.com is fully Cloudflare-blocked.
         # Re-probe periodically; should go live once DEN configures their backend.
         # See airport_research/pipeline/DEN.md for full investigation log.
-    },
-    {
-        "code": "SEA",
-        "name": "Seattle-Tacoma International",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: portseattle.org security page is Drupal/static — no JSON API found.
-        # seaspotsaver.com (their wait-time notification service) does not resolve externally.
-        # No skydive/mobi API domain exists. Re-probe if Port of Seattle launches a public API.
-        # See airport_research/pipeline/SEA.md for full investigation log.
     },
     {
         "code": "SFO",
@@ -206,7 +197,7 @@ def home_page_seo() -> Dict:
     return build_page_seo(
         title=f"Live TSA Wait Times — {codes} | TSA Tracker",
         description=(
-            "Track live TSA wait times for major US airports including PHL, MIA, ORD, CLT, MCO, JAX, DFW, LAX, JFK, EWR and LGA. "
+            "Track live TSA wait times for major US airports including PHL, MIA, ORD, CLT, MCO, JAX, DFW, LAX, JFK, EWR, LGA and SEA. "
             "Source-labeled feeds, trend charts, and fast airport lookup."
         ),
         canonical_path="/",
@@ -838,6 +829,76 @@ def fetch_lga_rows() -> List[Dict]:
     return _fetch_panynj_rows("LGA")
 
 
+_SEA_API = "https://www.portseattle.org/api/cwt/wait-times"
+
+_SEA_LANE_MAP = {
+    "Pre":        "PRECHECK",
+    "Clear":      "CLEAR",
+    "General":    "STANDARD",
+    "Premium":    "STANDARD",   # premium is still standard screening
+    "Spot Saver": "STANDARD",
+    "Visitor Pass": "STANDARD",
+}
+
+
+def fetch_sea_rows() -> List[Dict]:
+    """Port of Seattle public JSON API — 6 checkpoints, per-checkpoint wait + lane availability.
+
+    Endpoint: GET https://www.portseattle.org/api/cwt/wait-times
+    No auth required. Refreshes every 5 minutes per their own widget.
+    Response: list of checkpoints with IsOpen, WaitTimeMinutes, Options[{Name, Availability}].
+
+    Strategy: emit one row per available lane type per checkpoint so lane badges work.
+    If a checkpoint has no active lane breakdown, emit a single STANDARD row.
+    """
+    resp = requests.get(_SEA_API, headers=UA, timeout=20)
+    resp.raise_for_status()
+    checkpoints = resp.json()
+    if not checkpoints:
+        raise RuntimeError("SEA: empty response from portseattle.org API")
+    stamp = utc_now().isoformat()
+    rows: List[Dict] = []
+    for cp in checkpoints:
+        if not cp.get("IsOpen") or not cp.get("IsDataAvailable"):
+            continue
+        name = f"Checkpoint {cp.get('Name', '?')}"
+        wait_minutes = float(cp.get("WaitTimeMinutes") or 0)
+        # Build per-lane rows from Options
+        available_lanes = [
+            opt["Name"] for opt in cp.get("Options", [])
+            if opt.get("Availability") in ("Available", "Only")
+        ]
+        # Deduplicate canonical lane types
+        seen_lanes: set = set()
+        emitted = False
+        for lane_name in available_lanes:
+            lane_type = _SEA_LANE_MAP.get(lane_name, "STANDARD")
+            if lane_type in seen_lanes:
+                continue
+            seen_lanes.add(lane_type)
+            rows.append({
+                "airport_code": "SEA",
+                "checkpoint": name,
+                "wait_minutes": wait_minutes,
+                "lane_type": lane_type,
+                "source": _SEA_API,
+                "captured_at": stamp,
+            })
+            emitted = True
+        if not emitted:
+            rows.append({
+                "airport_code": "SEA",
+                "checkpoint": name,
+                "wait_minutes": wait_minutes,
+                "lane_type": "STANDARD",
+                "source": _SEA_API,
+                "captured_at": stamp,
+            })
+    if not rows:
+        raise RuntimeError("SEA: no open checkpoints in response")
+    return rows
+
+
 def collect_once() -> Dict:
     result = {"ok": [], "errors": []}
     collectors = [
@@ -852,6 +913,7 @@ def collect_once() -> Dict:
         ("JFK", fetch_jfk_rows),
         ("EWR", fetch_ewr_rows),
         ("LGA", fetch_lga_rows),
+        ("SEA", fetch_sea_rows),
     ]
     all_rows = []
     for code, fn in collectors:
