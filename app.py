@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
 import requests
-from flask import Flask, Response, jsonify, render_template, request
+from flask import Flask, Response, jsonify, render_template, request, send_from_directory
 
 APP_TZ = timezone.utc
 DB_PATH = os.getenv("DB_PATH", "data.db")
@@ -1202,6 +1202,11 @@ def api_collect_now():
     with _poll_lock:
         result = collect_once()
     return jsonify(result)
+
+
+@app.route("/ads.txt")
+def ads_txt():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), "ads.txt", mimetype="text/plain")
 
 
 if __name__ == "__main__":
