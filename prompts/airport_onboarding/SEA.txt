@@ -1,0 +1,25 @@
+You are in LOW-CREDIT mode. Do not run expensive/redundant checks.
+
+Task:
+Onboard a new airport live TSA source into my existing Flask project with minimal tool usage.
+
+Inputs:
+- Airport code: SEA
+- Airport security URL: https://www.portseattle.org/sea-tac/security-screening
+- Repo path: /Users/benbirkhahn/tsa-live-site
+- Branch: main
+
+Strict constraints:
+1) Max 1 static scan, max 1 dynamic trace (Playwright only if needed), no repeated loops.
+2) Stop once stable endpoint + required headers are confirmed.
+3) Implement only required code changes.
+4) Keep existing routes/UI working.
+5) Commit + push when done.
+6) Include: Co-Authored-By: Oz <oz-agent@warp.dev>
+
+Required output:
+A) discovery (endpoint, headers, auth, confidence)
+B) code changes (LIVE_AIRPORTS, pipeline, collector, polling list)
+C) minimal validation
+D) deploy + one production check
+E) short final report

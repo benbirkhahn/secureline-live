@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSA Tracker — Hybrid Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── TOKENS ── */
+:root {
+  --bg:       #0e0e10;
+  --surface:  #14141a;
+  --surface2: #1a1a22;
+  --border:   #22222e;
+  --border2:  #2c2c3a;
+  --text:     #e8e8f0;
+  --muted:    #55556a;
+  --subtle:   #33334a;
+  --amber:    #f59e0b;
+  --amber-dim:#f59e0b22;
+  --green:    #4ade80;
+  --yellow:   #facc15;
+  --orange:   #fb923c;
+  --red:      #f87171;
+  --blue:     #60a5fa;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'Space Grotesk', sans-serif;
+  --display:  'Oswald', sans-serif;
+
+  --tier-low-border:  #4ade80;
+  --tier-low-bg:      #0d2016;
+  --tier-med-border:  #facc15;
+  --tier-med-bg:      #201a06;
+  --tier-high-border: #fb923c;
+  --tier-high-bg:     #1f1208;
+  --tier-crit-border: #f87171;
+  --tier-crit-bg:     #200c0c;
+  --tier-none-border: #2c2c3a;
+  --tier-none-bg:     #14141a;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 58px;
+  background: rgba(14,14,16,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  display: flex; align-items: center; gap: 11px;
+  text-decoration: none; color: inherit;
+}
+.logo-icon { font-size: 22px; line-height: 1; }
+.logo-text {}
+.logo-name {
+  font-size: 16px; font-weight: 700; color: #fff;
+  letter-spacing: -.2px; line-height: 1.1;
+}
+.logo-tag {
+  font-family: var(--mono);
+  font-size: 9px; color: var(--amber);
+  text-transform: uppercase; letter-spacing: .12em;
+  line-height: 1;
+}
+.header-nav { display: flex; align-items: center; gap: 2px; }
+.header-nav a {
+  padding: 6px 12px; border-radius: 7px;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  text-decoration: none; transition: color .12s, background .12s;
+}
+.header-nav a:hover { color: var(--text); background: var(--surface2); }
+
+/* ── HERO ── */
+.hero {
+  max-width: 660px; margin: 0 auto;
+  padding: 56px 28px 36px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .14em;
+  color: var(--amber); margin-bottom: 16px;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+}
+.hero-headline {
+  font-size: 46px; font-weight: 700;
+  line-height: 1.05; letter-spacing: -.8px;
+  color: #fff; margin-bottom: 10px;
+}
+.hero-headline em { color: var(--amber); font-style: normal; }
+.hero-sub {
+  font-size: 15px; color: var(--muted); line-height: 1.55;
+  margin-bottom: 32px; max-width: 480px;
+}
+
+/* ── SEARCH ── */
+.search-wrap { position: relative; margin-bottom: 18px; }
+.search-input {
+  width: 100%; padding: 14px 18px 14px 46px;
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: 12px; font-family: var(--sans);
+  font-size: 16px; font-weight: 500; color: var(--text);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.search-input::placeholder { color: var(--muted); font-weight: 400; }
+.search-input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-dim);
+}
+.search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-size: 15px; pointer-events: none;
+  font-family: var(--mono);
+}
+
+/* ── AIRPORT CHIPS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 7px 14px; border-radius: 8px;
+  background: var(--surface); border: 1.5px solid var(--border2);
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  color: var(--muted); cursor: pointer; letter-spacing: .03em;
+  transition: all .12s;
+}
+.chip:hover { border-color: var(--border2); color: var(--text); background: var(--surface2); }
+.chip.active {
+  background: var(--amber-dim); border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* ── RESULTS ── */
+.results { max-width: 660px; margin: 0 auto; padding: 8px 28px 80px; }
+
+.airport-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.airport-name-block {}
+.airport-code {
+  font-family: var(--mono); font-size: 11px; font-weight: 600;
+  color: var(--amber); text-transform: uppercase; letter-spacing: .12em;
+  margin-bottom: 4px;
+}
+.airport-fullname {
+  font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -.3px;
+}
+.live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 11px; border-radius: 99px;
+  background: #0d2016; border: 1px solid #166534;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  color: var(--green); text-transform: uppercase; letter-spacing: .1em;
+}
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .4; }
+}
+
+/* ── CHECKPOINT BLOCK (C layout + A colors) ── */
+.cp-block {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 16px;
+  padding: 18px 20px 18px 24px;
+  margin-bottom: 3px;
+  border-radius: 12px;
+  border-left: 4px solid var(--tier-none-border);
+  background: var(--tier-none-bg);
+  transition: background .12s;
+}
+.cp-block:hover { filter: brightness(1.08); }
+.cp-block.low  { border-color: var(--tier-low-border);  background: var(--tier-low-bg); }
+.cp-block.med  { border-color: var(--tier-med-border);  background: var(--tier-med-bg); }
+.cp-block.high { border-color: var(--tier-high-border); background: var(--tier-high-bg); }
+.cp-block.crit { border-color: var(--tier-crit-border); background: var(--tier-crit-bg); }
+
+/* Left side: name + lane tags */
+.cp-left {}
+.cp-name {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  margin-bottom: 10px; letter-spacing: -.1px;
+}
+.cp-lanes { display: flex; flex-direction: column; gap: 5px; }
+.lane-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.lane-badge {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .07em;
+  padding: 3px 9px; border-radius: 5px;
+  white-space: nowrap;
+}
+.lane-std  { background: #1e1e2a; color: #6666aa; border: 1px solid #2a2a40; }
+.lane-pre  { background: #0f2040; color: #93c5fd; border: 1px solid #1e3a5f; }
+.lane-clr  { background: #2a1500; color: #fb923c; border: 1px solid #451a03; }
+.lane-clrpre { background: #0a2020; color: #34d399; border: 1px solid #064e3b; }
+
+/* Per-lane wait (shown when lanes have different times) */
+.lane-wait {
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  color: var(--muted);
+}
+.lane-wait.low  { color: var(--green); }
+.lane-wait.med  { color: var(--yellow); }
+.lane-wait.high { color: var(--orange); }
+.lane-wait.crit { color: var(--red); }
+
+/* Right side: big wait number */
+.cp-right { text-align: right; flex-shrink: 0; }
+.big-num {
+  font-family: var(--display);
+  font-size: 56px; font-weight: 700; line-height: 1;
+  letter-spacing: -.5px;
+}
+.big-num.low  { color: var(--green); }
+.big-num.med  { color: var(--yellow); }
+.big-num.high { color: var(--orange); }
+.big-num.crit { color: var(--red); }
+.big-num.none { color: var(--muted); font-size: 20px; font-family: var(--sans); font-weight: 600; }
+.big-unit {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
+  display: block; margin-top: 3px;
+}
+
+/* ── UPDATED FOOTER ── */
+.updated {
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+  margin-top: 14px; text-align: right; letter-spacing: .04em;
+}
+
+/* ── PIPELINE SECTION ── */
+.pipeline-section { max-width: 660px; margin: 0 auto; padding: 0 28px 80px; }
+.section-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .12em;
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.pipeline-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.pipeline-code {
+  font-family: var(--mono); font-size: 13px; font-weight: 600;
+  color: var(--muted); min-width: 36px;
+}
+.pipeline-name { font-size: 14px; color: var(--muted); flex: 1; }
+.pipeline-badge {
+  font-family: var(--mono); font-size: 9px; font-weight: 600;
+  padding: 3px 8px; border-radius: 4px;
+  background: var(--surface2); color: var(--muted);
+  border: 1px solid var(--border2);
+  text-transform: uppercase; letter-spacing: .08em;
+}
+
+/* ── MOBILE ── */
+@media (max-width: 600px) {
+  .hero { padding: 36px 20px 28px; }
+  .hero-headline { font-size: 34px; }
+  .results { padding: 8px 20px 60px; }
+  .pipeline-section { padding: 0 20px 60px; }
+  .big-num { font-size: 44px; }
+  .cp-block { padding: 14px 16px 14px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="logo" href="#">
+    <span class="logo-icon">✈️</span>
+    <div class="logo-text">
+      <div class="logo-name">TSA Tracker</div>
+      <div class="logo-tag">Live airport data</div>
+    </div>
+  </a>
+  <nav class="header-nav">
+    <a href="#">Home</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    12 airports · real-time
+  </div>
+  <h1 class="hero-headline">How long is<br>the <em>TSA line?</em></h1>
+  <p class="hero-sub">Wait times pulled directly from airport systems — not estimates, not models. Pick your airport.</p>
+
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" type="text" placeholder="Search airports — LAX, JFK, SEA…" id="search">
+  </div>
+
+  <div class="chips" id="chips">
+    <div class="chip active" onclick="selectAirport('LAX', this)">LAX</div>
+    <div class="chip" onclick="selectAirport('JFK', this)">JFK</div>
+    <div class="chip" onclick="selectAirport('EWR', this)">EWR</div>
+    <div class="chip" onclick="selectAirport('LGA', this)">LGA</div>
+    <div class="chip" onclick="selectAirport('SEA', this)">SEA</div>
+    <div class="chip" onclick="selectAirport('DFW', this)">DFW</div>
+    <div class="chip" onclick="selectAirport('ORD', this)">ORD</div>
+    <div class="chip" onclick="selectAirport('MIA', this)">MIA</div>
+    <div class="chip" onclick="selectAirport('MCO', this)">MCO</div>
+    <div class="chip" onclick="selectAirport('PHL', this)">PHL</div>
+    <div class="chip" onclick="selectAirport('CLT', this)">CLT</div>
+    <div class="chip" onclick="selectAirport('JAX', this)">JAX</div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="results" id="results">
+  <div class="airport-header">
+    <div class="airport-name-block">
+      <div class="airport-code" id="ap-code">LAX</div>
+      <div class="airport-fullname" id="ap-name">Los Angeles International</div>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span> Live</div>
+  </div>
+  <div id="checkpoints"></div>
+  <div class="updated" id="updated">Updated 7:11 PM · refreshes every 2 min</div>
+</section>
+
+<!-- PIPELINE -->
+<section class="pipeline-section">
+  <div class="section-divider">More airports coming soon</div>
+  <div class="pipeline-item">
+    <span class="pipeline-code">ATL</span>
+    <span class="pipeline-name">Hartsfield-Jackson Atlanta International</span>
+    <span class="pipeline-badge">In research</span>
+  </div>
+  <div class="pipeline-item">
+    <span class="pipeline-code">DEN</span>
+    <span class="pipeline-name">Denver International</span>
+    <span class="pipeline-badge">In research</span>
+  </div>
+  <div class="pipeline-item">
+    <span class="pipeline-code">IAH</span>
+    <span class="pipeline-name">Houston Intercontinental</span>
+    <span class="pipeline-badge">In research</span>
+  </div>
+  <div class="pipeline-item">
+    <span class="pipeline-code">SFO</span>
+    <span class="pipeline-name">San Francisco International</span>
+    <span class="pipeline-badge">In research</span>
+  </div>
+</section>
+
+<script>
+// ── MOCK DATA ──
+const AIRPORTS = {
+  LAX: {
+    name: 'Los Angeles International',
+    checkpoints: [
+      { name: 'TBIT', tier: 'low', bigNum: 3, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '3 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '2 min', wtier: 'low' }] },
+    ]
+  },
+  JFK: {
+    name: 'John F. Kennedy International',
+    checkpoints: [
+      { name: 'Terminal 1', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '4 min', wtier: 'low' }] },
+      { name: 'Terminal 4', tier: 'low', bigNum: 8, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '8 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '1 min', wtier: 'low' }] },
+      { name: 'Terminal 5', tier: 'low', bigNum: 1, bigUnit: 'min',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '1 min', wtier: 'low' }] },
+      { name: 'Terminal 7', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' }] },
+      { name: 'Terminal 8', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '1 min', wtier: 'low' }] },
+    ]
+  },
+  SEA: {
+    name: 'Seattle-Tacoma International',
+    checkpoints: [
+      { name: 'Checkpoint 1', tier: 'low', bigNum: 3, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '3 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '3 min', wtier: 'low' },
+                { badge: 'CLEAR',    cls: 'lane-clr', wait: '3 min', wtier: 'low' }] },
+      { name: 'Checkpoint 2', tier: 'none', bigNum: null, bigUnit: '',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: 'Closed', wtier: 'none' }] },
+      { name: 'Checkpoint 3', tier: 'low', bigNum: 3, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '3 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '3 min', wtier: 'low' }] },
+      { name: 'Checkpoint 4', tier: 'low', bigNum: 7, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '7 min', wtier: 'low' }] },
+      { name: 'Checkpoint 5', tier: 'low', bigNum: 3, bigUnit: 'mins',
+        lanes: [{ badge: 'TSA Pre✓', cls: 'lane-pre', wait: '3 min', wtier: 'low' }] },
+      { name: 'Checkpoint 6', tier: 'low', bigNum: 7, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '7 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '7 min', wtier: 'low' },
+                { badge: 'CLEAR',    cls: 'lane-clr', wait: '7 min', wtier: 'low' }] },
+    ]
+  },
+  DFW: {
+    name: 'Dallas/Fort Worth International',
+    checkpoints: [
+      { name: 'Terminal A – Checkpoint A21', tier: 'low', bigNum: 2, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '2 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '1 min', wtier: 'low' }] },
+      { name: 'Terminal B – Checkpoint B14', tier: 'med', bigNum: 18, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '18 min', wtier: 'med' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '4 min', wtier: 'low' },
+                { badge: 'CLEAR',    cls: 'lane-clr', wait: '<1 min', wtier: 'low' }] },
+      { name: 'Terminal C – Checkpoint C20', tier: 'high', bigNum: 31, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '31 min', wtier: 'high' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '6 min', wtier: 'low' }] },
+      { name: 'Terminal D – Checkpoint D10', tier: 'low', bigNum: 8, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '8 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '3 min', wtier: 'low' }] },
+      { name: 'Terminal E – Checkpoint E8', tier: 'crit', bigNum: 47, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '47 min', wtier: 'crit' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '11 min', wtier: 'low' }] },
+    ]
+  },
+  MIA: {
+    name: 'Miami International',
+    checkpoints: [
+      { name: 'Concourse D', tier: 'med', bigNum: 22, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '22 min', wtier: 'med' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '5 min', wtier: 'low' }] },
+      { name: 'Concourse E', tier: 'low', bigNum: 9, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '9 min', wtier: 'low' }] },
+      { name: 'Concourse H', tier: 'high', bigNum: 34, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '34 min', wtier: 'high' },
+                { badge: 'CLEAR + Pre✓', cls: 'lane-clrpre', wait: '<1 min', wtier: 'low' }] },
+    ]
+  },
+  EWR: { name: 'Newark Liberty International',
+    checkpoints: [
+      { name: 'Terminal A', tier: 'low', bigNum: 3, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '3 min', wtier: 'low'},
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '< 1 min', wtier: 'low'}] },
+      { name: 'Terminal B', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low'},
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '2 min', wtier: 'low'}] },
+      { name: 'Terminal C', tier: 'low', bigNum: 2, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '2 min', wtier: 'low'},
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '< 1 min', wtier: 'low'}] },
+    ]
+  },
+  LGA: { name: 'LaGuardia Airport',
+    checkpoints: [
+      { name: 'Terminal A', tier: 'low', bigNum: 0, bigUnit: 'min',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '< 1 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '< 1 min', wtier: 'low' }] },
+      { name: 'Terminal B', tier: 'low', bigNum: 0, bigUnit: 'min',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '< 1 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '< 1 min', wtier: 'low' }] },
+      { name: 'Terminal C', tier: 'low', bigNum: 0, bigUnit: 'min',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '< 1 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '< 1 min', wtier: 'low' }] },
+    ]
+  },
+  ORD: { name: "Chicago O'Hare International",
+    checkpoints: [
+      { name: 'Terminal 1 – B Gates', tier: 'med', bigNum: 19, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '19 min', wtier: 'med' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '5 min', wtier: 'low' }] },
+      { name: 'Terminal 2 – E Gates', tier: 'low', bigNum: 7, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '7 min', wtier: 'low' }] },
+      { name: 'Terminal 3 – H Gates', tier: 'high', bigNum: 28, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '28 min', wtier: 'high' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '8 min', wtier: 'low' }] },
+    ]
+  },
+  MCO: { name: 'Orlando International',
+    checkpoints: [
+      { name: 'Side A', tier: 'low', bigNum: 6, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '6 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '2 min', wtier: 'low' }] },
+      { name: 'Side B', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' }] },
+    ]
+  },
+  PHL: { name: 'Philadelphia International',
+    checkpoints: [
+      { name: 'A-West', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' }] },
+      { name: 'B-C', tier: 'med', bigNum: 17, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '17 min', wtier: 'med' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '3 min', wtier: 'low' }] },
+      { name: 'D-E', tier: 'low', bigNum: 8, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '8 min', wtier: 'low' }] },
+    ]
+  },
+  CLT: { name: 'Charlotte Douglas International',
+    checkpoints: [
+      { name: 'Main Checkpoint', tier: 'low', bigNum: 4, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '4 min', wtier: 'low' },
+                { badge: 'TSA Pre✓', cls: 'lane-pre', wait: '2 min', wtier: 'low' }] },
+    ]
+  },
+  JAX: { name: 'Jacksonville International',
+    checkpoints: [
+      { name: 'Main Checkpoint', tier: 'low', bigNum: 2, bigUnit: 'mins',
+        lanes: [{ badge: 'Regular', cls: 'lane-std', wait: '2 min', wtier: 'low' }] },
+    ]
+  },
+};
+
+function renderAirport(code) {
+  const ap = AIRPORTS[code];
+  if (!ap) return;
+
+  document.getElementById('ap-code').textContent = code;
+  document.getElementById('ap-name').textContent = ap.name;
+
+  const container = document.getElementById('checkpoints');
+  container.innerHTML = '';
+
+  ap.checkpoints.forEach(cp => {
+    const block = document.createElement('div');
+    block.className = `cp-block ${cp.tier}`;
+
+    const multiLane = cp.lanes.length > 1;
+
+    // Big number
+    let bigHtml;
+    if (cp.bigNum === null) {
+      bigHtml = `<div class="big-num none">Closed</div>`;
+    } else if (cp.bigNum === 0) {
+      bigHtml = `<div class="big-num low" style="font-size:38px">&lt;1</div><span class="big-unit">min</span>`;
+    } else {
+      bigHtml = `<div class="big-num ${cp.tier}">${cp.bigNum}</div><span class="big-unit">${cp.bigUnit}</span>`;
+    }
+
+    // Lane rows
+    const laneRows = cp.lanes.map(l => {
+      const waitSpan = multiLane
+        ? `<span class="lane-wait ${l.wtier}">${l.wait}</span>`
+        : '';
+      return `<div class="lane-row">
+        <span class="lane-badge ${l.cls}">${l.badge}</span>
+        ${waitSpan}
+      </div>`;
+    }).join('');
+
+    block.innerHTML = `
+      <div class="cp-left">
+        <div class="cp-name">${cp.name}</div>
+        <div class="cp-lanes">${laneRows}</div>
+      </div>
+      <div class="cp-right">${bigHtml}</div>
+    `;
+    container.appendChild(block);
+  });
+
+  // scroll to results
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectAirport(code, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderAirport(code);
+}
+
+// init
+renderAirport('LAX');
+
+// search filter
+document.getElementById('search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.chip').forEach(c => {
+    const code = c.textContent.toLowerCase();
+    c.style.display = code.includes(q) || !q ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>

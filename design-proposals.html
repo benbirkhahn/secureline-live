@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSA Tracker — Design Proposals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #0f0f0f; color: #fff; }
+
+/* ── PROPOSAL PICKER ── */
+.picker {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 24px;
+  background: #0f0f0f;
+  border-bottom: 1px solid #222;
+}
+.picker-label { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
+.pick-btn {
+  padding: 7px 18px; border-radius: 99px; border: 1.5px solid #333;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  background: transparent; color: #888; transition: all .15s;
+}
+.pick-btn.active { border-color: #fff; color: #fff; background: #1a1a1a; }
+.pick-btn:hover:not(.active) { border-color: #555; color: #ccc; }
+
+/* ── PROPOSAL PANELS ── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ────────────────────────────────────────────
+   OPTION A — "TERMINAL BOARD"
+   Dark, high-contrast, monospace numbers,
+   inspired by real airport departure boards
+──────────────────────────────────────────── */
+.a-wrap {
+  background: #111113;
+  min-height: 100vh;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.a-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 28px;
+  background: #0a0a0c;
+  border-bottom: 1px solid #1e1e24;
+}
+.a-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.a-logo-icon { font-size: 22px; }
+.a-logo-name { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+.a-logo-tag { font-size: 11px; color: #f59e0b; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+.a-nav a { color: #888; font-size: 13px; text-decoration: none; margin-left: 20px; font-weight: 500; }
+.a-nav a:hover { color: #fff; }
+
+.a-hero {
+  padding: 52px 28px 36px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.a-headline {
+  font-size: 42px; font-weight: 700;
+  color: #fff;
+  line-height: 1.1; letter-spacing: -.5px;
+  margin-bottom: 6px;
+}
+.a-headline em { color: #f59e0b; font-style: normal; }
+.a-sub { font-size: 15px; color: #666; margin-bottom: 28px; }
+
+.a-search {
+  display: flex; gap: 10px;
+  margin-bottom: 20px;
+}
+.a-search input {
+  flex: 1; padding: 13px 18px; border-radius: 10px;
+  background: #1c1c20; border: 1.5px solid #2a2a30;
+  color: #fff; font-size: 16px; font-family: inherit;
+  outline: none;
+}
+.a-search input::placeholder { color: #555; }
+.a-search input:focus { border-color: #f59e0b; }
+
+.a-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.a-chip {
+  padding: 7px 14px; border-radius: 8px;
+  background: #1c1c20; border: 1.5px solid #2a2a30;
+  font-size: 13px; font-weight: 600; color: #ccc; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace; letter-spacing: .03em;
+  transition: all .12s;
+}
+.a-chip:hover, .a-chip.sel { background: #f59e0b22; border-color: #f59e0b; color: #f59e0b; }
+
+.a-results { max-width: 720px; margin: 0 auto; padding: 0 28px 60px; }
+.a-airport-title {
+  font-size: 22px; font-weight: 700; color: #fff;
+  margin-bottom: 4px;
+}
+.a-live-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; color: #22c55e;
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 20px;
+}
+.a-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+
+/* Terminal board row */
+.a-board {
+  border: 1px solid #1e1e24;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.a-board-head {
+  display: grid; grid-template-columns: 1fr 140px 140px;
+  padding: 10px 20px;
+  background: #0d0d10;
+  font-size: 10px; font-weight: 700; color: #444;
+  text-transform: uppercase; letter-spacing: .1em;
+  border-bottom: 1px solid #1e1e24;
+}
+.a-row {
+  display: grid; grid-template-columns: 1fr 140px 140px;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #18181c;
+  transition: background .1s;
+}
+.a-row:last-child { border-bottom: none; }
+.a-row:hover { background: #161619; }
+.a-checkpoint { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.a-lane-tag {
+  display: inline-block; padding: 3px 9px; border-radius: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.a-lane-std  { background: #1e1e24; color: #888; }
+.a-lane-pre  { background: #1e3a5f; color: #93c5fd; }
+.a-lane-clr  { background: #451a03; color: #fb923c; }
+.a-wait {
+  font-family: 'Oswald', sans-serif;
+  font-size: 28px; font-weight: 700;
+  text-align: right;
+}
+.a-wait-low      { color: #4ade80; }
+.a-wait-med      { color: #facc15; }
+.a-wait-high     { color: #fb923c; }
+.a-wait-critical { color: #f87171; }
+.a-wait-unit { font-size: 13px; font-weight: 400; color: #555; margin-left: 3px; }
+.a-updated { font-size: 11px; color: #444; text-align: right; margin-top: 12px; font-family: 'IBM Plex Mono', monospace; }
+
+/* ────────────────────────────────────────────
+   OPTION B — "CRISP MODERN"
+   Clean light mode, strong type hierarchy,
+   feels like Flighty or a premium travel app
+──────────────────────────────────────────── */
+.b-wrap {
+  background: #f5f5f0;
+  min-height: 100vh;
+  font-family: 'DM Sans', sans-serif;
+  color: #111;
+}
+
+.b-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e8e8e3;
+  position: sticky; top: 0; z-index: 10;
+}
+.b-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.b-logo-icon { font-size: 20px; }
+.b-logo-name { font-size: 17px; font-weight: 700; color: #111; letter-spacing: -.3px; }
+.b-nav a { color: #888; font-size: 13px; text-decoration: none; margin-left: 20px; font-weight: 500; }
+
+.b-hero {
+  max-width: 680px; margin: 0 auto;
+  padding: 56px 28px 32px;
+}
+.b-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+  color: #e84545; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 7px;
+}
+.b-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #e84545; }
+.b-headline {
+  font-size: 44px; font-weight: 700; line-height: 1.08; letter-spacing: -.8px;
+  color: #111; margin-bottom: 8px;
+}
+.b-sub { font-size: 16px; color: #888; margin-bottom: 32px; line-height: 1.5; }
+
+.b-search-wrap { position: relative; margin-bottom: 16px; }
+.b-search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: #bbb; font-size: 16px;
+}
+.b-search {
+  width: 100%; padding: 15px 18px 15px 44px;
+  border-radius: 14px; border: 2px solid #e8e8e3;
+  background: #fff; font-size: 16px; font-family: inherit;
+  outline: none; color: #111;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  transition: border-color .15s, box-shadow .15s;
+}
+.b-search:focus { border-color: #e84545; box-shadow: 0 0 0 4px #e8454520; }
+.b-search::placeholder { color: #bbb; }
+
+.b-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.b-chip {
+  padding: 8px 16px; border-radius: 99px;
+  background: #fff; border: 1.5px solid #e8e8e3;
+  font-size: 13px; font-weight: 600; color: #555; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  transition: all .12s;
+}
+.b-chip:hover { border-color: #e84545; color: #e84545; }
+.b-chip.sel { background: #e84545; border-color: #e84545; color: #fff; }
+
+.b-results { max-width: 680px; margin: 0 auto; padding: 0 28px 60px; }
+.b-airport-card {
+  background: #fff; border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  overflow: hidden; margin-top: 4px;
+}
+.b-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0eb;
+}
+.b-airport-name { font-size: 18px; font-weight: 700; color: #111; }
+.b-live-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 99px;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  font-size: 11px; font-weight: 700; color: #15803d;
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.b-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+
+.b-checkpoint {
+  padding: 0 24px;
+}
+.b-checkpoint-group {
+  border-bottom: 1px solid #f5f5f0;
+}
+.b-checkpoint-group:last-child { border-bottom: none; }
+.b-cp-name {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  color: #bbb; padding: 14px 0 8px;
+}
+.b-lane-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0 10px;
+  border-top: 1px solid #f5f5f0;
+}
+.b-lane-left { display: flex; align-items: center; gap: 10px; }
+.b-lane-badge {
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .04em;
+}
+.b-std  { background: #f5f5f0; color: #888; }
+.b-pre  { background: #eff6ff; color: #2563eb; }
+.b-clr  { background: #fff7ed; color: #c2410c; }
+.b-wait-num {
+  font-size: 34px; font-weight: 700; line-height: 1;
+  letter-spacing: -.5px;
+}
+.b-wait-unit { font-size: 13px; color: #aaa; font-weight: 500; margin-left: 2px; }
+.b-low  { color: #16a34a; }
+.b-med  { color: #ca8a04; }
+.b-high { color: #ea580c; }
+.b-crit { color: #dc2626; }
+.b-updated { font-size: 11px; color: #bbb; text-align: right; padding: 12px 24px 16px; }
+
+/* ────────────────────────────────────────────
+   OPTION C — "BOLD NUMBERS"
+   Numbers are the hero. Super clear hierarchy.
+   Inspired by transit / train departure boards.
+   Strong color accents, not trying to be pretty.
+──────────────────────────────────────────── */
+.c-wrap {
+  background: #fafafa;
+  min-height: 100vh;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #0f0f0f;
+}
+
+.c-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 56px;
+  background: #0f0f0f;
+}
+.c-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.c-logo-icon { font-size: 20px; }
+.c-logo-name { font-size: 16px; font-weight: 700; color: #fff; }
+.c-nav a { color: #666; font-size: 13px; text-decoration: none; margin-left: 20px; font-weight: 500; }
+.c-nav a:hover { color: #fff; }
+
+.c-hero {
+  max-width: 700px; margin: 0 auto;
+  padding: 48px 28px 28px;
+}
+.c-headline {
+  font-family: 'Syne', sans-serif;
+  font-size: 48px; font-weight: 800; line-height: 1;
+  letter-spacing: -1px; color: #0f0f0f; margin-bottom: 8px;
+}
+.c-sub { font-size: 15px; color: #999; margin-bottom: 28px; }
+
+.c-search {
+  width: 100%; padding: 14px 18px;
+  border-radius: 0; border: none;
+  border-bottom: 3px solid #0f0f0f;
+  background: transparent; font-size: 18px; font-family: 'Space Grotesk', sans-serif;
+  color: #0f0f0f; outline: none; font-weight: 500;
+  transition: border-color .15s;
+  margin-bottom: 24px;
+}
+.c-search::placeholder { color: #ccc; }
+.c-search:focus { border-color: #2563eb; }
+
+.c-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.c-chip {
+  padding: 7px 14px; border-radius: 4px;
+  background: #f0f0f0; border: none;
+  font-size: 13px; font-weight: 700; color: #555; cursor: pointer;
+  font-family: inherit; letter-spacing: .02em;
+  transition: all .1s;
+}
+.c-chip:hover { background: #0f0f0f; color: #fff; }
+.c-chip.sel { background: #2563eb; color: #fff; }
+
+.c-results { max-width: 700px; margin: 0 auto; padding: 0 28px 60px; }
+.c-section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .12em; color: #999; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.c-section-label::after { content: ''; flex: 1; height: 1px; background: #e8e8e8; }
+
+/* Each checkpoint is a full-width block */
+.c-cp-block {
+  display: grid; grid-template-columns: 1fr auto;
+  border-left: 4px solid #e8e8e8;
+  padding: 16px 0 16px 20px;
+  margin-bottom: 2px;
+  align-items: start;
+}
+.c-cp-block.low  { border-color: #16a34a; }
+.c-cp-block.med  { border-color: #ca8a04; }
+.c-cp-block.high { border-color: #ea580c; }
+.c-cp-block.crit { border-color: #dc2626; }
+.c-cp-block.closed { border-color: #e8e8e8; }
+
+.c-cp-name { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px; }
+.c-lanes { display: flex; flex-direction: column; gap: 4px; }
+.c-lane {
+  display: flex; align-items: center; gap: 8px;
+}
+.c-l-tag {
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+}
+.c-std-t  { background: #f0f0f0; color: #888; }
+.c-pre-t  { background: #dbeafe; color: #1d4ed8; }
+.c-clr-t  { background: #fed7aa; color: #9a3412; }
+
+.c-wait-col { text-align: right; }
+.c-big-wait {
+  font-family: 'Oswald', sans-serif;
+  font-size: 52px; font-weight: 700; line-height: 1;
+  letter-spacing: -.5px;
+}
+.c-big-unit { font-size: 14px; color: #aaa; display: block; text-align: right; margin-top: 2px; font-weight: 500; }
+.c-low-num  { color: #16a34a; }
+.c-med-num  { color: #ca8a04; }
+.c-high-num { color: #ea580c; }
+.c-crit-num { color: #dc2626; }
+.c-closed-num { color: #ccc; }
+
+.c-updated { font-size: 11px; color: #bbb; margin-top: 20px; font-family: 'IBM Plex Mono', monospace; }
+
+/* ── PROPOSAL LABELS ── */
+.proposal-title {
+  text-align: center; padding: 32px 0 0;
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .12em; color: #555;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.pt-line { height: 1px; width: 80px; background: #333; }
+
+/* ── COMPARISON NOTE ── */
+.compare-note {
+  padding: 24px 28px;
+  background: #0f0f0f;
+  font-size: 13px; color: #666; line-height: 1.6;
+  border-top: 1px solid #222;
+}
+.compare-note strong { color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="picker">
+  <span class="picker-label">Proposal</span>
+  <button class="pick-btn active" onclick="show('a')">A — Terminal Board</button>
+  <button class="pick-btn" onclick="show('b')">B — Crisp Modern</button>
+  <button class="pick-btn" onclick="show('c')">C — Bold Numbers</button>
+</div>
+
+<!-- ═══════════════════════ OPTION A ═══════════════════════ -->
+<div class="panel active" id="panel-a">
+<div class="a-wrap">
+  <header class="a-header">
+    <a class="a-logo" href="#">
+      <span class="a-logo-icon">✈️</span>
+      <div>
+        <div class="a-logo-name">TSA Tracker</div>
+        <div class="a-logo-tag">Live airport data</div>
+      </div>
+    </a>
+    <nav class="a-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </nav>
+  </header>
+
+  <div class="a-hero">
+    <h1 class="a-headline">How long is<br>the <em>TSA line?</em></h1>
+    <p class="a-sub">Live wait times pulled directly from airport systems.</p>
+    <div class="a-search">
+      <input type="text" placeholder="Search airports — LAX, JFK, SEA…">
+    </div>
+    <div class="a-chips">
+      <div class="a-chip sel">LAX</div>
+      <div class="a-chip">JFK</div>
+      <div class="a-chip">EWR</div>
+      <div class="a-chip">LGA</div>
+      <div class="a-chip">SEA</div>
+      <div class="a-chip">DFW</div>
+      <div class="a-chip">ORD</div>
+      <div class="a-chip">MIA</div>
+      <div class="a-chip">PHL</div>
+    </div>
+  </div>
+
+  <div class="a-results">
+    <div style="margin-bottom:6px;">
+      <div class="a-airport-title">Los Angeles International</div>
+      <div class="a-live-badge"><span class="a-live-dot"></span> Live airport data</div>
+    </div>
+    <div class="a-board">
+      <div class="a-board-head">
+        <span>Checkpoint</span>
+        <span>Lane</span>
+        <span style="text-align:right">Wait</span>
+      </div>
+      <div class="a-row">
+        <span class="a-checkpoint">TBIT</span>
+        <span class="a-lane-tag a-lane-std">Regular</span>
+        <span class="a-wait a-wait-low">3 <span class="a-wait-unit">min</span></span>
+      </div>
+      <div class="a-row">
+        <span class="a-checkpoint">TBIT</span>
+        <span class="a-lane-tag a-lane-pre">TSA Pre✓</span>
+        <span class="a-wait a-wait-low">2 <span class="a-wait-unit">min</span></span>
+      </div>
+      <div class="a-row" style="opacity:.45">
+        <span class="a-checkpoint">Terminal 3</span>
+        <span class="a-lane-tag a-lane-std">Regular</span>
+        <span class="a-wait" style="color:#444;font-size:16px;font-family:'Space Grotesk',sans-serif;font-weight:600;">Closed</span>
+      </div>
+    </div>
+    <div class="a-updated">Updated 07:11 PM · auto-refreshes every 2 min</div>
+  </div>
+</div>
+<div class="compare-note">
+  <strong>Option A — Terminal Board:</strong> Dark mode, monospace numbers, amber accent. Feels like a real airport departure board. Distinctive, zero generic "dashboard" vibes. Numbers use Oswald condensed — big, legible, airport-y.
+</div>
+</div>
+
+<!-- ═══════════════════════ OPTION B ═══════════════════════ -->
+<div class="panel" id="panel-b">
+<div class="b-wrap">
+  <header class="b-header">
+    <a class="b-logo" href="#">
+      <span class="b-logo-icon">✈️</span>
+      <span class="b-logo-name">TSA Tracker</span>
+    </a>
+    <nav class="b-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </nav>
+  </header>
+
+  <div class="b-hero">
+    <div class="b-eyebrow"><span class="b-eyebrow-dot"></span> 12 live airports</div>
+    <h1 class="b-headline">How long is<br>the TSA line?</h1>
+    <p class="b-sub">Real wait times pulled directly from airport systems — not estimates.</p>
+    <div class="b-search-wrap">
+      <span class="b-search-icon">🔍</span>
+      <input class="b-search" type="text" placeholder="Search airport — LAX, JFK, SEA…">
+    </div>
+    <div class="b-chips">
+      <div class="b-chip sel">LAX</div>
+      <div class="b-chip">JFK</div>
+      <div class="b-chip">EWR</div>
+      <div class="b-chip">LGA</div>
+      <div class="b-chip">SEA</div>
+      <div class="b-chip">DFW</div>
+      <div class="b-chip">ORD</div>
+      <div class="b-chip">MIA</div>
+    </div>
+  </div>
+
+  <div class="b-results">
+    <div class="b-airport-card">
+      <div class="b-card-header">
+        <div class="b-airport-name">LAX — Los Angeles International</div>
+        <div class="b-live-pill"><span class="b-live-dot"></span> Live</div>
+      </div>
+      <div class="b-checkpoint">
+        <div class="b-checkpoint-group">
+          <div class="b-cp-name">TBIT</div>
+          <div class="b-lane-row">
+            <div class="b-lane-left">
+              <span class="b-lane-badge b-std">Regular</span>
+            </div>
+            <div>
+              <span class="b-wait-num b-low">3</span>
+              <span class="b-wait-unit">mins</span>
+            </div>
+          </div>
+          <div class="b-lane-row">
+            <div class="b-lane-left">
+              <span class="b-lane-badge b-pre">TSA Pre✓</span>
+            </div>
+            <div>
+              <span class="b-wait-num b-low">2</span>
+              <span class="b-wait-unit">mins</span>
+            </div>
+          </div>
+        </div>
+        <div class="b-checkpoint-group">
+          <div class="b-cp-name">Terminal 6</div>
+          <div class="b-lane-row">
+            <div class="b-lane-left">
+              <span class="b-lane-badge b-std">Regular</span>
+            </div>
+            <div>
+              <span class="b-wait-num b-med">18</span>
+              <span class="b-wait-unit">mins</span>
+            </div>
+          </div>
+          <div class="b-lane-row">
+            <div class="b-lane-left">
+              <span class="b-lane-badge b-pre">TSA Pre✓</span>
+            </div>
+            <div>
+              <span class="b-wait-num b-low">5</span>
+              <span class="b-wait-unit">mins</span>
+            </div>
+          </div>
+          <div class="b-lane-row">
+            <div class="b-lane-left">
+              <span class="b-lane-badge b-clr">CLEAR</span>
+            </div>
+            <div>
+              <span class="b-wait-num b-low">&lt;1</span>
+              <span class="b-wait-unit">min</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="b-updated">Updated 7:11 PM</div>
+    </div>
+  </div>
+</div>
+<div class="compare-note" style="background:#fff; color:#888; border-top: 1px solid #eee;">
+  <strong style="color:#111">Option B — Crisp Modern:</strong> Light mode, red accent (distinctive vs. generic blue), DM Sans type, card-in-card layout. Feels like a premium iOS app. Clean hierarchy, the card structure makes it feel intentional rather than tabular.
+</div>
+</div>
+
+<!-- ═══════════════════════ OPTION C ═══════════════════════ -->
+<div class="panel" id="panel-c">
+<div class="c-wrap">
+  <header class="c-header">
+    <a class="c-logo" href="#">
+      <span class="c-logo-icon">✈️</span>
+      <span class="c-logo-name">TSA Tracker</span>
+    </a>
+    <nav class="c-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+    </nav>
+  </header>
+
+  <div class="c-hero">
+    <h1 class="c-headline">How long is<br>the TSA line?</h1>
+    <p class="c-sub">Real-time data from airport systems. No estimates.</p>
+    <input class="c-search" type="text" placeholder="Type an airport…">
+    <div class="c-chips">
+      <div class="c-chip sel">LAX</div>
+      <div class="c-chip">JFK</div>
+      <div class="c-chip">EWR</div>
+      <div class="c-chip">LGA</div>
+      <div class="c-chip">SEA</div>
+      <div class="c-chip">DFW</div>
+      <div class="c-chip">ORD</div>
+      <div class="c-chip">MIA</div>
+      <div class="c-chip">PHL</div>
+    </div>
+  </div>
+
+  <div class="c-results">
+    <div class="c-section-label">LAX — Los Angeles International</div>
+
+    <div class="c-cp-block low">
+      <div>
+        <div class="c-cp-name">TBIT</div>
+        <div class="c-lanes">
+          <div class="c-lane"><span class="c-l-tag c-std-t">Regular</span></div>
+          <div class="c-lane"><span class="c-l-tag c-pre-t">TSA Pre✓</span></div>
+        </div>
+      </div>
+      <div class="c-wait-col">
+        <div class="c-big-wait c-low-num">3</div>
+        <span class="c-big-unit">mins</span>
+      </div>
+    </div>
+
+    <div class="c-cp-block med">
+      <div>
+        <div class="c-cp-name">Terminal 6</div>
+        <div class="c-lanes">
+          <div class="c-lane"><span class="c-l-tag c-std-t">Regular</span> <span style="font-size:13px;color:#ca8a04;font-weight:600;margin-left:4px;">18 min</span></div>
+          <div class="c-lane"><span class="c-l-tag c-pre-t">TSA Pre✓</span> <span style="font-size:13px;color:#16a34a;font-weight:600;margin-left:4px;">5 min</span></div>
+          <div class="c-lane"><span class="c-l-tag c-clr-t">CLEAR</span> <span style="font-size:13px;color:#16a34a;font-weight:600;margin-left:4px;">&lt;1 min</span></div>
+        </div>
+      </div>
+      <div class="c-wait-col">
+        <div class="c-big-wait c-med-num">18</div>
+        <span class="c-big-unit">mins</span>
+      </div>
+    </div>
+
+    <div class="c-cp-block high">
+      <div>
+        <div class="c-cp-name">Terminal 4</div>
+        <div class="c-lanes">
+          <div class="c-lane"><span class="c-l-tag c-std-t">Regular</span></div>
+        </div>
+      </div>
+      <div class="c-wait-col">
+        <div class="c-big-wait c-high-num">31</div>
+        <span class="c-big-unit">mins</span>
+      </div>
+    </div>
+
+    <div class="c-updated">Updated 7:11 PM · refreshes every 2 min</div>
+  </div>
+</div>
+<div class="compare-note">
+  <strong>Option C — Bold Numbers:</strong> The wait time IS the design. Giant Oswald numerals, left accent border coded by severity, everything else gets out of the way. Inspired by transit departure boards — if you're rushing through an airport, you read the number instantly. Multi-lane breakdowns are secondary, shown inline.
+</div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
