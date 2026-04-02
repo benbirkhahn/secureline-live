@@ -43,6 +43,7 @@ LIVE_AIRPORTS = {
     "EWR": {"name": "Newark Liberty International (EWR)", "mode": "LIVE_PUBLIC"},
     "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC"},
     "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC"},
+    "DEN": {"name": "Denver International (DEN)", "mode": "LIVE_KEY_REQUIRED"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -61,17 +62,6 @@ PIPELINE_AIRPORTS = [
         # internal: atl.com/times/ blocked by Cloudflare challenge (all endpoints 403).
         # Requires headless browser or alternative data source.
         # See airport_research/pipeline/ATL.md for full investigation log.
-    },
-    {
-        "code": "DEN",
-        "name": "Denver International",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: api.denverairport.com exists and handles /wait-times/checkpoint/DEN
-        # but returns {"success":true,"msg":"Missing Backfil URL"} — DEN hasn't wired their
-        # upstream source yet. flydenver.com is fully Cloudflare-blocked.
-        # Re-probe periodically; should go live once DEN configures their backend.
-        # See airport_research/pipeline/DEN.md for full investigation log.
     },
     {
         "code": "SFO",
