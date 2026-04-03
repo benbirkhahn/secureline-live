@@ -110,11 +110,23 @@ function renderLiveCards(payload, selectedCode) {
         bigNumHtml = `<span class="text-6xl font-headline font-bold ${cfg.text} tracking-tighter leading-none">${mins}<span class="text-xl ml-1">M</span></span>`;
     }
 
+
+    let bigNumHtml;
+    const mins = fmtMinutes(stdRow.wait_minutes);
+    if (mins === null) {
+        bigNumHtml = `<span class="text-5xl font-headline font-bold text-surface-variant tracking-tighter">--</span>`;
+    } else if (mins === 0) {
+        bigNumHtml = `<span class="text-5xl font-headline font-bold ${cfg.text} tracking-tighter">&lt;1<span class="text-xl ml-1 ${cfg.text}">M</span></span>`;
+    } else {
+        bigNumHtml = `<span class="text-6xl font-headline font-bold ${cfg.text} tracking-tighter leading-none">${mins}<span class="text-xl ml-1">M</span></span>`;
+    }
+
     const laneRowsHtml = lanes.length > 1 ? lanes.map(row => {
         const lCfg = laneConfig(row.lane_type);
         const lTier = TIER_CONFIG[waitTier(row.wait_minutes)];
         const lMins = fmtMinutes(row.wait_minutes);
         let lText = lMins === null ? "Closed" : (lMins === 0 ? "<1m" : `${lMins}m`);
+
 
         return `<div class="flex justify-between items-center py-2 border-t border-[#3a494b]/20">
             <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${lCfg.cls}">${lCfg.label}</span>
@@ -124,6 +136,7 @@ function renderLiveCards(payload, selectedCode) {
 
     const block = document.createElement("div");
     block.className = `bg-surface-container-high p-8 flex flex-col justify-between relative overflow-hidden group ${cfg.border}`;
+
 
     // Watermark
     const waterMark = document.createElement("div");
@@ -196,6 +209,10 @@ function drawChart(points, airportCode) {
   const ctx = document.getElementById("history-chart");
   if (!ctx) return;
   if (chart) chart.destroy();
+
+  Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+  Chart.defaults.color = "#88d1e7";
+
 
   Chart.defaults.font.family = "'Space Grotesk', sans-serif";
   Chart.defaults.color = "#88d1e7";
@@ -291,6 +308,11 @@ function renderAirportChips(payload, filterText = "") {
   const entries = Object.entries(payload.live_airports || {});
   const q = filterText.trim().toLowerCase();
 
+
+  const data = payload.data || {};
+  const entries = Object.entries(payload.live_airports || {});
+  const q = filterText.trim().toLowerCase();
+
   const filtered = entries.filter(([code, info]) =>
     !q || code.toLowerCase().includes(q) || info.name.toLowerCase().includes(q)
   );
@@ -306,6 +328,10 @@ function renderAirportChips(payload, filterText = "") {
     const tier = waitTier(avgWait);
     const cfg = TIER_CONFIG[tier];
 
+
+    const tier = waitTier(avgWait);
+    const cfg = TIER_CONFIG[tier];
+
     let bigNumHtml = `<span class="text-3xl font-headline font-bold text-primary">${Math.round(avgWait)}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
     if (avgWait === 0 && sample.length > 0) {
         bigNumHtml = `<span class="text-3xl font-headline font-bold text-primary">&lt;1<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
@@ -314,6 +340,7 @@ function renderAirportChips(payload, filterText = "") {
     const card = document.createElement("div");
     card.className = `bg-surface-container-low p-6 ${cfg.border} hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col justify-between`;
     card.onclick = () => window.location.href = `/airports/${code.toLowerCase()}-tsa-wait-times`;
+
 
     card.innerHTML = `
         <div>

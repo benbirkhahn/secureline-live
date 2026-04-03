@@ -191,6 +191,7 @@
       <!-- Dashboard Content -->
       <div class="pt-24 pb-24 md:pb-12 px-6 md:px-8 max-w-7xl mx-auto" id="results-section">
 
+
           {% if is_airport_page %}
           <!-- ── OPERATIONAL CORE (Airport Page) ── -->
           <header class="mb-12">
@@ -244,6 +245,7 @@
           <div class="mt-12 bg-surface-container-low border border-[#3a494b]/15 p-6 md:p-8">
               <h2 class="text-xl font-bold font-headline text-primary mb-4">About {{ initial_airport_code }} TSA Security Wait Times</h2>
               <p class="text-sm text-secondary opacity-80 mb-6 leading-relaxed">TSA Tracker provides live TSA checkpoint wait times for {{ airport_display_name }} ({{ initial_airport_code }}). Data is pulled directly from official {{ initial_airport_code }} airport security feeds — not estimates — and refreshes every ~2 minutes. Use the live data and 12-hour history chart above to plan when to head to the airport.</p>
+
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                   <div>
@@ -311,6 +313,7 @@
                       <!-- Rendered by app.js -->
                   </div>
               </div>
+
 
               <div class="bg-surface-container-high p-8 flex flex-col justify-center border-l-4 border-primary-container">
                   <span class="text-xs font-label text-primary-container tracking-widest uppercase mb-4">System Information</span>
