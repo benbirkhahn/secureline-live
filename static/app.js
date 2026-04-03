@@ -123,7 +123,7 @@ function renderLiveCards(payload, selectedCode) {
     }).join("") : "";
 
     const block = document.createElement("div");
-    block.className = `bg-surface-container-high p-8 flex flex-col justify-between relative overflow-hidden group ${cfg.border}`;
+    block.className = `bg-surface-container-high ${cfg.bg} p-8 flex flex-col justify-between relative overflow-hidden group ${cfg.border}`;
 
     // Watermark
     const waterMark = document.createElement("div");
