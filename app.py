@@ -31,6 +31,8 @@ ADS_TXT_LINE = os.getenv(
 UA = {"User-Agent": "Mozilla/5.0 (tsa-live-site/1.0)"}
 
 LIVE_AIRPORTS = {
+    "DTW": {"name": "Detroit Metropolitan (DTW)", "mode": "LIVE_PUBLIC"},
+    "IAH": {"name": "George Bush Intercontinental (IAH)", "mode": "LIVE_KEY_REQUIRED"},
     "PHL": {"name": "Philadelphia International (PHL)", "mode": "LIVE_PUBLIC"},
     "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED"},
     "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
@@ -43,6 +45,9 @@ LIVE_AIRPORTS = {
     "EWR": {"name": "Newark Liberty International (EWR)", "mode": "LIVE_PUBLIC"},
     "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC"},
     "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC"},
+    "DEN": {"name": "Denver International (DEN)", "mode": "LIVE_KEY_REQUIRED"},
+    "IAH": {"name": "George Bush Intercontinental (IAH)", "mode": "LIVE_KEY_REQUIRED"},
+    "DTW": {"name": "Detroit Metropolitan (DTW)", "mode": "LIVE_PUBLIC"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -50,6 +55,20 @@ AIRPORT_FACTORS = {
     "LAX": 1.4, "LGA": 1.25, "MCO": 1.1, "MDW": 0.9, "MIA": 1.25, "MSP": 1.0,
     "ORD": 1.3, "PHL": 1.1, "PHX": 1.0, "SEA": 1.1, "SFO": 1.25, "SLC": 0.9,
     "TPA": 0.9, "JAX": 0.9,
+}
+ORD_CHECKPOINT_MAP = {
+    "t2c5general": "Terminal 2 — Checkpoint 5 General",
+    "t2c5precheck": "Terminal 2 — Checkpoint 5 TSA PreCheck",
+    "t3c6": "Terminal 3 — Checkpoint 6",
+    "t3c7general": "Terminal 3 — Checkpoint 7 General",
+    "t3c7a": "Terminal 3 — Checkpoint 7A",
+    "t3c8general": "Terminal 3 — Checkpoint 8 General",
+    "t3c8precheck": "Terminal 3 — Checkpoint 8 TSA PreCheck",
+    "t3c9": "Terminal 3 — Checkpoint 9",
+    "t5c10": "Terminal 5 — Checkpoint 10",
+    "security02floor": "Terminal 1 — Economy",
+    "tsafloor": "Terminal 1 — TSA PreCheck",
+    "pafloor": "Terminal 1 — Priority",
 }
 
 PIPELINE_AIRPORTS = [
@@ -63,17 +82,6 @@ PIPELINE_AIRPORTS = [
         # See airport_research/pipeline/ATL.md for full investigation log.
     },
     {
-        "code": "DEN",
-        "name": "Denver International",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: api.denverairport.com exists and handles /wait-times/checkpoint/DEN
-        # but returns {"success":true,"msg":"Missing Backfil URL"} — DEN hasn't wired their
-        # upstream source yet. flydenver.com is fully Cloudflare-blocked.
-        # Re-probe periodically; should go live once DEN configures their backend.
-        # See airport_research/pipeline/DEN.md for full investigation log.
-    },
-    {
         "code": "SFO",
         "name": "San Francisco International",
         "status": "IN_RESEARCH",
@@ -82,15 +90,6 @@ PIPELINE_AIRPORTS = [
         # returns 200 but wait-time data is loaded dynamically (JS/AJAX) — not in static HTML.
         # No public JSON API or skydive/mobi endpoint found. Drupal site, no Next.js bundle.
         # See airport_research/pipeline/SFO.md for full investigation log.
-    },
-    {
-        "code": "IAH",
-        "name": "George Bush Intercontinental (IAH)",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: fly2houston.com/iah/security renders wait times dynamically (JS/AJAX).
-        # No public JSON API or skydive/mobi endpoint found. Wait-time data loaded client-side.
-        # See airport_research/pipeline/IAH.md for full investigation log.
     },
     {
         "code": "LAS",
@@ -109,15 +108,6 @@ PIPELINE_AIRPORTS = [
         # internal: bwiairport.com/at-bwi/airport-security renders wait times dynamically.
         # No public JSON API found. Requires headless browser or XHR interception.
         # See airport_research/pipeline/BWI.md for full investigation log.
-    },
-    {
-        "code": "DTW",
-        "name": "Detroit Metropolitan (DTW)",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: metroairport.com/at-the-airport/security renders wait times dynamically.
-        # No public JSON API found. Requires headless browser or XHR interception.
-        # See airport_research/pipeline/DTW.md for full investigation log.
     },
     {
         "code": "IAD",
@@ -149,7 +139,7 @@ _clt_cache = {
 }
 _mco_cache = {
     "endpoint": "https://api.goaa.aero/wait-times/checkpoint/MCO",
-    "key": os.getenv("MCO_API_KEY", "8eaac7209c824616a8fe58d22268cd59"),
+    "key": os.getenv("MCO_API_KEY"),
     "version": os.getenv("MCO_API_VERSION", "140"),
 }
 _poll_lock = threading.Lock()
@@ -229,6 +219,38 @@ def legal_page_seo(slug: str) -> Dict:
     )
 
 
+
+def _get_tier_config(wait_minutes: float) -> dict:
+    if wait_minutes is None or wait_minutes < 0:
+        return {"text": "text-surface-variant", "bg": "bg-surface-variant/10", "border": "border-l-2 border-surface-variant", "label": "Closed", "icon": "block"}
+    if wait_minutes <= 15:
+        return {"text": "text-[#00f2ff]", "bg": "bg-[#00f2ff]/10", "border": "border-l-2 border-[#00f2ff]", "label": "Optimal", "icon": "check_circle"}
+    if wait_minutes <= 30:
+        return {"text": "text-[#88d1e7]", "bg": "bg-[#88d1e7]/10", "border": "border-l-2 border-[#88d1e7]", "label": "Nominal", "icon": "bar_chart"}
+    if wait_minutes <= 45:
+        return {"text": "text-orange-400", "bg": "bg-orange-400/10", "border": "border-l-2 border-orange-400", "label": "Elevated", "icon": "warning"}
+    return {"text": "text-[#ffb4ab]", "bg": "bg-[#ffb4ab]/10", "border": "border-l-2 border-[#ffb4ab]", "label": "Congested", "icon": "error"}
+
+def get_ssr_live_data() -> dict:
+    data = latest_snapshot()
+    ssr_data = {}
+    for code, info in LIVE_AIRPORTS.items():
+        rows = data.get(code, [])
+        active = [r for r in rows if r["wait_minutes"] is not None and r["wait_minutes"] > 0]
+        sample = active if active else rows
+
+        values = [max(0, r["wait_minutes"]) for r in sample if r["wait_minutes"] is not None]
+        avg_wait = sum(values) / len(values) if values else 0
+
+        ssr_data[code] = {
+            "name": info["name"],
+            "avgWait": avg_wait,
+            "sampleLength": len(sample),
+            "cfg": _get_tier_config(avg_wait)
+        }
+    return ssr_data
+
+
 def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     is_airport_page = bool(initial_airport_code and initial_airport_code in LIVE_AIRPORTS)
     airport_display_name = ""
@@ -238,6 +260,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     return {
         "live_airports": LIVE_AIRPORTS,
         "pipeline_airports": PIPELINE_AIRPORTS,
+        "ssr_live_data": get_ssr_live_data() if not is_airport_page else {},
         "initial_airport_code": initial_airport_code,
         "is_airport_page": is_airport_page,
         "airport_display_name": airport_display_name,
@@ -587,21 +610,7 @@ def fetch_mia_rows() -> List[Dict]:
 
 def ord_friendly_checkpoint(metric_name: str) -> str:
     s = metric_name.lower()
-    mapping = [
-        ("t2c5general", "Terminal 2 — Checkpoint 5 General"),
-        ("t2c5precheck", "Terminal 2 — Checkpoint 5 TSA PreCheck"),
-        ("t3c6", "Terminal 3 — Checkpoint 6"),
-        ("t3c7general", "Terminal 3 — Checkpoint 7 General"),
-        ("t3c7a", "Terminal 3 — Checkpoint 7A"),
-        ("t3c8general", "Terminal 3 — Checkpoint 8 General"),
-        ("t3c8precheck", "Terminal 3 — Checkpoint 8 TSA PreCheck"),
-        ("t3c9", "Terminal 3 — Checkpoint 9"),
-        ("t5c10", "Terminal 5 — Checkpoint 10"),
-        ("security02floor", "Terminal 1 — Economy"),
-        ("tsafloor", "Terminal 1 — TSA PreCheck"),
-        ("pafloor", "Terminal 1 — Priority"),
-    ]
-    for key, label in mapping:
+    for key, label in ORD_CHECKPOINT_MAP.items():
         if key in s:
             return label
     return metric_name
@@ -700,8 +709,8 @@ def fetch_jax_rows() -> List[Dict]:
 
 _DFW_API = "https://api.dfwairport.mobi/wait-times/checkpoint/DFW"
 _DFW_HEADERS = {
-    "Api-Key": "87856E0636AA4BF282150FCBE1AD63DE",
-    "Api-Version": "170",
+    "Api-Key": os.getenv("DFW_API_KEY"),
+    "Api-Version": os.getenv("DFW_API_VERSION", "170"),
     "Accept": "application/json",
 }
 
@@ -771,6 +780,126 @@ def fetch_lax_rows() -> List[Dict]:
 
 
 _PANYNJ_GQL = "https://api.jfkairport.com/graphql"
+
+
+
+def fetch_den_rows() -> List[Dict]:
+    """FlyFruition API for Denver (DEN) - Requires x-api-key."""
+    key = os.environ.get("DEN_API_KEY")
+    if not key:
+        return []
+
+    url = "https://app.flyfruition.com/api/public/tsa"
+    headers = {**UA, "x-api-key": key}
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    out = []
+    stamp = utc_now().isoformat()
+    for location in payload:
+        loc_title = location.get("title", "Security")
+        for lane in location.get("lanes", []):
+            if lane.get("hide_lane", False):
+                continue
+
+            lane_title = lane.get("title", "Standard")
+            wait_str = str(lane.get("wait_time", "0"))
+
+            m = re.search(r"(\d+)-(\d+)", wait_str)
+            if m:
+                mins = int(m.group(2))
+            else:
+                m = re.search(r"(\d+)", wait_str)
+                mins = int(m.group(1)) if m else 0
+
+            out.append({
+                "checkpoint": f"{loc_title} - {lane_title}",
+                "wait_minutes": mins,
+                "airport_code": "DEN",
+                "source": "flyfruition",
+                "captured_at": stamp,
+            })
+    return out
+
+
+
+def fetch_iah_rows() -> List[Dict]:
+    """Houston Airports API for IAH - Requires api-key and api-version."""
+    key = os.environ.get("IAH_API_KEY")
+    if not key:
+        return []
+
+    url = "https://api.houstonairports.mobi/wait-times/checkpoint/iah"
+    headers = {
+        **UA,
+        "api-key": key,
+        "api-version": "120",
+        "accept": "application/json"
+    }
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    out = []
+    stamp = utc_now().isoformat()
+    wait_times = payload.get("data", {}).get("wait_times", [])
+
+    for item in wait_times:
+        if not item.get("isDisplayable", False):
+            continue
+
+        # Ignore immigration
+        if item.get("lane") == "FIS":
+            continue
+
+        name = item.get("name", "Unknown Checkpoint")
+        # IAH returns waitSeconds
+        wait_seconds = item.get("waitSeconds", 0)
+        wait_minutes = max(0, int(wait_seconds / 60))
+
+        out.append({
+            "airport_code": "IAH",
+            "checkpoint": name,
+            "wait_minutes": wait_minutes,
+            "source": url,
+            "captured_at": stamp
+        })
+    return out
+
+
+
+def fetch_dtw_rows() -> List[Dict]:
+    """Detroit Metropolitan Airport (DTW) - SkyFii Proxy API.
+    Public API, no auth required.
+    """
+    url = "https://proxy.metroairport.com/SkyFiiTSAProxy.ashx"
+    headers = {
+        **UA,
+        "accept": "application/json",
+        "origin": "https://www.metroairport.com",
+        "referer": "https://www.metroairport.com/"
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    out = []
+    stamp = utc_now().isoformat()
+
+    for item in payload:
+        name = item.get("Name", "Unknown Terminal")
+        wait_minutes = int(item.get("WaitTime", 0))
+
+        out.append({
+            "airport_code": "DTW",
+            "checkpoint": f"{name} Terminal",
+            "wait_minutes": wait_minutes,
+            "source": url,
+            "captured_at": stamp
+        })
+    return out
 
 
 def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
@@ -914,6 +1043,9 @@ def collect_once() -> Dict:
         ("EWR", fetch_ewr_rows),
         ("LGA", fetch_lga_rows),
         ("SEA", fetch_sea_rows),
+        ("DEN", fetch_den_rows),
+        ("IAH", fetch_iah_rows),
+        ("DTW", fetch_dtw_rows),
     ]
     all_rows = []
     for code, fn in collectors:
@@ -980,12 +1112,28 @@ def latest_for_code(airport_code: str) -> List[Dict]:
 def normalized_current_wait_for_code(code: str) -> Dict:
     rows = latest_for_code(code)
     if rows:
-        active = [r for r in rows if float(r.get("wait_minutes", 0)) > 0]
-        sample = active if active else rows
-        values = [clamp_wait_minutes(float(r.get("wait_minutes", 0))) for r in sample]
-        standard = round(sum(values) / len(values), 1) if values else 0.0
-        has_pre = any("pre" in str(r.get("checkpoint", "")).lower() for r in rows)
-        latest_ts = max(rows, key=lambda r: r.get("captured_at", ""))["captured_at"]
+        active_values = []
+        all_values = []
+        has_pre = False
+        latest_ts = ""
+
+        for r in rows:
+            wait_val = float(r.get("wait_minutes", 0))
+            clamped_val = clamp_wait_minutes(wait_val)
+            all_values.append(clamped_val)
+            if wait_val > 0:
+                active_values.append(clamped_val)
+
+            if not has_pre and "pre" in str(r.get("checkpoint", "")).lower():
+                has_pre = True
+
+            captured_at = r.get("captured_at", "")
+            if captured_at > latest_ts:
+                latest_ts = captured_at
+
+        sample_values = active_values if active_values else all_values
+        standard = round(sum(sample_values) / len(sample_values), 1) if sample_values else 0.0
+
         return {
             "available": True,
             "sourceType": "live_direct",
