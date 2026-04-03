@@ -222,12 +222,12 @@ def _get_tier_config(wait_minutes: float) -> dict:
     if wait_minutes is None or wait_minutes < 0:
         return {"text": "text-surface-variant", "bg": "bg-surface-variant/10", "border": "border-l-2 border-surface-variant", "label": "Closed", "icon": "block"}
     if wait_minutes <= 15:
-        return {"text": "text-[#00f2ff]", "bg": "bg-[#00f2ff]/10", "border": "border-l-2 border-[#00f2ff]", "label": "Optimal", "icon": "check_circle"}
+        return {"text": "text-[#00ff00]", "bg": "bg-[#00ff00]/10", "border": "border-l-2 border-[#00ff00]", "label": "Optimal", "icon": "check_circle"}
     if wait_minutes <= 30:
-        return {"text": "text-[#88d1e7]", "bg": "bg-[#88d1e7]/10", "border": "border-l-2 border-[#88d1e7]", "label": "Nominal", "icon": "bar_chart"}
+        return {"text": "text-[#ffff00]", "bg": "bg-[#ffff00]/10", "border": "border-l-2 border-[#ffff00]", "label": "Nominal", "icon": "bar_chart"}
     if wait_minutes <= 45:
-        return {"text": "text-orange-400", "bg": "bg-orange-400/10", "border": "border-l-2 border-orange-400", "label": "Elevated", "icon": "warning"}
-    return {"text": "text-[#ffb4ab]", "bg": "bg-[#ffb4ab]/10", "border": "border-l-2 border-[#ffb4ab]", "label": "Congested", "icon": "error"}
+        return {"text": "text-[#ff0000]", "bg": "bg-[#ff0000]/10", "border": "border-l-2 border-[#ff0000]", "label": "Elevated", "icon": "warning"}
+    return {"text": "text-[#ff0000]", "bg": "bg-[#ff0000]/10", "border": "border-l-2 border-[#ff0000]", "label": "Congested", "icon": "error"}
 
 def get_ssr_live_data() -> dict:
     data = latest_snapshot()

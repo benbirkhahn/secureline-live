@@ -29,10 +29,10 @@ function latestCapturedAt(rows) {
 
 // Map logical tiers to our Tailwind colors
 const TIER_CONFIG = {
-  low:  { text: "text-[#00f2ff]",      bg: "bg-[#00f2ff]/10", border: "border-l-2 border-[#00f2ff]", label: "Optimal",  icon: "check_circle" },
-  med:  { text: "text-[#88d1e7]",      bg: "bg-[#88d1e7]/10", border: "border-l-2 border-[#88d1e7]", label: "Nominal",  icon: "bar_chart" },
-  high: { text: "text-orange-400",     bg: "bg-orange-400/10",border: "border-l-2 border-orange-400",label: "Elevated", icon: "warning" },
-  crit: { text: "text-[#ffb4ab]",      bg: "bg-[#ffb4ab]/10", border: "border-l-2 border-[#ffb4ab]", label: "Congested",icon: "error" },
+  low:  { text: "text-[#00ff00]",      bg: "bg-[#00ff00]/10", border: "border-l-2 border-[#00ff00]", label: "Optimal",  icon: "check_circle" },
+  med:  { text: "text-[#ffff00]",      bg: "bg-[#ffff00]/10", border: "border-l-2 border-[#ffff00]", label: "Nominal",  icon: "bar_chart" },
+  high: { text: "text-[#ff0000]",     bg: "bg-[#ff0000]/10",border: "border-l-2 border-[#ff0000]",label: "Elevated", icon: "warning" },
+  crit: { text: "text-[#ff0000]",      bg: "bg-[#ff0000]/10", border: "border-l-2 border-[#ff0000]", label: "Congested",icon: "error" },
   none: { text: "text-surface-variant",bg: "bg-surface-variant/10", border: "border-l-2 border-surface-variant", label: "Closed", icon: "block" }
 };
 
@@ -110,23 +110,11 @@ function renderLiveCards(payload, selectedCode) {
         bigNumHtml = `<span class="text-6xl font-headline font-bold ${cfg.text} tracking-tighter leading-none">${mins}<span class="text-xl ml-1">M</span></span>`;
     }
 
-
-    let bigNumHtml;
-    const mins = fmtMinutes(stdRow.wait_minutes);
-    if (mins === null) {
-        bigNumHtml = `<span class="text-5xl font-headline font-bold text-surface-variant tracking-tighter">--</span>`;
-    } else if (mins === 0) {
-        bigNumHtml = `<span class="text-5xl font-headline font-bold ${cfg.text} tracking-tighter">&lt;1<span class="text-xl ml-1 ${cfg.text}">M</span></span>`;
-    } else {
-        bigNumHtml = `<span class="text-6xl font-headline font-bold ${cfg.text} tracking-tighter leading-none">${mins}<span class="text-xl ml-1">M</span></span>`;
-    }
-
     const laneRowsHtml = lanes.length > 1 ? lanes.map(row => {
         const lCfg = laneConfig(row.lane_type);
         const lTier = TIER_CONFIG[waitTier(row.wait_minutes)];
         const lMins = fmtMinutes(row.wait_minutes);
         let lText = lMins === null ? "Closed" : (lMins === 0 ? "<1m" : `${lMins}m`);
-
 
         return `<div class="flex justify-between items-center py-2 border-t border-[#3a494b]/20">
             <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-widest ${lCfg.cls}">${lCfg.label}</span>
@@ -136,7 +124,6 @@ function renderLiveCards(payload, selectedCode) {
 
     const block = document.createElement("div");
     block.className = `bg-surface-container-high ${cfg.bg} p-8 flex flex-col justify-between relative overflow-hidden group ${cfg.border}`;
-
 
     // Watermark
     const waterMark = document.createElement("div");
@@ -209,10 +196,6 @@ function drawChart(points, airportCode) {
   const ctx = document.getElementById("history-chart");
   if (!ctx) return;
   if (chart) chart.destroy();
-
-  Chart.defaults.font.family = "'Space Grotesk', sans-serif";
-  Chart.defaults.color = "#88d1e7";
-
 
   Chart.defaults.font.family = "'Space Grotesk', sans-serif";
   Chart.defaults.color = "#88d1e7";
@@ -308,11 +291,6 @@ function renderAirportChips(payload, filterText = "") {
   const entries = Object.entries(payload.live_airports || {});
   const q = filterText.trim().toLowerCase();
 
-
-  const data = payload.data || {};
-  const entries = Object.entries(payload.live_airports || {});
-  const q = filterText.trim().toLowerCase();
-
   const filtered = entries.filter(([code, info]) =>
     !q || code.toLowerCase().includes(q) || info.name.toLowerCase().includes(q)
   );
@@ -329,11 +307,6 @@ function renderAirportChips(payload, filterText = "") {
     const cfg = TIER_CONFIG[tier];
 
     let bigNumHtml = `<span class="text-3xl font-headline font-bold ${cfg.text}">${Math.round(avgWait)}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
-
-    const tier = waitTier(avgWait);
-    const cfg = TIER_CONFIG[tier];
-
-    let bigNumHtml = `<span class="text-3xl font-headline font-bold text-primary">${Math.round(avgWait)}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
     if (avgWait === 0 && sample.length > 0) {
         bigNumHtml = `<span class="text-3xl font-headline font-bold ${cfg.text}">&lt;1<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
     }
@@ -341,7 +314,6 @@ function renderAirportChips(payload, filterText = "") {
     const card = document.createElement("div");
     card.className = `bg-surface-container-low ${cfg.bg} p-6 ${cfg.border} hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col justify-between`;
     card.onclick = () => window.location.href = `/airports/${code.toLowerCase()}-tsa-wait-times`;
-
 
     card.innerHTML = `
         <div>
@@ -374,7 +346,7 @@ async function selectAirport(code) {
   if (select) select.value = code;
 
   await updateSelectionSourceStatus(code);
-  renderAirportChips(livePayloadCache, document.getElementById("airport-search")?.value || "");
+  if (document.getElementById("airport-chips")) renderAirportChips(livePayloadCache, document.getElementById("airport-search")?.value || "");
   renderLiveCards(livePayloadCache, code);
   await loadHistory(code);
 }
@@ -388,7 +360,7 @@ async function bootstrap() {
 
       const search = document.getElementById("airport-search");
       if (search) {
-          search.addEventListener("input", (e) => renderAirportChips(livePayloadCache, e.target.value));
+          search.addEventListener("input", (e) => { if (document.getElementById("airport-chips")) renderAirportChips(livePayloadCache, e.target.value); });
           search.addEventListener("keydown", (e) => {
             if (e.key !== "Enter") return;
             const q = search.value.trim().toLowerCase();
@@ -399,7 +371,7 @@ async function bootstrap() {
           });
       }
 
-      renderAirportChips(livePayloadCache);
+      if (document.getElementById("airport-chips")) renderAirportChips(livePayloadCache);
 
       const initialCode = String(window.INITIAL_AIRPORT_CODE || "").toUpperCase();
       if (initialCode && livePayloadCache.live_airports?.[initialCode]) {
