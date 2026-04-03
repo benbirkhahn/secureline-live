@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import sqlite3
+from contextlib import contextmanager
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -452,61 +453,71 @@ def normalize_lane_type(raw: str) -> str:
     return "STANDARD"
 
 
-def init_db() -> None:
+
+@contextmanager
+def get_db():
     conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS samples (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            airport_code TEXT NOT NULL,
-            checkpoint TEXT NOT NULL,
-            wait_minutes REAL NOT NULL,
-            source TEXT NOT NULL,
-            captured_at TEXT NOT NULL,
-            lane_type TEXT NOT NULL DEFAULT 'STANDARD'
-        )
-        """
-    )
-    # Migrate existing DBs that don't yet have lane_type
     try:
-        cur.execute("ALTER TABLE samples ADD COLUMN lane_type TEXT NOT NULL DEFAULT 'STANDARD'")
+        yield conn
+        conn.commit()
     except Exception:
-        pass  # column already exists
-    cur.execute(
-        """
-        CREATE INDEX IF NOT EXISTS idx_samples_airport_time
-        ON samples (airport_code, captured_at)
-        """
-    )
-    conn.commit()
-    conn.close()
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def init_db() -> None:
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS samples (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                airport_code TEXT NOT NULL,
+                checkpoint TEXT NOT NULL,
+                wait_minutes REAL NOT NULL,
+                source TEXT NOT NULL,
+                captured_at TEXT NOT NULL,
+                lane_type TEXT NOT NULL DEFAULT 'STANDARD'
+            )
+            """
+        )
+        # Migrate existing DBs that don't yet have lane_type
+        try:
+            cur.execute("ALTER TABLE samples ADD COLUMN lane_type TEXT NOT NULL DEFAULT 'STANDARD'")
+        except Exception:
+            pass  # column already exists
+        cur.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_samples_airport_time
+            ON samples (airport_code, captured_at)
+            """
+        )
 
 
 def db_insert_rows(rows: List[Dict]) -> None:
     if not rows:
         return
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.executemany(
-        """
-        INSERT INTO samples (airport_code, checkpoint, wait_minutes, source, captured_at, lane_type)
-        VALUES (?, ?, ?, ?, ?, ?)
-        """,
-        [
-            (
-                r["airport_code"],
-                r["checkpoint"],
-                float(r["wait_minutes"]),
-                r["source"],
-                r["captured_at"],
-                r.get("lane_type", "STANDARD"),
-            )
-            for r in rows
-        ],
-    )
-    conn.commit()
-    conn.close()
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.executemany(
+            """
+            INSERT INTO samples (airport_code, checkpoint, wait_minutes, source, captured_at, lane_type)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            [
+                (
+                    r["airport_code"],
+                    r["checkpoint"],
+                    float(r["wait_minutes"]),
+                    r["source"],
+                    r["captured_at"],
+                    r.get("lane_type", "STANDARD"),
+                )
+                for r in rows
+            ],
+        )
 
 
 def fetch_phl_rows() -> List[Dict]:
@@ -1069,38 +1080,37 @@ def poll_forever() -> None:
 
 def latest_snapshot() -> Dict:
     cutoff = (utc_now() - timedelta(minutes=15)).isoformat()
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT airport_code, checkpoint, wait_minutes, source, captured_at,
-               COALESCE(lane_type, 'STANDARD') AS lane_type
-        FROM samples
-        WHERE captured_at >= ?
-        ORDER BY captured_at DESC
-        """,
-        (cutoff,),
-    )
-    rows = cur.fetchall()
-    conn.close()
-    out: Dict[str, List[Dict]] = {}
-    seen = set()
-    for airport_code, checkpoint, wait_minutes, source, captured_at, lane_type in rows:
-        if airport_code == "ORD":
-            checkpoint = ord_friendly_checkpoint(checkpoint)
-        key = (airport_code, checkpoint, lane_type)
-        if key in seen:
-            continue
-        seen.add(key)
-        out.setdefault(airport_code, []).append(
-            {
-                "checkpoint": checkpoint,
-                "wait_minutes": wait_minutes,
-                "lane_type": lane_type,
-                "captured_at": captured_at,
-            }
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT airport_code, checkpoint, wait_minutes, source, captured_at,
+                   COALESCE(lane_type, 'STANDARD') AS lane_type
+            FROM samples
+            WHERE captured_at >= ?
+            ORDER BY captured_at DESC
+            """,
+            (cutoff,),
         )
-    return out
+        rows = cur.fetchall()
+        out: Dict[str, List[Dict]] = {}
+        seen = set()
+        for airport_code, checkpoint, wait_minutes, source, captured_at, lane_type in rows:
+            if airport_code == "ORD":
+                checkpoint = ord_friendly_checkpoint(checkpoint)
+            key = (airport_code, checkpoint, lane_type)
+            if key in seen:
+                continue
+            seen.add(key)
+            out.setdefault(airport_code, []).append(
+                {
+                    "checkpoint": checkpoint,
+                    "wait_minutes": wait_minutes,
+                    "lane_type": lane_type,
+                    "captured_at": captured_at,
+                }
+            )
+        return out
 
 
 def latest_for_code(airport_code: str) -> List[Dict]:
@@ -1169,28 +1179,27 @@ def normalized_current_wait_for_code(code: str) -> Dict:
 
 def history_for_airport(airport_code: str, hours: int = 12) -> List[Dict]:
     cutoff = (utc_now() - timedelta(hours=hours)).isoformat()
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT airport_code, checkpoint, wait_minutes, captured_at
-        FROM samples
-        WHERE airport_code = ? AND captured_at >= ?
-        ORDER BY captured_at ASC
-        """,
-        (airport_code, cutoff),
-    )
-    rows = cur.fetchall()
-    conn.close()
-    return [
-        {
-            "airport_code": r[0],
-            "checkpoint": r[1],
-            "wait_minutes": r[2],
-            "captured_at": r[3],
-        }
-        for r in rows
-    ]
+    with get_db() as conn:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT airport_code, checkpoint, wait_minutes, captured_at
+            FROM samples
+            WHERE airport_code = ? AND captured_at >= ?
+            ORDER BY captured_at ASC
+            """,
+            (airport_code, cutoff),
+        )
+        rows = cur.fetchall()
+        return [
+            {
+                "airport_code": r[0],
+                "checkpoint": r[1],
+                "wait_minutes": r[2],
+                "captured_at": r[3],
+            }
+            for r in rows
+        ]
 
 
 @app.route("/")
@@ -1333,9 +1342,8 @@ def ads_txt():
 @app.route("/healthz")
 def healthz():
     try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.execute("SELECT 1")
-        conn.close()
+        with get_db() as conn:
+            conn.execute("SELECT 1")
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
     return jsonify({"ok": True, "generated_at": utc_now().isoformat()})
