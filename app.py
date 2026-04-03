@@ -44,6 +44,8 @@ LIVE_AIRPORTS = {
     "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC"},
     "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC"},
     "DEN": {"name": "Denver International (DEN)", "mode": "LIVE_KEY_REQUIRED"},
+    "IAH": {"name": "George Bush Intercontinental (IAH)", "mode": "LIVE_KEY_REQUIRED"},
+    "DTW": {"name": "Detroit Metropolitan (DTW)", "mode": "LIVE_PUBLIC"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -74,15 +76,6 @@ PIPELINE_AIRPORTS = [
         # See airport_research/pipeline/SFO.md for full investigation log.
     },
     {
-        "code": "IAH",
-        "name": "George Bush Intercontinental (IAH)",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: fly2houston.com/iah/security renders wait times dynamically (JS/AJAX).
-        # No public JSON API or skydive/mobi endpoint found. Wait-time data loaded client-side.
-        # See airport_research/pipeline/IAH.md for full investigation log.
-    },
-    {
         "code": "LAS",
         "name": "Harry Reid International (LAS)",
         "status": "IN_RESEARCH",
@@ -99,15 +92,6 @@ PIPELINE_AIRPORTS = [
         # internal: bwiairport.com/at-bwi/airport-security renders wait times dynamically.
         # No public JSON API found. Requires headless browser or XHR interception.
         # See airport_research/pipeline/BWI.md for full investigation log.
-    },
-    {
-        "code": "DTW",
-        "name": "Detroit Metropolitan (DTW)",
-        "status": "IN_RESEARCH",
-        "public_note": "Live integration coming soon.",
-        # internal: metroairport.com/at-the-airport/security renders wait times dynamically.
-        # No public JSON API found. Requires headless browser or XHR interception.
-        # See airport_research/pipeline/DTW.md for full investigation log.
     },
     {
         "code": "IAD",
@@ -804,6 +788,85 @@ def fetch_den_rows() -> List[Dict]:
     return out
 
 
+
+def fetch_iah_rows() -> List[Dict]:
+    """Houston Airports API for IAH - Requires api-key and api-version."""
+    key = os.environ.get("IAH_API_KEY")
+    if not key:
+        return []
+
+    url = "https://api.houstonairports.mobi/wait-times/checkpoint/iah"
+    headers = {
+        **UA,
+        "api-key": key,
+        "api-version": "120",
+        "accept": "application/json"
+    }
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    out = []
+    stamp = utc_now().isoformat()
+    wait_times = payload.get("data", {}).get("wait_times", [])
+
+    for item in wait_times:
+        if not item.get("isDisplayable", False):
+            continue
+
+        # Ignore immigration
+        if item.get("lane") == "FIS":
+            continue
+
+        name = item.get("name", "Unknown Checkpoint")
+        # IAH returns waitSeconds
+        wait_seconds = item.get("waitSeconds", 0)
+        wait_minutes = max(0, int(wait_seconds / 60))
+
+        out.append({
+            "airport_code": "IAH",
+            "checkpoint": name,
+            "wait_minutes": wait_minutes,
+            "source": url,
+            "captured_at": stamp
+        })
+    return out
+
+
+
+def fetch_dtw_rows() -> List[Dict]:
+    """Detroit Metropolitan Airport (DTW) - SkyFii Proxy API.
+    Public API, no auth required.
+    """
+    url = "https://proxy.metroairport.com/SkyFiiTSAProxy.ashx"
+    headers = {
+        **UA,
+        "accept": "application/json",
+        "origin": "https://www.metroairport.com",
+        "referer": "https://www.metroairport.com/"
+    }
+
+    resp = requests.get(url, headers=headers, timeout=20)
+    resp.raise_for_status()
+    payload = resp.json()
+
+    out = []
+    stamp = utc_now().isoformat()
+
+    for item in payload:
+        name = item.get("Name", "Unknown Terminal")
+        wait_minutes = int(item.get("WaitTime", 0))
+
+        out.append({
+            "airport_code": "DTW",
+            "checkpoint": f"{name} Terminal",
+            "wait_minutes": wait_minutes,
+            "source": url,
+            "captured_at": stamp
+        })
+    return out
+
+
 def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
     """Shared PANYNJ GraphQL fetcher for JFK, EWR, and LGA.
 
@@ -946,6 +1009,8 @@ def collect_once() -> Dict:
         ("LGA", fetch_lga_rows),
         ("SEA", fetch_sea_rows),
         ("DEN", fetch_den_rows),
+        ("IAH", fetch_iah_rows),
+        ("DTW", fetch_dtw_rows),
     ]
     all_rows = []
     for code, fn in collectors:
