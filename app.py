@@ -217,6 +217,38 @@ def legal_page_seo(slug: str) -> Dict:
     )
 
 
+
+def _get_tier_config(wait_minutes: float) -> dict:
+    if wait_minutes is None or wait_minutes < 0:
+        return {"text": "text-surface-variant", "bg": "bg-surface-variant/10", "border": "border-l-2 border-surface-variant", "label": "Closed", "icon": "block"}
+    if wait_minutes <= 15:
+        return {"text": "text-[#00f2ff]", "bg": "bg-[#00f2ff]/10", "border": "border-l-2 border-[#00f2ff]", "label": "Optimal", "icon": "check_circle"}
+    if wait_minutes <= 30:
+        return {"text": "text-[#88d1e7]", "bg": "bg-[#88d1e7]/10", "border": "border-l-2 border-[#88d1e7]", "label": "Nominal", "icon": "bar_chart"}
+    if wait_minutes <= 45:
+        return {"text": "text-orange-400", "bg": "bg-orange-400/10", "border": "border-l-2 border-orange-400", "label": "Elevated", "icon": "warning"}
+    return {"text": "text-[#ffb4ab]", "bg": "bg-[#ffb4ab]/10", "border": "border-l-2 border-[#ffb4ab]", "label": "Congested", "icon": "error"}
+
+def get_ssr_live_data() -> dict:
+    data = latest_snapshot()
+    ssr_data = {}
+    for code, info in LIVE_AIRPORTS.items():
+        rows = data.get(code, [])
+        active = [r for r in rows if r["wait_minutes"] is not None and r["wait_minutes"] > 0]
+        sample = active if active else rows
+
+        values = [max(0, r["wait_minutes"]) for r in sample if r["wait_minutes"] is not None]
+        avg_wait = sum(values) / len(values) if values else 0
+
+        ssr_data[code] = {
+            "name": info["name"],
+            "avgWait": avg_wait,
+            "sampleLength": len(sample),
+            "cfg": _get_tier_config(avg_wait)
+        }
+    return ssr_data
+
+
 def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     is_airport_page = bool(initial_airport_code and initial_airport_code in LIVE_AIRPORTS)
     airport_display_name = ""
@@ -226,6 +258,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     return {
         "live_airports": LIVE_AIRPORTS,
         "pipeline_airports": PIPELINE_AIRPORTS,
+        "ssr_live_data": get_ssr_live_data() if not is_airport_page else {},
         "initial_airport_code": initial_airport_code,
         "is_airport_page": is_airport_page,
         "airport_display_name": airport_display_name,

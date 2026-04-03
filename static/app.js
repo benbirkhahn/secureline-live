@@ -328,17 +328,18 @@ function renderAirportChips(payload, filterText = "") {
     const tier = waitTier(avgWait);
     const cfg = TIER_CONFIG[tier];
 
+    let bigNumHtml = `<span class="text-3xl font-headline font-bold ${cfg.text}">${Math.round(avgWait)}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
 
     const tier = waitTier(avgWait);
     const cfg = TIER_CONFIG[tier];
 
     let bigNumHtml = `<span class="text-3xl font-headline font-bold text-primary">${Math.round(avgWait)}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
     if (avgWait === 0 && sample.length > 0) {
-        bigNumHtml = `<span class="text-3xl font-headline font-bold text-primary">&lt;1<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
+        bigNumHtml = `<span class="text-3xl font-headline font-bold ${cfg.text}">&lt;1<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>`;
     }
 
     const card = document.createElement("div");
-    card.className = `bg-surface-container-low p-6 ${cfg.border} hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col justify-between`;
+    card.className = `bg-surface-container-low ${cfg.bg} p-6 ${cfg.border} hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col justify-between`;
     card.onclick = () => window.location.href = `/airports/${code.toLowerCase()}-tsa-wait-times`;
 
 
@@ -352,7 +353,7 @@ function renderAirportChips(payload, filterText = "") {
                 <span class="text-[10px] text-secondary uppercase tracking-[0.2em] block mb-1">Status</span>
                 <div class="flex items-center gap-2">
                     <div class="w-1.5 h-1.5 ${cfg.bg.split('/')[0].replace('bg-','bg-')} shadow-[0_0_8px_currentColor] ${cfg.text}"></div>
-                    <span class="text-xs font-bold text-primary uppercase tracking-widest">${cfg.label}</span>
+                    <span class="text-xs font-bold ${cfg.text} uppercase tracking-widest">${cfg.label}</span>
                 </div>
             </div>
         </div>

@@ -300,7 +300,32 @@
           <h2 class="text-sm font-headline font-bold text-secondary-fixed-dim tracking-[0.5em] uppercase mb-8 border-b border-outline-variant/15 pb-4">Standard Terminal Network</h2>
           <!-- Airport Grid populated by JS -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="airport-chips">
-              <!-- Cards rendered here by app.js -->
+              {% for code, info in ssr_live_data.items() %}
+              {% set cfg = info.cfg %}
+              <div class="bg-surface-container-low {{ cfg.bg }} p-6 {{ cfg.border }} hover:bg-surface-container-high transition-colors cursor-pointer flex flex-col justify-between" onclick="window.location.href = '/airports/{{ code | lower }}-tsa-wait-times'">
+                  <div>
+                      <div class="flex justify-between items-start mb-4">
+                          <span class="text-2xl font-headline font-bold text-primary leading-none">{{ code }}</span>
+                          <span class="material-symbols-outlined {{ cfg.text }}">{{ cfg.icon }}</span>
+                      </div>
+                      <div class="mb-6">
+                          <span class="text-[10px] text-secondary uppercase tracking-[0.2em] block mb-1">Status</span>
+                          <div class="flex items-center gap-2">
+                              <div class="w-1.5 h-1.5 {{ cfg.bg.split('/')[0].replace('bg-','bg-') }} shadow-[0_0_8px_currentColor] {{ cfg.text }}"></div>
+                              <span class="text-xs font-bold {{ cfg.text }} uppercase tracking-widest">{{ cfg.label }}</span>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="flex justify-between items-end mt-4">
+                      {% if info.avgWait == 0 and info.sampleLength > 0 %}
+                      <span class="text-3xl font-headline font-bold {{ cfg.text }}">&lt;1<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>
+                      {% else %}
+                      <span class="text-3xl font-headline font-bold {{ cfg.text }}">{{ info.avgWait | round | int }}<span class="text-sm ml-1 text-secondary opacity-50">MIN</span></span>
+                      {% endif %}
+                      <button class="text-primary-container border-b border-primary-container/20 pb-0.5 text-[10px] font-bold uppercase tracking-widest hover:border-primary-container transition-all">Details</button>
+                  </div>
+              </div>
+              {% endfor %}
           </div>
 
           <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -310,8 +335,21 @@
                       <span class="font-headline font-bold text-primary uppercase tracking-widest">In Development (Pipeline)</span>
                   </div>
                   <div class="flex flex-col gap-3" id="pipeline-list">
-                      <!-- Rendered by app.js -->
+                  {% for airport in pipeline_airports %}
+                  <div class="bg-surface-container-high p-4 flex items-center gap-4">
+                      <div class="p-3 bg-[#37374f] text-[#88d1e7]">
+                          <span class="material-symbols-outlined text-xl">construction</span>
+                      </div>
+                      <div class="flex-1">
+                          <h4 class="text-xs font-bold font-headline text-primary mb-1 uppercase tracking-widest">{{ airport.code }}</h4>
+                          <p class="text-[10px] text-secondary-fixed-dim opacity-60 uppercase tracking-widest">{{ airport.name }}</p>
+                      </div>
+                      <div class="px-2 py-1 bg-surface-container-highest text-[#88d1e7] text-[10px] font-bold uppercase tracking-widest border border-[#88d1e7]/20">
+                          Research
+                      </div>
                   </div>
+                  {% endfor %}
+              </div>
               </div>
 
 
