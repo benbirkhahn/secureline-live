@@ -1,8 +1,8 @@
 # DEN — Denver International Airport
 
-**Status:** 🔬 In Research
-**Pipeline status:** `IN_RESEARCH`
-**Last investigated:** 2026-03-22
+**Status:** 🔬 In Research  
+**Pipeline status:** `IN_RESEARCH`  
+**Last investigated:** 2026-03-22  
 
 ---
 
