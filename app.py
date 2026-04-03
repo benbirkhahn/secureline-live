@@ -1047,6 +1047,18 @@ def history_for_airport(airport_code: str, hours: int = 12) -> List[Dict]:
     ]
 
 
+@app.route("/favicon.ico")
+def favicon_ico():
+    return send_from_directory(os.path.join(app.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon")
+
+@app.route("/favicon-48x48.png")
+def favicon_png():
+    return send_from_directory(os.path.join(app.root_path, "static"), "favicon-48x48.png", mimetype="image/png")
+
+@app.route("/apple-touch-icon.png")
+def favicon_apple():
+    return send_from_directory(os.path.join(app.root_path, "static"), "apple-touch-icon.png", mimetype="image/png")
+
 @app.route("/")
 def index():
     return render_template("index.html", **index_template_context("", home_page_seo()))
