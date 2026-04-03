@@ -54,6 +54,20 @@ AIRPORT_FACTORS = {
     "ORD": 1.3, "PHL": 1.1, "PHX": 1.0, "SEA": 1.1, "SFO": 1.25, "SLC": 0.9,
     "TPA": 0.9, "JAX": 0.9,
 }
+ORD_CHECKPOINT_MAP = {
+    "t2c5general": "Terminal 2 — Checkpoint 5 General",
+    "t2c5precheck": "Terminal 2 — Checkpoint 5 TSA PreCheck",
+    "t3c6": "Terminal 3 — Checkpoint 6",
+    "t3c7general": "Terminal 3 — Checkpoint 7 General",
+    "t3c7a": "Terminal 3 — Checkpoint 7A",
+    "t3c8general": "Terminal 3 — Checkpoint 8 General",
+    "t3c8precheck": "Terminal 3 — Checkpoint 8 TSA PreCheck",
+    "t3c9": "Terminal 3 — Checkpoint 9",
+    "t5c10": "Terminal 5 — Checkpoint 10",
+    "security02floor": "Terminal 1 — Economy",
+    "tsafloor": "Terminal 1 — TSA PreCheck",
+    "pafloor": "Terminal 1 — Priority",
+}
 
 PIPELINE_AIRPORTS = [
     {
@@ -561,21 +575,7 @@ def fetch_mia_rows() -> List[Dict]:
 
 def ord_friendly_checkpoint(metric_name: str) -> str:
     s = metric_name.lower()
-    mapping = [
-        ("t2c5general", "Terminal 2 — Checkpoint 5 General"),
-        ("t2c5precheck", "Terminal 2 — Checkpoint 5 TSA PreCheck"),
-        ("t3c6", "Terminal 3 — Checkpoint 6"),
-        ("t3c7general", "Terminal 3 — Checkpoint 7 General"),
-        ("t3c7a", "Terminal 3 — Checkpoint 7A"),
-        ("t3c8general", "Terminal 3 — Checkpoint 8 General"),
-        ("t3c8precheck", "Terminal 3 — Checkpoint 8 TSA PreCheck"),
-        ("t3c9", "Terminal 3 — Checkpoint 9"),
-        ("t5c10", "Terminal 5 — Checkpoint 10"),
-        ("security02floor", "Terminal 1 — Economy"),
-        ("tsafloor", "Terminal 1 — TSA PreCheck"),
-        ("pafloor", "Terminal 1 — Priority"),
-    ]
-    for key, label in mapping:
+    for key, label in ORD_CHECKPOINT_MAP.items():
         if key in s:
             return label
     return metric_name
