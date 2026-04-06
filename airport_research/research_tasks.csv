@@ -1,0 +1,11 @@
+Airport Code,Airport Name,Target Webpage URL,Instructions,API Endpoint Found,Required Headers / Auth Found
+LAS,Harry Reid International Airport,https://www.harryreidairport.com/Flights/Security,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+DEN,Denver International Airport,https://www.flydenver.com/airport/securities,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,https://app.flyfruition.com/api/public/tsa,x-api-key: <API_KEY_HIDDEN>
+SEA,Seattle-Tacoma International Airport,N/A,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+SFO,San Francisco International Airport,N/A,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+IAD,Washington Dulles International Airport,https://www.flydulles.com/iad/security-checkpoints,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+IAH,George Bush Intercontinental Airport,https://www.fly2houston.com/iah/security,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+DCA,Ronald Reagan Washington National Airport,https://www.flyreagan.com/dca/security,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+BWI,Baltimore/Washington International Airport,https://www.bwiairport.com/at-bwi/airport-security,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+ATL,Hartsfield-Jackson Atlanta International Airport,https://www.atl.com/times/,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
+DTW,Detroit Metropolitan Airport,https://www.metroairport.com/at-the-airport/security,Open URL in browser -> Developer Tools -> Network tab -> Refresh -> Look for XHR/Fetch request returning wait times JSON,,
