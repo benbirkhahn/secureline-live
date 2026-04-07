@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About TSA Tracker | Real-Time Airport Security Wait Times</title>
+  <meta name="description" content="TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowd-sourced guesses. Learn how it works, which airports are covered, and why it's the most accurate source for airport security wait times.">
+  <link rel="canonical" href="{{ seo.canonical_url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="About TSA Tracker | Real-Time Airport Security Wait Times">
+  <meta property="og:description" content="Learn how TSA Tracker sources live checkpoint wait times directly from official airport feeds, updated every 2 minutes.">
+  <meta property="og:url" content="{{ seo.canonical_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="header">
+    <a href="/" class="header-home-link">
+      <span class="logo-shield">✈️</span>
+      <div>
+        <div class="logo-name">TSA Tracker</div>
+        <div class="logo-tag">Live airport data</div>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="header-nav-link">Home</a>
+      <a href="/about" class="header-nav-link">About</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="card content-card" style="max-width:780px;margin:0 auto;">
+
+      <h1 style="font-size:2rem;font-weight:700;margin-bottom:8px;">About TSA Tracker</h1>
+      <p class="muted" style="font-size:1.05rem;margin-bottom:32px;">The only free tool that shows <strong>live TSA checkpoint wait times</strong> pulled directly from official airport systems — not crowdsourced, not estimated, not stale.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Why We Built This</h2>
+      <p>Getting to the airport is stressful enough. But even after you arrive, the question of <em>how long is the TSA line right now?</em> is surprisingly hard to answer. Most apps guess. Some aggregate Twitter posts. A few use historical averages and call it "live."</p>
+      <p style="margin-top:10px;">TSA Tracker started from a simple frustration: we wanted to know the actual wait time at the checkpoint before heading to security. Not a model. Not a community report from 40 minutes ago. The <em>real number</em>, right now.</p>
+      <p style="margin-top:10px;">It turns out most major airports publish that data — they just don't make it easy to find. TSA Tracker finds it, normalizes it, and puts it in front of you within 2 minutes of when the airport updates it.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">How the Data Works</h2>
+      <p>Each supported airport publishes its checkpoint wait time data through its own system — some via public JSON APIs, some through embedded data feeds on their websites. TSA Tracker polls these sources approximately every 2 minutes, parses the raw data, and stores a time-stamped snapshot for each checkpoint and lane type.</p>
+      <p style="margin-top:10px;">When you open the site, you're seeing the most recent snapshot — usually no more than 2 minutes old. The timestamp shown on each checkpoint card tells you exactly when that reading was taken, so you always know how fresh the data is.</p>
+      <p style="margin-top:10px;">The 12-hour history chart shows every snapshot we've collected during that window, so you can see patterns: when does the 7 AM rush peak? When does the afternoon lull hit? That context helps you decide <em>when</em> to leave for the airport, not just whether lines are long right now.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">What "Official Airport Systems" Means</h2>
+      <p>Each airport's authority or management company collects wait time data from checkpoint sensors, staffing systems, or queue-monitoring cameras. They use this data internally for operational planning and often publish it on their website for travelers. That is the data TSA Tracker reads.</p>
+      <p style="margin-top:10px;">This is meaningfully different from crowdsourced reports (where someone at the airport posts a rough estimate) or algorithmic predictions (where a model guesses based on historical patterns and flight schedules). Official airport data reflects what sensors and staff are actually measuring at that moment.</p>
+      <p style="margin-top:10px;">Not every airport publishes this data publicly. Some systems are behind API keys or require partnerships. That's why our list of live airports is limited — we only show real data, not fabricated numbers.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Lane Types Explained</h2>
+      <p>Where airports provide lane-level data, TSA Tracker shows separate wait times for each lane type:</p>
+      <ul class="content-list" style="margin-top:8px;">
+        <li><strong>Standard</strong> — the regular TSA security line open to all passengers.</li>
+        <li><strong>TSA PreCheck</strong> — expedited screening for enrolled travelers. Shoes stay on, laptops stay in bags. PreCheck lines are almost always shorter than standard, often dramatically so during peak hours.</li>
+        <li><strong>CLEAR</strong> — a paid biometric identity verification service that can skip the ID-check step. CLEAR members still go through TSA screening, but the identity portion moves faster.</li>
+      </ul>
+      <p style="margin-top:10px;">Not all airports report separate wait times by lane. Some only publish a single aggregate figure for the whole checkpoint. In those cases, we display the single available number.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Live Airports</h2>
+      <p>TSA Tracker currently has live data feeds for the following airports. Each links to its dedicated wait-time page:</p>
+      <ul class="content-list" style="margin-top:8px;columns:2;column-gap:24px;">
+        <li><a href="/airports/phl-tsa-wait-times">PHL — Philadelphia International</a></li>
+        <li><a href="/airports/mia-tsa-wait-times">MIA — Miami International</a></li>
+        <li><a href="/airports/ord-tsa-wait-times">ORD — Chicago O'Hare</a></li>
+        <li><a href="/airports/clt-tsa-wait-times">CLT — Charlotte Douglas</a></li>
+        <li><a href="/airports/mco-tsa-wait-times">MCO — Orlando International</a></li>
+        <li><a href="/airports/jax-tsa-wait-times">JAX — Jacksonville International</a></li>
+        <li><a href="/airports/dfw-tsa-wait-times">DFW — Dallas/Fort Worth</a></li>
+        <li><a href="/airports/lax-tsa-wait-times">LAX — Los Angeles International</a></li>
+        <li><a href="/airports/jfk-tsa-wait-times">JFK — John F. Kennedy International</a></li>
+        <li><a href="/airports/ewr-tsa-wait-times">EWR — Newark Liberty International</a></li>
+        <li><a href="/airports/lga-tsa-wait-times">LGA — LaGuardia Airport</a></li>
+        <li><a href="/airports/sea-tsa-wait-times">SEA — Seattle-Tacoma International</a></li>
+      </ul>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Airports Coming Soon</h2>
+      <p>We're actively working on adding more airports. The challenge isn't desire — it's data availability. Our pipeline airports include ATL, DEN, SFO, IAH, LAS, BOS, and more. Each one requires finding, testing, and normalizing a reliable data source. We only launch an airport when we're confident the data is real and consistently updated. Check the Coming Soon section on the homepage for current status.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Color Coding Guide</h2>
+      <p>Each checkpoint card uses a simple color system to help you immediately understand conditions:</p>
+      <ul class="content-list" style="margin-top:8px;">
+        <li><strong style="color:#22c55e;">Green</strong> — short wait, generally under 15 minutes. You're in good shape.</li>
+        <li><strong style="color:#f59e0b;">Yellow</strong> — moderate wait, roughly 15–30 minutes. Factor this into your timing.</li>
+        <li><strong style="color:#ef4444;">Red</strong> — long wait, over 30 minutes. Arrive earlier than you planned, or check a different checkpoint if your airport has multiple security entrances.</li>
+      </ul>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Tips for Getting Through Security Faster</h2>
+      <ul class="content-list" style="margin-top:8px;">
+        <li><strong>Check the history chart before you leave home.</strong> If you're flying at 8 AM and the chart shows consistent red between 6–9 AM, leave earlier or prepare for a long line.</li>
+        <li><strong>Consider TSA PreCheck.</strong> The enrollment fee pays for itself the first time you walk through a 3-minute PreCheck line while the standard line is 45 minutes long. Enrollment is $85 for five years.</li>
+        <li><strong>Know your airport's checkpoints.</strong> Large airports like ORD, LAX, and JFK have multiple security checkpoints in different terminals. One might have a long line while another is clear. Check your terminal before committing to a checkpoint.</li>
+        <li><strong>Pack smart.</strong> The biggest cause of slow screening (beyond volume) is bags that need secondary inspection. Keep liquids accessible, laptops easy to pull out, and avoid wearing heavy metal accessories.</li>
+        <li><strong>TSA recommends 2 hours for domestic, 3 for international.</strong> That's a minimum — if wait times are high during your window, add more buffer.</li>
+      </ul>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Accuracy and Limitations</h2>
+      <p>TSA Tracker is as accurate as the official data each airport publishes. When airports update their feeds promptly (most do), our data is very accurate. However, a few caveats are worth knowing:</p>
+      <ul class="content-list" style="margin-top:8px;">
+        <li>Some airports update their feeds less frequently than others. Where we can detect stale data, we flag it.</li>
+        <li>Wait times can change rapidly during peak periods. A 5-minute wait can become 25 minutes in the time it takes you to park and get to the terminal.</li>
+        <li>TSA Tracker shows data <em>per checkpoint</em>, not a prediction of what wait times will be when you arrive. Use the history chart for forward-looking planning.</li>
+        <li>A small number of airports use estimated or sensor-averaged data rather than real-time queue measurement. We note this where we're aware of it.</li>
+      </ul>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Is TSA Tracker Free?</h2>
+      <p>Yes, TSA Tracker is completely free to use. The site is supported by advertising. We show clearly labeled ads in the ad slots on the page — that's it. We don't charge for access, don't require sign-ups, and don't sell data.</p>
+
+      <h2 style="font-size:1.25rem;font-weight:700;margin:32px 0 10px;">Contact and Feedback</h2>
+      <p>Have a question, found a bug, or want to suggest an airport? We'd love to hear from you. The best way to reach us is email: <a href="mailto:benbirkhahn10@gmail.com">benbirkhahn10@gmail.com</a>. We try to respond within 1–2 business days.</p>
+      <p style="margin-top:10px;">If you work at an airport and want to ensure your data is being surfaced correctly, please reach out — we're happy to coordinate on data feed details.</p>
+
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>TSA Tracker — live security wait times. Data refreshes every ~2 minutes.</div>
+    <div class="footer-links">
+      <a href="/about">About</a>
+      <span>·</span>
+      <a href="/privacy">Privacy</a>
+      <span>·</span>
+      <a href="/terms">Terms</a>
+      <span>·</span>
+      <a href="/contact">Contact</a>
+      <span>·</span>
+      <a href="/guide/tsa-wait-times">TSA Guide</a>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About TSA Tracker",
+    "description": "TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowdsourced guesses.",
+    "url": "{{ seo.canonical_url }}",
+    "publisher": {
+      "@type": "Organization",
+      "name": "TSA Tracker",
+      "url": "{{ seo.site_url }}"
+    }
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ seo.title }}</title>
+  <meta name="description" content="{{ seo.description }}">
+  <link rel="canonical" href="{{ seo.canonical_url }}">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{ seo.title }}">
+  <meta property="og:description" content="{{ seo.description }}">
+  <meta property="og:url" content="{{ seo.canonical_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  {% if monetization.enable_adsense %}
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ monetization.adsense_client }}"
+          crossorigin="anonymous"></script>
+  {% endif %}
+  <style>
+    .guide-toc {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 18px 22px;
+      margin: 24px 0 32px;
+      border-left: 3px solid #3b82f6;
+    }
+    .guide-toc h3 { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; color: #6b7280; }
+    .guide-toc ol { margin: 0; padding-left: 20px; }
+    .guide-toc li { margin-bottom: 5px; font-size: 0.95rem; }
+    .guide-toc a { color: #3b82f6; text-decoration: none; }
+    .guide-toc a:hover { text-decoration: underline; }
+    .guide-tip-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+    }
+    .guide-tip-box strong { color: #1d4ed8; }
+    .guide-stat { font-size: 1.5rem; font-weight: 700; color: #3b82f6; }
+    .airport-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin: 16px 0; }
+    .airport-mini-card { background: #f8f9fa; border-radius: 8px; padding: 12px 14px; }
+    .airport-mini-card .code { font-weight: 700; font-size: 1.1rem; margin-bottom: 2px; }
+    .airport-mini-card .name { font-size: 0.85rem; color: #6b7280; margin-bottom: 6px; }
+    .airport-mini-card a { font-size: 0.85rem; color: #3b82f6; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="/" class="header-home-link">
+      <span class="logo-shield">✈️</span>
+      <div>
+        <div class="logo-name">TSA Tracker</div>
+        <div class="logo-tag">Live airport data</div>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="header-nav-link">Home</a>
+      <a href="/about" class="header-nav-link">About</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <article class="card content-card" style="max-width:800px;margin:0 auto;" itemscope itemtype="https://schema.org/Article">
+
+      <div style="margin-bottom:8px;">
+        <span style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6b7280;">Travel Guide</span>
+      </div>
+      <h1 itemprop="headline" style="font-size:2rem;font-weight:700;margin-bottom:10px;line-height:1.2;">TSA Wait Times Explained: How to Get Through Airport Security Faster in 2025</h1>
+      <p class="muted" style="margin-bottom:6px;">A complete, practical guide to understanding TSA security lines, how wait times are measured, and the most effective ways to minimize your time at the checkpoint.</p>
+      <p style="font-size:0.85rem;color:#9ca3af;margin-bottom:28px;"><em>By the TSA Tracker team · Updated April 2025</em></p>
+
+      <div class="guide-toc">
+        <h3>In This Guide</h3>
+        <ol>
+          <li><a href="#what-determines-wait-times">What determines TSA wait times</a></li>
+          <li><a href="#how-data-is-measured">How TSA wait time data is measured</a></li>
+          <li><a href="#peak-hours">Peak hours and the worst times to fly</a></li>
+          <li><a href="#tsa-precheck">TSA PreCheck vs. Standard vs. CLEAR</a></li>
+          <li><a href="#airport-tips">Tips for the busiest US airports</a></li>
+          <li><a href="#packing-tips">Packing to get through faster</a></li>
+          <li><a href="#live-data">Using live wait time data</a></li>
+          <li><a href="#faq">Frequently asked questions</a></li>
+        </ol>
+      </div>
+
+      <!-- ── SECTION 1 ── -->
+      <h2 id="what-determines-wait-times" style="font-size:1.35rem;font-weight:700;margin:32px 0 10px;">1. What Determines TSA Wait Times</h2>
+      <p>TSA wait times are driven by a predictable set of factors — and understanding them helps you make smarter decisions about when to arrive at the airport.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Passenger Volume</h3>
+      <p>The single biggest driver is how many passengers are trying to clear security at the same time. This is why Monday morning departures are miserable and Tuesday afternoons are smooth. Early-morning banking flights (departures between 6–9 AM) concentrate a huge number of business travelers at the same checkpoint window. Holiday weekends multiply this effect across airports simultaneously.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Number of Open Lanes</h3>
+      <p>TSA dynamically staffs checkpoints based on expected volume. More lanes open means faster throughput even with the same number of passengers. Airports with multiple checkpoints (different terminals or security entrances) effectively distribute the load — if one checkpoint is packed, another might be clear.</p>
+      <p style="margin-top:8px;">This is why wait times can jump dramatically during shift changes or when TSA pulls officers for breaks: the same volume of passengers is now flowing through fewer lanes.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Passenger Preparation</h3>
+      <p>Individual passenger behavior compounds the volume problem. Every traveler who doesn't remove their laptop, leaves metal in their pockets, or packs a bag that triggers an alarm creates a delay that ripples through the entire line behind them. During high-volume periods, even small per-passenger delays accumulate into major backups.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Technology and Equipment</h3>
+      <p>CT scanners (the newer 3D scanning machines now being deployed across many US airports) are faster and more effective than older X-ray machines — and critically, they don't require passengers to remove laptops from their bags for PreCheck lanes. Airports that have upgraded to CT scanning throughout generally see better throughput. The TSA has been deploying these systems since 2019 but adoption is still uneven across airports.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Random Security Events</h3>
+      <p>A bag flagged for secondary screening, a medical alert, an equipment malfunction, or a staff emergency can cause sudden, unpredictable slowdowns. These events are why even low-wait-time estimates don't eliminate the need for buffer time.</p>
+
+      <div class="guide-tip-box">
+        <strong>Key insight:</strong> Wait times aren't just about how many people are at the airport — they're about the ratio of passengers to open lanes, multiplied by how smoothly each person moves through the process. You can't control the first factor, but you can maximize your contribution to the third.
+      </div>
+
+      <!-- ── SECTION 2 ── -->
+      <h2 id="how-data-is-measured" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">2. How TSA Wait Time Data Is Measured</h2>
+      <p>Understanding how wait time data is collected helps you interpret it correctly — and understand its limitations.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Queue Sensors and Camera Systems</h3>
+      <p>The most accurate airport wait time systems use overhead cameras or infrared sensors positioned at queue entry and exit points. These systems continuously measure the density of people in the queue zone and the rate at which passengers are processed through the checkpoint. From these measurements, they calculate an estimated wait time for a new person joining the queue.</p>
+      <p style="margin-top:8px;">Airports like Philadelphia (PHL), Los Angeles (LAX), and Seattle (SEA) use these direct measurement systems. The data is refreshed frequently — often every few minutes — and reflects actual conditions, not estimates.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Staff Observations and Manual Reporting</h3>
+      <p>Some airports rely on TSA officers or airport operations staff to manually report estimated wait times at intervals. This is inherently less precise — it depends on observer judgment and may only update every 15–30 minutes. During fast-changing conditions, manually reported times can lag significantly behind reality.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Algorithmic Estimates</h3>
+      <p>A smaller number of systems generate wait time estimates algorithmically, using historical patterns, current flight load data, staffing levels, and other inputs. These are predictions, not measurements. They tend to be more accurate during typical conditions but can be significantly wrong during unusual events (unexpected flight delays, sudden volume spikes, or staffing disruptions).</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">How TSA Tracker Sources Data</h3>
+      <p>TSA Tracker connects directly to each supported airport's official data feed — the same source the airport uses to display wait times on its own website or app. We poll these feeds approximately every 2 minutes and store the results with timestamps, so you can see both the current reading and the trend over the past 12 hours.</p>
+      <p style="margin-top:8px;">We only display data from airports where we've confirmed a reliable, official source. We don't fabricate or extrapolate wait times for airports not on our live list — a gap in coverage is better than a number you can't trust.</p>
+
+      <!-- ── SECTION 3 ── -->
+      <h2 id="peak-hours" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">3. Peak Hours and the Worst Times to Fly</h2>
+      <p>TSA wait times follow predictable patterns. Here's when to expect the worst — and when lines are typically clear.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Worst Times of Day</h3>
+      <ul class="content-list" style="margin-top:6px;">
+        <li><strong>5:30 AM – 9:00 AM</strong> — the morning banking window. Business travelers and early-departure flights concentrate here. PreCheck lanes are usually significantly faster than standard during this period.</li>
+        <li><strong>12:00 PM – 2:00 PM</strong> — a secondary midday peak driven by connecting passengers and noon departures. Less severe than the morning rush but notable at busy hubs.</li>
+        <li><strong>4:00 PM – 7:00 PM</strong> — the afternoon surge. Post-work departure flights and end-of-business-day traffic build. This peak can be worse than the morning rush at some airports.</li>
+      </ul>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Best Times to Clear Security</h3>
+      <ul class="content-list" style="margin-top:6px;">
+        <li><strong>9:30 AM – 11:30 AM</strong> — between the morning rush and midday peak. One of the most consistently short-wait windows.</li>
+        <li><strong>2:30 PM – 3:30 PM</strong> — a reliable lull before the afternoon surge.</li>
+        <li><strong>After 8:00 PM</strong> — late-evening flights see significantly lower volume at most airports, though some airports reduce lane staffing accordingly.</li>
+      </ul>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Worst Days of the Week</h3>
+      <ul class="content-list" style="margin-top:6px;">
+        <li><strong>Monday mornings</strong> — consistently the worst combination of business travelers and early-departure volume.</li>
+        <li><strong>Friday afternoons</strong> — end-of-week travel combines business and leisure. Afternoon TSA lines can be very long.</li>
+        <li><strong>Sunday evenings</strong> — the return-trip surge for weekend travelers is one of the most predictable high-volume windows of the week.</li>
+      </ul>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Worst Days of the Year</h3>
+      <p>The TSA reports its busiest travel days annually. Consistently high-volume periods include:</p>
+      <ul class="content-list" style="margin-top:6px;">
+        <li>The Wednesday before Thanksgiving and the Sunday after — routinely among the 5 busiest days of the year at US airports.</li>
+        <li>The Friday before Memorial Day weekend and the Monday after.</li>
+        <li>The days surrounding July 4th, especially if the holiday falls mid-week.</li>
+        <li>The week between Christmas and New Year's Eve — extended holiday travel spreads the volume over several days but keeps airports consistently busy.</li>
+        <li>Spring Break windows (typically mid-March through early April) vary by region but pack family travel and college departures.</li>
+      </ul>
+
+      <div class="guide-tip-box">
+        <strong>Pro tip:</strong> Check the <a href="/">TSA Tracker history chart</a> for your specific airport and travel day before you leave home. General peak patterns are useful baselines, but every airport has its own rhythms — a chart of actual historical readings beats any rule of thumb.
+      </div>
+
+      <!-- ── SECTION 4 ── -->
+      <h2 id="tsa-precheck" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">4. TSA PreCheck vs. Standard vs. CLEAR</h2>
+      <p>If you fly more than a few times a year, the choice between these programs is one of the highest-leverage decisions you can make for reducing security stress.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">TSA PreCheck</h3>
+      <p>TSA PreCheck is the TSA's trusted traveler program. After a background check and in-person enrollment (fingerprints and identity verification), approved travelers get a Known Traveler Number (KTN) that they add to flight bookings. When the airline assigns a PreCheck boarding pass, you get access to dedicated PreCheck lanes.</p>
+      <p style="margin-top:8px;">In PreCheck lanes:</p>
+      <ul class="content-list" style="margin-top:6px;">
+        <li>Shoes, belts, and light jackets stay on.</li>
+        <li>Laptops stay in your bag (at airports with CT scanning).</li>
+        <li>Liquids stay in your bag.</li>
+        <li>The combination of these factors dramatically speeds up per-passenger processing time.</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>Cost:</strong> $85 for a 5-year membership (about $17/year). Renewals are $70. Many credit cards (Chase Sapphire, Amex Platinum, Capital One Venture X, and others) reimburse the application fee.</p>
+      <p style="margin-top:8px;"><strong>Wait time impact:</strong> During peak morning hours at major hubs, PreCheck lines routinely run 5–8 minutes while standard lines run 30–45+ minutes. The wait time difference is frequently the single most impactful variable at the checkpoint.</p>
+      <p style="margin-top:8px;"><strong>Limitation:</strong> Not all flights and airlines display PreCheck — some international airlines, certain budget carriers, and some specific routes don't participate. Always verify at booking.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">CLEAR</h3>
+      <p>CLEAR is a private service (not a government program) that uses biometrics (fingerprints, iris scan) to verify your identity at the airport — skipping the ID document check step at the front of the security line. CLEAR members walk to the front of the ID verification queue, verify via biometrics in seconds, and are then escorted to the standard or PreCheck screening lane.</p>
+      <p style="margin-top:8px;"><strong>Key distinction:</strong> CLEAR only speeds up identity verification — not the actual security screening. You still go through the X-ray or scanner. At airports where the ID check line is long, CLEAR helps. Where the screening line is the bottleneck (which is most of the time during peak hours), CLEAR's benefit is limited.</p>
+      <p style="margin-top:8px;"><strong>Cost:</strong> $189/year. Delta SkyMiles members get a discount; some credit cards offer credits toward CLEAR membership. Many CLEAR subscribers combine it with TSA PreCheck — CLEAR for the ID step, PreCheck for screening — for the fastest possible throughput.</p>
+      <p style="margin-top:8px;"><strong>Best for:</strong> Frequent business travelers at hub airports where CLEAR is available. CLEAR's presence is more limited than PreCheck — it operates at roughly 50 US airports versus PreCheck's 200+.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Global Entry</h3>
+      <p>Global Entry is a CBP (Customs and Border Protection) program for international travelers that allows expedited customs clearance on return to the US. Global Entry includes TSA PreCheck as a benefit — so if you fly internationally even occasionally, Global Entry ($100 for 5 years) is often the better value than PreCheck alone. Application is slightly more involved (a CBP interview is required), and the review process takes longer.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Bottom Line</h3>
+      <p>For most US domestic travelers, TSA PreCheck is the single best investment for reducing airport security time. CLEAR adds value on top of PreCheck for very frequent travelers at hub airports. Global Entry is the best choice if you fly internationally.</p>
+
+      <!-- ── SECTION 5 ── -->
+      <h2 id="airport-tips" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">5. Tips for the Busiest US Airports</h2>
+      <p>Every major airport has its own security quirks. Here's what to know at each airport where TSA Tracker has live data:</p>
+
+      <div class="airport-card-grid" style="margin-bottom:20px;">
+        <div class="airport-mini-card">
+          <div class="code">LAX</div>
+          <div class="name">Los Angeles International</div>
+          <a href="/airports/lax-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">ORD</div>
+          <div class="name">Chicago O'Hare</div>
+          <a href="/airports/ord-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">JFK</div>
+          <div class="name">John F. Kennedy Intl</div>
+          <a href="/airports/jfk-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">LGA</div>
+          <div class="name">LaGuardia Airport</div>
+          <a href="/airports/lga-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">EWR</div>
+          <div class="name">Newark Liberty Intl</div>
+          <a href="/airports/ewr-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">MIA</div>
+          <div class="name">Miami International</div>
+          <a href="/airports/mia-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">DFW</div>
+          <div class="name">Dallas/Fort Worth</div>
+          <a href="/airports/dfw-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">SEA</div>
+          <div class="name">Seattle-Tacoma</div>
+          <a href="/airports/sea-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">PHL</div>
+          <div class="name">Philadelphia Intl</div>
+          <a href="/airports/phl-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">MCO</div>
+          <div class="name">Orlando International</div>
+          <a href="/airports/mco-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">CLT</div>
+          <div class="name">Charlotte Douglas</div>
+          <a href="/airports/clt-tsa-wait-times">Live wait times →</a>
+        </div>
+        <div class="airport-mini-card">
+          <div class="code">JAX</div>
+          <div class="name">Jacksonville Intl</div>
+          <a href="/airports/jax-tsa-wait-times">Live wait times →</a>
+        </div>
+      </div>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">LAX — Los Angeles International</h3>
+      <p>LAX has multiple terminals, each with its own security checkpoint. The terminal you check in at is determined by your airline, and you're generally required to use that terminal's security. Terminal 1 (Southwest) and Terminal 2/3 (Delta, Alaska, and others) tend to see the highest volumes on weekend mornings. LAX has CT scanning in most lanes and is one of the more extensively data-monitored airports in the country. The Tom Bradley International Terminal has its own checkpoint and is separate from domestic terminals.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">ORD — Chicago O'Hare</h3>
+      <p>O'Hare is consistently one of the busiest airports in the country. It has checkpoints in each terminal (T1, T2, T3, and T5 international), and they are not interconnected once you're past security. United dominates T1; American dominates T3. The morning banking windows (6–9 AM) can push wait times over 45 minutes in standard lanes. PreCheck is very much worth it at ORD. The T2/T3 connector checkpoint is often less crowded than the main T3 entrance during peak hours.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">JFK — John F. Kennedy International</h3>
+      <p>JFK is heavily international, which means Terminal 4 (major international carriers) and Terminal 8 (American international) can have very long lines, especially mid-morning when international departures bank. Domestic departures are spread across T2, T5 (JetBlue), and T8. JFK consistently has some of the highest wait times of any US airport — check the live data before heading to the checkpoint, and arrive with significant buffer for international flights.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">EWR & LGA — New York Area Airports</h3>
+      <p>Newark (EWR) serves Terminals A, B, and C. Terminal C (United hub) sees very heavy morning business travel. LaGuardia (LGA) has undergone significant reconstruction and now has a cleaner checkpoint flow than before, but still gets congested during peak periods. For New York-area travel, checking all three airport options and their respective wait times can help you choose the best option when you have flexibility.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">SEA — Seattle-Tacoma International</h3>
+      <p>SEA has a single main security checkpoint for the central terminal, which means all passenger volume funnels to one location. This can create significant bottlenecks during peak periods. SEA has invested in modern equipment and has TSA PreCheck lanes that typically move much faster than standard during the morning rush. The satellite terminal (N Gates) has its own security entry and is often overlooked — if your gate is in the N concourse, that can be your fastest option.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">MCO — Orlando International</h3>
+      <p>MCO's security is unusual — it's centralized above the main terminal, with tram access down to the gate areas. The central checkpoint structure means all passengers go through the same security zone regardless of airline. MCO handles very high leisure and family travel volume, meaning standard lanes can be slow — families with children and inexperienced travelers generally slow throughput. PreCheck is especially valuable at MCO during peak leisure travel periods (spring break, summer, and holidays).</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">DFW — Dallas/Fort Worth International</h3>
+      <p>DFW is one of the largest airports in the world by area, with five separate terminals (A through E). Each terminal has its own security checkpoint, and terminals are connected airside by the Skylink train — but you can only use that connection after clearing security. Know your terminal before arriving. Terminal D is DFW's international terminal. American Airlines dominates A, C, and D. Peak periods at DFW are pronounced due to American's large hub banking operations.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">MIA — Miami International</h3>
+      <p>MIA serves a mix of domestic and heavy international traffic, particularly to Latin America and Europe. The airport has three concourses (D, E/F, and G/H/J) with separate security checkpoints. International departures can see long lines in the early morning for transatlantic and Latin American banking flights. MIA's standard lines can be long and variable; PreCheck is notably beneficial here during peak international departure periods.</p>
+
+      <!-- ── SECTION 6 ── -->
+      <h2 id="packing-tips" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">6. Packing to Get Through Security Faster</h2>
+      <p>How you pack your carry-on has a direct impact on how quickly you move through the checkpoint — both for you and for everyone behind you.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">The Bins: What Goes in Them</h3>
+      <p>At standard lanes, you need to remove from your bag and place in separate bins: laptops (and tablets in some cases), liquids bag (3-1-1 compliant: 3.4 oz max, 1 quart-size bag, 1 bag per person), shoes, belts, and heavy jackets. Metal items from pockets go in the bin or a jacket pocket going in the bin.</p>
+      <p style="margin-top:8px;">The most common cause of bin delays: people who didn't know what to remove and are figuring it out at the belt. Have everything ready before you reach the bins.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Pack Your Liquids Accessibly</h3>
+      <p>Put your 3-1-1 liquids bag in an exterior pocket of your carry-on so you can pull it out quickly without digging. If you're a PreCheck traveler, this matters less — liquids stay in the bag — but for standard screening, having it accessible saves meaningful time.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Electronics and Cords</h3>
+      <p>At standard lanes (and many PreCheck lanes at older airports), X-ray operators may flag tangled cords and cables. Keeping cords in a small pouch and laptops near the top of your bag reduces secondary screening flags.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">What Can't Go in Carry-On</h3>
+      <p>The TSA's prohibited items list is comprehensive and available at <a href="https://www.tsa.gov/travel/security-screening/whatcanibring/all" target="_blank" rel="noopener">tsa.gov</a>. Common mistakes that cause secondary screening: oversized power banks, food that's gel-like (peanut butter, jam) which falls under liquid rules, and forgotten water bottles. Empty your water bottle before security or expect to dump it.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">What to Wear to Security</h3>
+      <p>At standard lanes: minimize metal. A belt you can't easily remove will slow you down. Shoes without complicated lacing are faster to remove and replace. Heavy jewelry goes in your carry-on before the checkpoint. If you have a metal implant, inform the officer before entering the scanner.</p>
+      <p style="margin-top:8px;">At PreCheck lanes: none of this matters as much since shoes, belts, and light jackets stay on. But you still go through the scanner, so avoid anything that will trigger the alarm (bulky metal accessories, forgotten change in pockets).</p>
+
+      <!-- ── SECTION 7 ── -->
+      <h2 id="live-data" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">7. Using Live Wait Time Data Effectively</h2>
+      <p>Live data is powerful, but it's most useful when you know how to apply it to your specific situation.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Check Before You Leave, Not at the Airport</h3>
+      <p>The value of real-time wait time data is in planning, not in reacting. Check TSA Tracker before you get in the car. A 40-minute wait time when you're 25 minutes from the airport — with a 90-minute departure window — is actionable. The same information discovered at the airport is mostly just stressful.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Use the 12-Hour Chart for Context</h3>
+      <p>A single data point — the current wait time — tells you what's happening right now. The 12-hour chart tells you whether that wait is going up, going down, or is part of a sustained peak. A 25-minute wait that's declining (morning rush tapering off) is very different from a 25-minute wait that's been climbing for two hours (building to a peak). The trend line is often more useful than the current reading.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Account for the Journey to the Checkpoint</h3>
+      <p>Remember that TSA Tracker shows the wait time at the checkpoint — not the total time from when you arrive at the airport. You still need to account for parking (or rideshare drop-off delays during peak periods), the walk to your terminal, and any bag drop lines. The TSA recommends 2 hours for domestic (3 for international) as total arrival-before-departure buffer, and that's before accounting for any above-average wait times.</p>
+
+      <h3 style="font-size:1.05rem;font-weight:700;margin:20px 0 6px;">Multiple Checkpoints at Your Airport</h3>
+      <p>If your airport has multiple security checkpoints (different terminals with separate entrances), check if TSA Tracker shows separate data for each. Where lane-level data is available, it lets you compare PreCheck vs. standard wait times directly — useful for deciding whether to seek out a PreCheck lane versus using a less-crowded standard lane at a different terminal entrance.</p>
+
+      <!-- ── SECTION 8 ── -->
+      <h2 id="faq" style="font-size:1.35rem;font-weight:700;margin:40px 0 10px;">8. Frequently Asked Questions</h2>
+
+      <div class="faq-section">
+        <div class="faq-item">
+          <h3>How far in advance should I check TSA wait times?</h3>
+          <p>Check the live wait time 30–60 minutes before you plan to leave for the airport, not right before your flight. This gives you time to adjust your departure if lines are unusually long. For flights during peak periods, also check the 12-hour history chart the night before to gauge what to expect.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Can TSA wait times change quickly?</h3>
+          <p>Yes — dramatically. A 5-minute wait can become a 35-minute wait in under 20 minutes if a large flight bank starts boarding all at once and pushes a wave of passengers toward security. This is why checking right before you leave is more useful than checking hours in advance. The history chart helps you understand whether you're in a typically volatile time window.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is TSA wait time data the same as what the TSA publishes?</h3>
+          <p>TSA Tracker's data comes from individual airports, not directly from the TSA. The TSA itself doesn't publish a comprehensive real-time wait time feed — instead, each airport authority collects and publishes its own checkpoint data. TSA Tracker aggregates these individual airport feeds. The TSA does publish historical data for research purposes, but that's different from live wait times.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Why does TSA Tracker only cover certain airports?</h3>
+          <p>We only display wait times from airports that have reliable, official data feeds. Not all airports publish this data publicly, and some that do have feeds that are unreliable, infrequently updated, or not accessible without commercial agreements. We add airports when we can confirm a stable, official source — we'd rather show nothing than show inaccurate numbers.</p>
+        </div>
+        <div class="faq-item">
+          <h3>What does it mean when TSA Tracker shows "No data available"?</h3>
+          <p>This typically means the airport's data feed didn't return a valid reading during our last poll. This can happen if the airport's system is temporarily down, if a checkpoint is closed (late night or early morning), or if there's an upstream issue with the data feed. Try refreshing — if data is still unavailable after a few minutes, the airport's system may be experiencing issues.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do I sign up for TSA PreCheck?</h3>
+          <p>Visit <a href="https://www.tsa.gov/precheck/enroll" target="_blank" rel="noopener">tsa.gov/precheck/enroll</a> to start your application. You'll complete the online form, schedule an in-person appointment at an enrollment location, provide identity documents, and be fingerprinted. The TSA usually processes applications in 3–5 business days after your appointment, though some applications take longer. Once approved, you'll receive a KTN to add to your airline profiles.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Does TSA PreCheck work at all airports?</h3>
+          <p>TSA PreCheck is available at more than 200 US airports and with most major US airlines. However, PreCheck designation on your boarding pass depends on both the airport having PreCheck lanes and your airline participating in the program. Most major carriers (United, Delta, American, Southwest, JetBlue, Alaska, etc.) participate. Some smaller regional carriers and certain international airlines operating domestic US routes may not. Always check your boarding pass for the PreCheck indicator before assuming you have access.</p>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:18px 22px;margin-top:36px;">
+        <p style="font-weight:700;margin-bottom:6px;">Ready to check your airport?</p>
+        <p>TSA Tracker shows live, official wait times for 12 major US airports. Check before you leave.</p>
+        <a href="/" style="display:inline-block;margin-top:10px;background:#22c55e;color:white;font-weight:700;padding:10px 20px;border-radius:7px;text-decoration:none;">See Live Wait Times →</a>
+      </div>
+
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div>TSA Tracker — live security wait times. Data refreshes every ~2 minutes.</div>
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <span>·</span>
+      <a href="/about">About</a>
+      <span>·</span>
+      <a href="/privacy">Privacy</a>
+      <span>·</span>
+      <a href="/terms">Terms</a>
+      <span>·</span>
+      <a href="/contact">Contact</a>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "TSA Wait Times Explained: How to Get Through Airport Security Faster in 2025",
+    "description": "{{ seo.description }}",
+    "url": "{{ seo.canonical_url }}",
+    "dateModified": "2025-04-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "TSA Tracker",
+      "url": "{{ seo.site_url }}"
+    },
+    "mainEntity": {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How far in advance should I check TSA wait times?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Check the live wait time 30–60 minutes before you plan to leave for the airport. For peak-period flights, also check the 12-hour history chart the night before."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is TSA wait time data the same as what the TSA publishes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "TSA Tracker data comes from individual airports, not directly from the TSA. Each airport authority collects and publishes its own checkpoint data, which TSA Tracker aggregates."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I sign up for TSA PreCheck?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Visit tsa.gov/precheck/enroll to apply. You'll complete an online form, schedule an in-person appointment, provide identity documents, and be fingerprinted. Applications are typically processed in 3–5 business days."
+          }
+        }
+      ]
+    }
+  }
+  </script>
+</body>
+</html>

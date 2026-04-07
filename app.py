@@ -1078,26 +1078,59 @@ def airport_page(airport_slug: str):
 @app.route("/about")
 def about_page():
     seo = build_page_seo(
-        title="About | TSA Tracker",
-        description="TSA Tracker shows live TSA checkpoint wait times for major US airports. Learn how it works and which airports are covered.",
+        title="About TSA Tracker | Real-Time Airport Security Wait Times",
+        description="TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowd-sourced guesses. Learn how it works, which airports are covered, and why it's the most accurate source for airport security wait times.",
         canonical_path="/about",
     )
-    return render_template("legal.html", page_title="About TSA Tracker", slug="about", seo=seo)
+    return render_template("about.html", seo=seo)
 
 
 @app.route("/privacy")
 def privacy():
-    return render_template("legal.html", page_title="Privacy Policy", slug="privacy", seo=legal_page_seo("privacy"))
+    seo = build_page_seo(
+        title="Privacy Policy | TSA Tracker",
+        description="TSA Tracker's privacy policy — how we collect, use, and protect your information when you use our live airport security wait time service.",
+        canonical_path="/privacy",
+    )
+    return render_template("privacy.html", seo=seo)
 
 
 @app.route("/terms")
 def terms():
-    return render_template("legal.html", page_title="Terms of Service", slug="terms", seo=legal_page_seo("terms"))
+    seo = build_page_seo(
+        title="Terms of Service | TSA Tracker",
+        description="TSA Tracker terms of service — the rules and conditions for using our live airport TSA wait time service.",
+        canonical_path="/terms",
+    )
+    return render_template("terms.html", seo=seo)
 
 
 @app.route("/contact")
 def contact():
-    return render_template("legal.html", page_title="Contact", slug="contact", seo=legal_page_seo("contact"))
+    seo = build_page_seo(
+        title="Contact | TSA Tracker",
+        description="Get in touch with the TSA Tracker team — questions, feedback, bug reports, airport data requests, and partnership inquiries.",
+        canonical_path="/contact",
+    )
+    return render_template("contact.html", seo=seo)
+
+
+@app.route("/guide/tsa-wait-times")
+def guide_tsa_wait_times():
+    seo = build_page_seo(
+        title="TSA Wait Times Explained: How to Get Through Airport Security Faster | TSA Tracker",
+        description="A complete guide to TSA security wait times — how data is measured, peak hours to avoid, TSA PreCheck vs. CLEAR vs. standard lanes, airport-specific tips, and how to use live wait time data effectively.",
+        canonical_path="/guide/tsa-wait-times",
+    )
+    monetization = {
+        "enable_adsense": ENABLE_ADSENSE,
+        "adsense_client": ADSENSE_CLIENT,
+        "adsense_slot_top": ADSENSE_SLOT_TOP,
+        "adsense_slot_bottom": ADSENSE_SLOT_BOTTOM,
+        "sponsor_cta_url": SPONSOR_CTA_URL,
+        "sponsor_cta_text": SPONSOR_CTA_TEXT,
+    }
+    return render_template("guide.html", seo=seo, monetization=monetization)
 
 
 @app.route("/api/live")
@@ -1170,7 +1203,7 @@ def sitemap_xml():
     pages = (
         [("/", "1.0", "hourly")]
         + [(airport_seo_slug(c), "0.9", "always") for c in LIVE_AIRPORTS.keys()]
-        + [("/privacy", "0.3", "monthly"), ("/terms", "0.3", "monthly"), ("/contact", "0.4", "monthly")]
+        + [("/about", "0.6", "monthly"), ("/privacy", "0.3", "monthly"), ("/terms", "0.3", "monthly"), ("/contact", "0.4", "monthly"), ("/guide/tsa-wait-times", "0.7", "monthly")]
     )
     entries = []
     for path, priority, changefreq in pages:
