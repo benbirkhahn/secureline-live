@@ -382,6 +382,14 @@ select {
   background: linear-gradient(135deg, #1e293b 0%, #273548 100%);
   transform: translateY(-1px);
 }
+.affiliate-cta.klook {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-color: #f97316;
+}
+.affiliate-cta.klook:hover {
+  background: linear-gradient(135deg, #16213e 0%, #1e3a5f 100%);
+  transform: translateY(-1px);
+}
 .affiliate-icon {
   font-size: 28px;
   flex-shrink: 0;

@@ -26,6 +26,7 @@ SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
 LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
 PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
+KLOOK_AFFILIATE_URL = os.getenv("KLOOK_AFFILIATE_URL", "https://klook.tpo.li/nu6sgjUi").strip()
 TRAVEL_INSURANCE_URL = os.getenv("TRAVEL_INSURANCE_URL", "https://www.travelinsurance.com/").strip()
 SITE_URL = os.getenv("SITE_URL", "https://tsatracker.com").strip().rstrip("/")
 _publisher_token = ADSENSE_CLIENT.replace("ca-", "").strip() if ADSENSE_CLIENT else ""
@@ -268,6 +269,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "uber_url": UBER_AFFILIATE_URL,
             "lyft_url": LYFT_AFFILIATE_URL,
             "parking_url": PARKING_AFFILIATE_URL,
+            "klook_url": KLOOK_AFFILIATE_URL,
         },
     }
 
