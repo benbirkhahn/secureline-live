@@ -349,6 +349,67 @@ select {
 }
 .sponsor-cta:hover { background: #0d2a1a; }
 
+/* ── AFFILIATE CTA GRID ── */
+.affiliate-cta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  height: 100%;
+}
+.affiliate-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+.affiliate-cta.rideshare {
+  background: linear-gradient(135deg, #0a1f12 0%, #0d2818 100%);
+  border-color: #166534;
+}
+.affiliate-cta.rideshare:hover {
+  background: linear-gradient(135deg, #0d2818 0%, #115e2c 100%);
+  transform: translateY(-1px);
+}
+.affiliate-cta.parking {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-color: #334155;
+}
+.affiliate-cta.parking:hover {
+  background: linear-gradient(135deg, #1e293b 0%, #273548 100%);
+  transform: translateY(-1px);
+}
+.affiliate-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.affiliate-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.affiliate-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+.affiliate-sub {
+  font-size: 11px;
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .affiliate-cta-grid {
+    grid-template-columns: 1fr;
+  }
+  .ad-slot-frame {
+    height: auto;
+    min-height: 200px;
+  }
+}
+
 /* ── PIPELINE ── */
 .section-divider {
   display: flex; align-items: center; gap: 12px; margin-bottom: 16px;

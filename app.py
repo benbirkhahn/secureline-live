@@ -22,6 +22,11 @@ ADSENSE_SLOT_TOP = os.getenv("ADSENSE_SLOT_TOP", "").strip()
 ADSENSE_SLOT_BOTTOM = os.getenv("ADSENSE_SLOT_BOTTOM", "").strip()
 SPONSOR_CTA_URL = os.getenv("SPONSOR_CTA_URL", "mailto:ads@secureline-live.com").strip()
 SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
+# Affiliate monetization links (override via env vars with your affiliate IDs)
+UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
+LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
+PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
+TRAVEL_INSURANCE_URL = os.getenv("TRAVEL_INSURANCE_URL", "https://www.travelinsurance.com/").strip()
 SITE_URL = os.getenv("SITE_URL", "https://tsatracker.com").strip().rstrip("/")
 _publisher_token = ADSENSE_CLIENT.replace("ca-", "").strip() if ADSENSE_CLIENT else ""
 ADS_TXT_LINE = os.getenv(
@@ -260,6 +265,9 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "adsense_slot_bottom": ADSENSE_SLOT_BOTTOM,
             "sponsor_cta_url": SPONSOR_CTA_URL,
             "sponsor_cta_text": SPONSOR_CTA_TEXT,
+            "uber_url": UBER_AFFILIATE_URL,
+            "lyft_url": LYFT_AFFILIATE_URL,
+            "parking_url": PARKING_AFFILIATE_URL,
         },
     }
 

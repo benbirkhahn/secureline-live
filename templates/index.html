@@ -173,9 +173,22 @@
            data-full-width-responsive="true"></ins>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       {% else %}
-      <a class="sponsor-cta" href="{{ monetization.sponsor_cta_url }}" target="_blank" rel="noopener">
-        {{ monetization.sponsor_cta_text }} — Reach travelers now
-      </a>
+      <div class="affiliate-cta-grid">
+        <a class="affiliate-cta rideshare" href="{{ monetization.uber_url }}" target="_blank" rel="noopener">
+          <span class="affiliate-icon">🚗</span>
+          <div class="affiliate-content">
+            <span class="affiliate-title">Need a ride to the airport?</span>
+            <span class="affiliate-sub">Book with Uber — reliable pickups</span>
+          </div>
+        </a>
+        <a class="affiliate-cta parking" href="{{ monetization.parking_url }}" target="_blank" rel="noopener">
+          <span class="affiliate-icon">🅿️</span>
+          <div class="affiliate-content">
+            <span class="affiliate-title">Save on airport parking</span>
+            <span class="affiliate-sub">Book ahead — skip the terminal rates</span>
+          </div>
+        </a>
+      </div>
       {% endif %}
       </div>
     </section>
@@ -302,9 +315,22 @@
            data-full-width-responsive="true"></ins>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       {% else %}
-      <a class="sponsor-cta" href="{{ monetization.sponsor_cta_url }}" target="_blank" rel="noopener">
-        {{ monetization.sponsor_cta_text }} — High-intent airport audience
-      </a>
+      <div class="affiliate-cta-grid">
+        <a class="affiliate-cta rideshare" href="{{ monetization.lyft_url }}" target="_blank" rel="noopener">
+          <span class="affiliate-icon">🚕</span>
+          <div class="affiliate-content">
+            <span class="affiliate-title">Airport pickup made easy</span>
+            <span class="affiliate-sub">Lyft — affordable rides when you land</span>
+          </div>
+        </a>
+        <a class="affiliate-cta parking" href="{{ monetization.parking_url }}" target="_blank" rel="noopener">
+          <span class="affiliate-icon">🅿️</span>
+          <div class="affiliate-content">
+            <span class="affiliate-title">Off-site parking deals</span>
+            <span class="affiliate-sub">Save up to 50% vs terminal parking</span>
+          </div>
+        </a>
+      </div>
       {% endif %}
       </div>
     </section>
