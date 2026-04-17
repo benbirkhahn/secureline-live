@@ -94,12 +94,15 @@ body {
   background: var(--amber); box-shadow: 0 0 8px var(--amber);
 }
 .hero-headline {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 46px; font-weight: 700;
   line-height: 1.05; letter-spacing: -.8px;
   color: #fff; margin-bottom: 10px;
+  text-wrap: balance;
 }
 .hero-headline em { color: var(--amber); font-style: normal; }
 .hero-sub {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 15px; color: #a8a8c0; line-height: 1.55;
   margin-bottom: 32px; max-width: 480px;
 }
@@ -315,9 +318,19 @@ select {
   color: var(--muted); font-size: 10px; font-family: var(--mono);
   margin: 0 0 5px; letter-spacing: .08em; text-transform: uppercase;
 }
+.ad-slot-frame {
+  height: 280px;
+  border-radius: 12px;
+  border: 1px dashed var(--border2);
+  background: var(--surface);
+  overflow: hidden;
+}
 .ad-slot ins {
-  min-height: 90px; border-radius: 12px;
-  border: 1px dashed var(--border2); background: var(--surface);
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface);
 }
 .adsense-auto-note {
   border-radius: 12px; border: 1px dashed var(--border2);
@@ -326,10 +339,13 @@ select {
   font-family: var(--mono);
 }
 .sponsor-cta {
-  display: block; text-decoration: none; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  text-decoration: none; border-radius: 12px;
   border: 1px solid #166534; background: #0d2016;
   color: var(--green); font-weight: 700; font-family: var(--mono);
   font-size: 12px; padding: 14px; letter-spacing: .04em;
+  text-align: center;
 }
 .sponsor-cta:hover { background: #0d2a1a; }
 
@@ -363,8 +379,15 @@ select {
 
 /* ── HERO TRUST LINE ── */
 .hero-trust {
-  font-family: var(--mono); font-size: 11px; color: var(--muted);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px; color: var(--muted);
   letter-spacing: .04em; margin: 10px 0 0; opacity: .7;
+}
+
+/* Prioritize above-the-fold hero; defer below-the-fold rendering */
+.main > *:not(.hero-section) {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
 }
 
 /* ── CHART PLANNING TIP ── */
@@ -424,6 +447,7 @@ select {
   .cp-block { padding: 14px 16px 14px 18px; }
   .content-columns { grid-template-columns: 1fr; }
   .footer { padding: 0 20px; }
+  .ad-slot-frame { height: 250px; }
   /* Content pages: full-width card on mobile */
   .content-card { padding: 16px !important; margin: 0 !important; border-radius: 12px !important; }
   .content-card h1 { font-size: 1.5rem !important; }

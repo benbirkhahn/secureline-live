@@ -2,6 +2,15 @@ let chart;
 let livePayloadCache = null;
 let selectedAirportCode = null;
 let chartJsPromise = null;
+const hasRIC = typeof window !== "undefined" && "requestIdleCallback" in window;
+
+function scheduleNonCriticalTask(fn, timeout = 800) {
+  if (hasRIC) {
+    window.requestIdleCallback(fn, { timeout });
+    return;
+  }
+  setTimeout(fn, 0);
+}
 
 function loadChartJs() {
   if (chartJsPromise) return chartJsPromise;
@@ -348,10 +357,10 @@ async function selectAirport(code) {
   const apName = document.getElementById("ap-name");
   if (apName && meta) apName.textContent = meta.name;
 
-  await updateSelectionSourceStatus(code);
+  updateSelectionSourceStatus(code);
   renderAirportChips(livePayloadCache, document.getElementById("airport-search").value);
   renderLiveCards(livePayloadCache, code);
-  await loadHistory(code);
+  scheduleNonCriticalTask(() => loadHistory(code));
 
   // Scroll to results
   const resultsEl = document.getElementById("results-section");
@@ -383,20 +392,8 @@ async function silentRefresh() {
 }
 
 async function bootstrap() {
-  const [liveResp, pipeResp] = await Promise.all([fetch("/api/live"), fetch("/api/pipeline")]);
+  const liveResp = await fetch("/api/live");
   livePayloadCache = await liveResp.json();
-  const pipePayload = await pipeResp.json();
-  renderPipeline(pipePayload.airports || []);
-
-  // Populate chart airport dropdown
-  const select = document.getElementById("airport-select");
-  Object.keys(livePayloadCache.live_airports || {}).forEach((code) => {
-    const opt = document.createElement("option");
-    opt.value = code;
-    opt.textContent = code;
-    select.appendChild(opt);
-  });
-  select.addEventListener("change", (e) => selectAirport(e.target.value));
 
   // Wire up hero search input
   const search = document.getElementById("airport-search");
@@ -412,16 +409,40 @@ async function bootstrap() {
 
   renderAirportChips(livePayloadCache);
   renderLiveCards(livePayloadCache, null);
-  await loadHistory(null);
 
   // Auto-select airport if this is a dedicated airport page
   const initialCode = String(window.INITIAL_AIRPORT_CODE || "").toUpperCase();
   if (initialCode && livePayloadCache.live_airports?.[initialCode]) {
-    await selectAirport(initialCode);
+    selectAirport(initialCode);
   }
 
+  scheduleNonCriticalTask(async () => {
+    const select = document.getElementById("airport-select");
+    Object.keys(livePayloadCache.live_airports || {}).forEach((code) => {
+      const opt = document.createElement("option");
+      opt.value = code;
+      opt.textContent = code;
+      select.appendChild(opt);
+    });
+    select.addEventListener("change", (e) => selectAirport(e.target.value));
+    await loadHistory(null);
+  });
+
+  scheduleNonCriticalTask(async () => {
+    try {
+      const pipeResp = await fetch("/api/pipeline");
+      if (!pipeResp.ok) return;
+      const pipePayload = await pipeResp.json();
+      renderPipeline(pipePayload.airports || []);
+    } catch (_e) {
+      // no-op
+    }
+  }, 1200);
+
   // Kick off silent background refresh every 2 minutes (matching server poll interval)
-  setInterval(silentRefresh, 2 * 60 * 1000);
+  scheduleNonCriticalTask(() => {
+    setInterval(silentRefresh, 2 * 60 * 1000);
+  }, 1000);
 }
 
 bootstrap();

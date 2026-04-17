@@ -22,22 +22,11 @@
   <meta name="twitter:title" content="{{ seo.title }}">
   <meta name="twitter:description" content="{{ seo.description }}">
   <meta name="twitter:image" content="{{ seo.site_url }}/static/og-image.png">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9MN7W14PC1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-9MN7W14PC1');
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="/static/style.css">
-  {% if monetization.enable_adsense %}
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ monetization.adsense_client }}"
-          crossorigin="anonymous"></script>
-  {% endif %}
 </head>
 <body>
 
@@ -174,6 +163,7 @@
     <!-- ── TOP AD SLOT ── -->
     <section class="ad-slot top-ad">
       <div class="ad-label">Advertisement</div>
+      <div class="ad-slot-frame">
       {% if monetization.enable_adsense %}
       <ins class="adsbygoogle"
            style="display:block"
@@ -187,6 +177,7 @@
         {{ monetization.sponsor_cta_text }} — Reach travelers now
       </a>
       {% endif %}
+      </div>
     </section>
 
     <!-- ── COMING SOON (pipeline) ── -->
@@ -301,6 +292,7 @@
     <!-- ── BOTTOM AD SLOT ── -->
     <section class="ad-slot bottom-ad">
       <div class="ad-label">Advertisement</div>
+      <div class="ad-slot-frame">
       {% if monetization.enable_adsense %}
       <ins class="adsbygoogle"
            style="display:block"
@@ -314,6 +306,7 @@
         {{ monetization.sponsor_cta_text }} — High-intent airport audience
       </a>
       {% endif %}
+      </div>
     </section>
 
   </main>
@@ -341,8 +334,41 @@
     document.querySelectorAll(".header-nav-link").forEach(function(a) {
       if (a.getAttribute("href") === "/") a.classList.add("active");
     });
+
+    function scheduleThirdPartyLoad(fn, timeout) {
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(fn, { timeout: timeout || 1500 });
+        return;
+      }
+      setTimeout(fn, 0);
+    }
+
+    window.addEventListener("load", function () {
+      scheduleThirdPartyLoad(function () {
+        var ga = document.createElement("script");
+        ga.async = true;
+        ga.src = "https://www.googletagmanager.com/gtag/js?id=G-9MN7W14PC1";
+        ga.onload = function () {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag("js", new Date());
+          gtag("config", "G-9MN7W14PC1");
+        };
+        document.head.appendChild(ga);
+      }, 1200);
+
+      {% if monetization.enable_adsense %}
+      scheduleThirdPartyLoad(function () {
+        var ads = document.createElement("script");
+        ads.async = true;
+        ads.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ monetization.adsense_client }}";
+        ads.crossOrigin = "anonymous";
+        document.head.appendChild(ads);
+      }, 2000);
+      {% endif %}
+    });
   </script>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js" defer></script>
 
   <script type="application/ld+json">
     {
