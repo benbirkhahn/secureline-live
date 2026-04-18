@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: secureline-live
+    name: tsatracker-com
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt

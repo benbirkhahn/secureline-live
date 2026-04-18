@@ -20,7 +20,7 @@ ENABLE_ADSENSE = os.getenv("ENABLE_ADSENSE", "true").lower() == "true"
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "ca-pub-3769301792129016").strip()
 ADSENSE_SLOT_TOP = os.getenv("ADSENSE_SLOT_TOP", "").strip()
 ADSENSE_SLOT_BOTTOM = os.getenv("ADSENSE_SLOT_BOTTOM", "").strip()
-SPONSOR_CTA_URL = os.getenv("SPONSOR_CTA_URL", "mailto:ads@secureline-live.com").strip()
+SPONSOR_CTA_URL = os.getenv("SPONSOR_CTA_URL", "mailto:ads@tsatracker.com").strip()
 SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
 # Affiliate monetization links (override via env vars with your affiliate IDs)
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
@@ -164,7 +164,7 @@ logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
-logger = logging.getLogger("secureline-live")
+logger = logging.getLogger("tsa-tracker")
 
 
 def start_runtime_once() -> None:

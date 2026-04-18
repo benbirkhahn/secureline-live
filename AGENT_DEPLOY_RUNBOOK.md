@@ -1,8 +1,8 @@
 # Agent Deployment Runbook (No Product Decisions Needed)
-This runbook is for an AI agent/operator to deploy `secureline-live` without asking for implementation choices.
+This runbook is for an AI agent/operator to deploy `tsatracker.com` without asking for implementation choices.
 
 ## Repository
-- URL: `https://github.com/benbirkhahn/secureline-live`
+- URL: `https://github.com/benbirkhahn/tsatracker.com`
 - Branch: `main`
 
 ## Target platform
