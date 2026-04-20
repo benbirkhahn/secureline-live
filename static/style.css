@@ -160,13 +160,63 @@ body {
   margin-bottom: 20px; padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
 }
+.airport-header-left { flex: 1; min-width: 0; }
+.airport-header-main {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+.airport-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.3px;
+  margin: 0;
+}
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  top: -1px;
+}
+.pulse {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  display: block;
+  animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.live-text {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: .05em;
+}
+.refresh-timer {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  opacity: .7;
+  margin-left: 2px;
+}
+@keyframes livePulse {
+  0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+  70%  { transform: scale(1); box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
 .airport-code-label {
   font-family: var(--mono); font-size: 11px; font-weight: 600;
   color: var(--amber); text-transform: uppercase; letter-spacing: .12em;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 .airport-fullname {
-  font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -.3px;
+  font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0;
 }
 .live-badge {
   display: inline-flex; align-items: center; gap: 6px;

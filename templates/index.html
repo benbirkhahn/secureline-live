@@ -89,7 +89,15 @@
     <section class="results-card" id="results-section">
       <!-- Airport header (shown once an airport is selected) -->
       <div class="airport-header" id="airport-header" style="display:none;">
-        <div>
+        <div class="airport-header-left">
+          <div class="airport-header-main">
+            <h2 class="airport-name" id="current-airport-name">{{ airport_display_name }}</h2>
+            <div class="live-indicator">
+              <span class="pulse"></span>
+              <span class="live-text">LIVE</span>
+              <span class="refresh-timer" id="last-updated-text">Just now</span>
+            </div>
+          </div>
           <div class="airport-code-label" id="ap-code"></div>
           <div class="airport-fullname" id="ap-name"></div>
         </div>
@@ -192,8 +200,8 @@
         <a class="affiliate-cta klook" href="{{ monetization.klook_url }}" target="_blank" rel="noopener">
           <span class="affiliate-icon">🎫</span>
           <div class="affiliate-content">
-            <span class="affiliate-title">Book activities & skip-the-line tickets</span>
-            <span class="affiliate-sub">Klook — exclusive travel deals</span>
+            <span class="affiliate-title">Activities {% if airport_city %}in {{ airport_city }}{% else %}& more{% endif %}</span>
+            <span class="affiliate-sub">Klook — skip-the-line deals</span>
           </div>
         </a>
       </div>

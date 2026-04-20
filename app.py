@@ -47,18 +47,18 @@ ADS_TXT_LINE = os.getenv(
 UA = {"User-Agent": "Mozilla/5.0 (tsa-live-site/1.0)"}
 
 LIVE_AIRPORTS = {
-    "PHL": {"name": "Philadelphia International (PHL)", "mode": "LIVE_PUBLIC"},
-    "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED"},
-    "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC"},
-    "CLT": {"name": "Charlotte Douglas International (CLT)", "mode": "LIVE_KEY_REQUIRED"},
-    "MCO": {"name": "Orlando International (MCO)", "mode": "LIVE_KEY_REQUIRED"},
-    "JAX": {"name": "Jacksonville International (JAX)", "mode": "LIVE_PUBLIC"},
-    "DFW": {"name": "Dallas/Fort Worth International (DFW)", "mode": "LIVE_KEY_EMBEDDED"},
-    "LAX": {"name": "Los Angeles International (LAX)", "mode": "LIVE_PUBLIC"},
-    "JFK": {"name": "John F. Kennedy International (JFK)", "mode": "LIVE_PUBLIC"},
-    "EWR": {"name": "Newark Liberty International (EWR)", "mode": "LIVE_PUBLIC"},
-    "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC"},
-    "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC"},
+    "PHL": {"name": "Philadelphia International (PHL)", "mode": "LIVE_PUBLIC", "city": "Philadelphia"},
+    "MIA": {"name": "Miami International (MIA)", "mode": "LIVE_KEY_REQUIRED", "city": "Miami"},
+    "ORD": {"name": "Chicago O'Hare International (ORD)", "mode": "LIVE_PUBLIC", "city": "Chicago"},
+    "CLT": {"name": "Charlotte Douglas International (CLT)", "mode": "LIVE_KEY_REQUIRED", "city": "Charlotte"},
+    "MCO": {"name": "Orlando International (MCO)", "mode": "LIVE_KEY_REQUIRED", "city": "Orlando"},
+    "JAX": {"name": "Jacksonville International (JAX)", "mode": "LIVE_PUBLIC", "city": "Jacksonville"},
+    "DFW": {"name": "Dallas/Fort Worth International (DFW)", "mode": "LIVE_KEY_EMBEDDED", "city": "Dallas"},
+    "LAX": {"name": "Los Angeles International (LAX)", "mode": "LIVE_PUBLIC", "city": "Los Angeles"},
+    "JFK": {"name": "John F. Kennedy International (JFK)", "mode": "LIVE_PUBLIC", "city": "New York"},
+    "EWR": {"name": "Newark Liberty International (EWR)", "mode": "LIVE_PUBLIC", "city": "Newark"},
+    "LGA": {"name": "LaGuardia Airport (LGA)", "mode": "LIVE_PUBLIC", "city": "New York"},
+    "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC", "city": "Seattle"},
 }
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -265,6 +265,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "initial_airport_code": initial_airport_code,
         "is_airport_page": is_airport_page,
         "airport_display_name": airport_display_name,
+        "airport_city": LIVE_AIRPORTS[initial_airport_code].get("city") if is_airport_page and initial_airport_code in LIVE_AIRPORTS else None,
         "airport_pages": [{"code": c, "href": airport_seo_slug(c), "name": v["name"]} for c, v in LIVE_AIRPORTS.items()],
         "seo": seo,
         "initial_data": initial_data,
@@ -281,7 +282,11 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "uber_url": UBER_AFFILIATE_URL,
             "lyft_url": LYFT_AFFILIATE_URL,
             "parking_url": PARKING_AFFILIATE_URL,
-            "klook_url": KLOOK_AFFILIATE_URL,
+            "klook_url": (
+                f"https://www.klook.com/en-US/search?query={LIVE_AIRPORTS[initial_airport_code]['city'].replace(' ', '%20')}&marker={TRAVELPAYOUTS_ID}"
+                if is_airport_page and initial_airport_code in LIVE_AIRPORTS and LIVE_AIRPORTS[initial_airport_code].get("city") and TRAVELPAYOUTS_ID
+                else KLOOK_AFFILIATE_URL
+            ),
         },
     }
 

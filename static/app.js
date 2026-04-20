@@ -2,6 +2,7 @@ let chart;
 let livePayloadCache = null;
 let selectedAirportCode = null;
 let chartJsPromise = null;
+let lastUpdateTimestamp = null;
 const hasRIC = typeof window !== "undefined" && "requestIdleCallback" in window;
 
 function scheduleNonCriticalTask(fn, timeout = 800) {
@@ -367,6 +368,10 @@ async function selectAirport(code) {
   if (resultsEl) {
     resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  // Update last refresh timestamp
+  lastUpdateTimestamp = new Date();
+  updateRefreshText();
 }
 
 // Silent background refresh — only re-fetches /api/live and repaints
@@ -386,8 +391,25 @@ async function silentRefresh() {
     if (selectedAirportCode) {
       renderLiveCards(livePayloadCache, selectedAirportCode);
     }
+    lastUpdateTimestamp = new Date();
+    updateRefreshText();
   } catch (_e) {
     // Network error — silently skip, try again next cycle
+  }
+}
+
+function updateRefreshText() {
+  const el = document.getElementById("last-updated-text");
+  if (!el || !lastUpdateTimestamp) return;
+
+  const now = new Date();
+  const diffSec = Math.floor((now - lastUpdateTimestamp) / 1000);
+
+  if (diffSec < 60) {
+    el.textContent = "Just now";
+  } else {
+    const mins = Math.floor(diffSec / 60);
+    el.textContent = `${mins}m ago`;
   }
 }
 
@@ -442,6 +464,8 @@ async function bootstrap() {
   // Kick off silent background refresh every 2 minutes (matching server poll interval)
   scheduleNonCriticalTask(() => {
     setInterval(silentRefresh, 2 * 60 * 1000);
+    // Update the "Last Updated" text every 30 seconds
+    setInterval(updateRefreshText, 30 * 1000);
   }, 1000);
 }
 
