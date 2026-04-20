@@ -32,6 +32,8 @@ SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
 TRAVELPAYOUTS_ID = os.getenv("TRAVELPAYOUTS_ID", "").strip()
 TRAVELPAYOUTS_TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN", "").strip()
 KLOOK_AFFILIATE_URL = os.getenv("KLOOK_AFFILIATE_URL", f"https://www.klook.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.klook.com/").strip()
+AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.li/iHq6wvHP").strip()
+LOUNGE_AFFILIATE_URL = os.getenv("LOUNGE_AFFILIATE_URL", f"https://www.prioritypass.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.prioritypass.com/").strip()
 
 # Affiliate monetization links (override via env vars with your affiliate IDs)
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
@@ -282,6 +284,8 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "uber_url": UBER_AFFILIATE_URL,
             "lyft_url": LYFT_AFFILIATE_URL,
             "parking_url": PARKING_AFFILIATE_URL,
+            "airhelp_url": AIRHELP_AFFILIATE_URL,
+            "lounge_url": LOUNGE_AFFILIATE_URL,
             "klook_url": (
                 f"https://www.klook.com/en-US/search?query={LIVE_AIRPORTS[initial_airport_code]['city'].replace(' ', '%20')}&marker={TRAVELPAYOUTS_ID}"
                 if is_airport_page and initial_airport_code in LIVE_AIRPORTS and LIVE_AIRPORTS[initial_airport_code].get("city") and TRAVELPAYOUTS_ID
