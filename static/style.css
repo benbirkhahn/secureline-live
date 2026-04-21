@@ -404,17 +404,18 @@ select {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  height: 100%;
 }
 .affiliate-cta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 16px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-decoration: none;
   transition: all 0.2s;
   border: 1px solid;
+  min-height: 80px;
+  color: #fff; /* Ensure text is always white */
 }
 .affiliate-cta.rideshare {
   background: linear-gradient(135deg, #0a1f12 0%, #0d2818 100%);
@@ -486,6 +487,8 @@ select {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
   border-color: #4338ca;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 .featured-tag {
   position: absolute; top: 14px; right: 14px;

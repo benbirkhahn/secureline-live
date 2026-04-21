@@ -276,18 +276,12 @@
       </div>
     </section>
 
-    <!-- ── FLIGHT SEARCH WIDGET (PASSIVE INCOME) ── -->
-    {% if is_airport_page %}
-    <section class="card widget-card" style="padding: 10px; background: transparent; border: none; box-shadow: none;">
-      <div class="section-divider">Find your next flight</div>
-      <div
-        style="background: var(--surface); border-radius: 12px; padding: 2px; overflow: hidden; border: 1px solid var(--border);">
-        <script
-          src="https://tp.media/content?currency=usd&promo_id=4464&shmarker={{ monetization.travelpayouts_id }}&campaign_id=121&trs=205623&target_host=tsatracker.com&type=compact&limit=4&powered_by=false&marker={{ monetization.travelpayouts_id }}"
-          charset="utf-8"></script>
+    <section class="card widget-card" style="padding:0; background:transparent; border:none; box-shadow:none; margin-top: 2rem;">
+      <div class="section-divider">Find your next flight from {{ initial_airport_code }}</div>
+      <div style="min-height: 280px; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow);">
+        <script charset="utf-8" src="https://tp.media/content?currency=usd&promo_id=4464&shmarker={{ monetization.travelpayouts_id }}&campaign_id=121&trs=205623&target_host=tsatracker.com&type=compact&limit=4&powered_by=false&marker={{ monetization.travelpayouts_id }}"></script>
       </div>
     </section>
-    {% endif %}
 
     <!-- ── COMING SOON (pipeline) ── -->
     <section class="card pipeline-card">
