@@ -35,6 +35,11 @@
   </noscript>
   <link rel="stylesheet" href="/static/style.css">
   <script async src="https://tp.st/drive/{{ monetization.emerald_id }}"></script>
+    <script>
+      window.MONETIZATION_CONFIG = {
+        tpMarker: "{{ monetization.travelpayouts_id }}"
+      };
+    </script>
 </head>
 
 <body>
@@ -286,17 +291,15 @@
             <p>Guaranteed lowest prices via Kiwi.com</p>
           </div>
         </div>
-        <form action="https://kiwi.tp.st/results" method="GET" target="_blank" class="search-form-inline">
-          <input type="hidden" name="marker" value="{{ monetization.travelpayouts_id }}">
-          <input type="hidden" name="origin" id="flight-origin-input" value="{{ initial_airport_code }}">
+        <div class="search-form-inline">
           <div class="form-row">
             <div class="input-wrap">
               <label>Destination</label>
-              <input type="text" name="destination" placeholder="Where to?" required>
+              <input type="text" id="flight-destination-input" placeholder="Where to?" required>
             </div>
-            <button type="submit" class="search-btn-premium">Search Flights →</button>
+            <button type="button" onclick="performFlightSearch()" class="search-btn-premium">Search Flights →</button>
           </div>
-        </form>
+        </div>
       </div>
     </section>
 

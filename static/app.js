@@ -406,6 +406,31 @@ async function selectAirport(code, shouldPush = true) {
   updateRefreshText();
 }
 
+/**
+ * Robust flight search handler using the official tp.media/r redirect handshake
+ * to prevent 404s and ensure 100% affiliate tracking.
+ */
+function performFlightSearch() {
+  const destInput = document.getElementById("flight-destination-input");
+  const dest = destInput ? destInput.value.trim() : "";
+  
+  if (!dest) {
+    alert("Please enter a destination (city or airport code)");
+    return;
+  }
+  
+  const origin = selectedAirportCode || "JFK";
+  const marker = (window.MONETIZATION_CONFIG && window.MONETIZATION_CONFIG.tpMarker) || "719940";
+  
+  // Clean URL for the final destination
+  const targetUrl = `https://www.kiwi.com/en/search/results/${origin.toLowerCase()}/${dest.toLowerCase()}`;
+  
+  // Official Travelpayouts Redirector (Gold Standard for 404 avoidance)
+  const affiliateUrl = `https://tp.media/r?marker=${marker}&u=${encodeURIComponent(targetUrl)}`;
+  
+  window.open(affiliateUrl, "_blank");
+}
+
 // Handle browser Back/Forward buttons
 window.addEventListener("popstate", (event) => {
   if (event.state && event.state.airportCode) {

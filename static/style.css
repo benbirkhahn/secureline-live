@@ -363,17 +363,17 @@ select {
 }
 
 /* ── AD SLOTS ── */
-.ad-slot { margin: 0 0 14px; }
+.ad-slot { margin: 0 0 24px; }
 .ad-label {
   color: var(--muted); font-size: 10px; font-family: var(--mono);
-  margin: 0 0 5px; letter-spacing: .08em; text-transform: uppercase;
+  margin: 0 0 10px; letter-spacing: .12em; text-transform: uppercase;
+  display: block; opacity: 0.6;
 }
 .ad-slot-frame {
-  height: 280px;
+  height: auto;
+  min-height: 0;
   border-radius: 12px;
-  border: 1px dashed var(--border2);
-  background: var(--surface);
-  overflow: hidden;
+  overflow: visible;
 }
 .ad-slot ins {
   width: 100%;
@@ -631,11 +631,22 @@ select {
   .cp-block { padding: 14px 16px 14px 18px; }
   .content-columns { grid-template-columns: 1fr; }
   .footer { padding: 0 20px; }
-  .ad-slot-frame { height: 250px; }
-  /* Content pages: full-width card on mobile */
-  .content-card { padding: 16px !important; margin: 0 !important; border-radius: 12px !important; }
-  .content-card h1 { font-size: 1.5rem !important; }
+  /* ── AIRPORT CHIPS MOBILE TWEAK ── */
+  .airport-chips-hero {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 4px 20px 16px;
+    margin: 0 -20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+  .airport-chips-hero::-webkit-scrollbar { display: none; }
+  .airport-chip { flex: 0 0 auto; margin: 0; }
 }
+
 @media (max-width: 400px) {
   .big-num { font-size: 36px; }
   .hero-headline { font-size: 28px; }
