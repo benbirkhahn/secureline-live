@@ -422,13 +422,10 @@ function performFlightSearch() {
   const origin = selectedAirportCode || "JFK";
   const marker = (window.MONETIZATION_CONFIG && window.MONETIZATION_CONFIG.tpMarker) || "719940";
   
-  // Clean URL for the final destination
-  const targetUrl = `https://www.kiwi.com/en/search/results/${origin.toLowerCase()}/${dest.toLowerCase()}`;
+  // Stable URL for the final destination (using /tiles/ for instant results)
+  const targetUrl = `https://www.kiwi.com/en/search/tiles/${origin.toLowerCase()}/${dest.toLowerCase()}?marker=${marker}`;
   
-  // Official Travelpayouts Redirector (Gold Standard for 404 avoidance)
-  const affiliateUrl = `https://tp.media/r?marker=${marker}&u=${encodeURIComponent(targetUrl)}`;
-  
-  window.open(affiliateUrl, "_blank");
+  window.open(targetUrl, "_blank");
 }
 
 // Handle browser Back/Forward buttons

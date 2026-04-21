@@ -78,7 +78,7 @@ def get_monetization_context(airport_code: str = "") -> Dict:
             else KLOOK_AFFILIATE_URL
         ),
         "kiwi_url": (
-            f"https://www.kiwi.com/en/search/results/{airport_code.lower()}/anywhere?marker={TRAVELPAYOUTS_ID}"
+            f"https://www.kiwi.com/en/search/tiles/{airport_code.lower()}/anywhere?marker={TRAVELPAYOUTS_ID}"
             if is_airport_page and TRAVELPAYOUTS_ID
             else KIWI_AFFILIATE_URL
         ),
