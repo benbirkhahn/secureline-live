@@ -342,8 +342,17 @@ function renderAirportChips(payload, filterText = "") {
   });
 }
 
-async function selectAirport(code) {
+async function selectAirport(code, shouldPush = true) {
   selectedAirportCode = code;
+
+  // Update URL history for SEO/Bookmarks (preventing re-push on back button)
+  if (shouldPush) {
+    const slug = `${code.toLowerCase()}-tsa-wait-times`;
+    const newUrl = `/airports/${slug}`;
+    if (window.location.pathname !== newUrl) {
+      history.pushState({ airportCode: code }, "", newUrl);
+    }
+  }
 
   // Update chart dropdown
   const select = document.getElementById("airport-select");
@@ -364,16 +373,33 @@ async function selectAirport(code) {
   fetchCommunityStatus(code);
   scheduleNonCriticalTask(() => loadHistory(code));
 
-  // Scroll to results
-  const resultsEl = document.getElementById("results-section");
-  if (resultsEl) {
-    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Scroll to results (only if the user explicitly clicked)
+  if (shouldPush) {
+    const resultsEl = document.getElementById("results-section");
+    if (resultsEl) {
+      resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   // Update last refresh timestamp
   lastUpdateTimestamp = new Date();
   updateRefreshText();
 }
+
+// Handle browser Back/Forward buttons
+window.addEventListener("popstate", (event) => {
+  if (event.state && event.state.airportCode) {
+    selectAirport(event.state.airportCode, false);
+  } else if (window.location.pathname === "/") {
+    // Smoothly return to landing state
+    selectedAirportCode = null;
+    const apHeader = document.getElementById("airport-header");
+    if (apHeader) apHeader.style.display = "none";
+    renderAirportChips(livePayloadCache, "");
+    renderLiveCards(livePayloadCache, null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
 
 // Silent background refresh — only re-fetches /api/live and repaints
 // the wait-time cards for the currently selected airport.
