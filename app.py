@@ -1330,11 +1330,6 @@ def ads_txt():
     """Serves the ads.txt file via Ezoic's dynamic manager."""
     return redirect("https://srv.adstxtmanager.com/19390/tsatracker.com", code=301)
 
-@app.route("/sw.js")
-def sw_js():
-    """Serves the Monetag service worker from the static folder."""
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'sw.js')
-
 @app.route("/healthz")
 def healthz():
     try:
