@@ -302,6 +302,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "adsense_slot_bottom": ADSENSE_SLOT_BOTTOM,
             "emerald_id": EMERALD_ID,
             "emerald_tag": EMERALD_TAG,
+            "travelpayouts_id": TRAVELPAYOUTS_ID,
             "sponsor_cta_url": SPONSOR_CTA_URL,
             "sponsor_cta_text": SPONSOR_CTA_TEXT,
             "uber_url": UBER_AFFILIATE_URL,
