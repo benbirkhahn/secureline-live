@@ -34,11 +34,34 @@ TRAVELPAYOUTS_TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN", "").strip()
 KLOOK_AFFILIATE_URL = os.getenv("KLOOK_AFFILIATE_URL", f"https://www.klook.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.klook.com/").strip()
 AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.li/iHq6wvHP").strip()
 LOUNGE_AFFILIATE_URL = os.getenv("LOUNGE_AFFILIATE_URL", f"https://www.prioritypass.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.prioritypass.com/").strip()
+KIWI_AFFILIATE_URL = os.getenv("KIWI_AFFILIATE_URL", f"https://www.kiwi.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.kiwi.com/").strip()
 
 # Affiliate monetization links (override via env vars with your affiliate IDs)
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
 LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
 PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
+
+# Top Airport Personalized Offers (Revenue Boosters)
+LOCAL_OFFERS = {
+    "JFK": {
+        "title": "JFK AirTrain & Transfers",
+        "sub": "Fastest way to Manhattan — pre-book",
+        "url": f"https://www.klook.com/en-US/activity/7150-jfk-airport-private-transfers-new-york/?marker={TRAVELPAYOUTS_ID}",
+        "icon": "🚈"
+    },
+    "ORD": {
+        "title": "Chicago L Train & Shuttles",
+        "sub": "Direct to the Loop — book transfer",
+        "url": f"https://www.klook.com/en-US/search?query=Chicago%20Transfer&marker={TRAVELPAYOUTS_ID}",
+        "icon": "🚆"
+    },
+    "MCO": {
+        "title": "Disney & Universal Shuttles",
+        "sub": "Skip the taxi line — pre-book now",
+        "url": f"https://www.klook.com/en-US/activity/55263-mco-airport-shuttle-orlando/?marker={TRAVELPAYOUTS_ID}",
+        "icon": "🏰"
+    }
+}
 TRAVEL_INSURANCE_URL = os.getenv("TRAVEL_INSURANCE_URL", "https://www.travelinsurance.com/").strip()
 SITE_URL = os.getenv("SITE_URL", "https://tsatracker.com").strip().rstrip("/")
 _publisher_token = ADSENSE_CLIENT.replace("ca-", "").strip() if ADSENSE_CLIENT else ""
@@ -286,10 +309,16 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             "parking_url": PARKING_AFFILIATE_URL,
             "airhelp_url": AIRHELP_AFFILIATE_URL,
             "lounge_url": LOUNGE_AFFILIATE_URL,
+            "local_offer": LOCAL_OFFERS.get(initial_airport_code),
             "klook_url": (
                 f"https://www.klook.com/en-US/search?query={LIVE_AIRPORTS[initial_airport_code]['city'].replace(' ', '%20')}&marker={TRAVELPAYOUTS_ID}"
                 if is_airport_page and initial_airport_code in LIVE_AIRPORTS and LIVE_AIRPORTS[initial_airport_code].get("city") and TRAVELPAYOUTS_ID
                 else KLOOK_AFFILIATE_URL
+            ),
+            "kiwi_url": (
+                f"https://www.kiwi.com/en/search/tiles/{initial_airport_code.lower()}/anywhere?marker={TRAVELPAYOUTS_ID}"
+                if is_airport_page and TRAVELPAYOUTS_ID
+                else KIWI_AFFILIATE_URL
             ),
         },
     }
@@ -485,6 +514,16 @@ def init_db() -> None:
             source TEXT NOT NULL,
             captured_at TEXT NOT NULL,
             lane_type TEXT NOT NULL DEFAULT 'STANDARD'
+        )
+        """
+    )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS user_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            airport_code TEXT NOT NULL,
+            level TEXT NOT NULL,
+            reported_at TEXT NOT NULL
         )
         """
     )
@@ -1302,6 +1341,44 @@ def api_collect_now():
         result = collect_once()
     return jsonify(result)
 
+@app.route("/api/report-wait", methods=["POST"])
+def api_report_wait():
+    data = request.json or {}
+    code = data.get("code")
+    level = data.get("level")
+    if not code or level not in ["short", "med", "long"]:
+        return jsonify({"error": "Invalid request"}), 400
+    
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute(
+        "INSERT INTO user_reports (airport_code, level, reported_at) VALUES (?, ?, ?)",
+        (code, level, utc_now().isoformat())
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
+
+
+@app.route("/api/community-status")
+def community_status():
+    code = request.args.get("code")
+    if not code:
+        return jsonify({"error": "No code"}), 400
+    
+    # Get last report within 30 mins
+    cutoff = (utc_now() - timedelta(minutes=30)).isoformat()
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT level, reported_at FROM user_reports WHERE airport_code = ? AND reported_at >= ? ORDER BY reported_at DESC LIMIT 1",
+        (code, cutoff)
+    )
+    row = cur.fetchone()
+    conn.close()
+    
+    if row:
+        return jsonify({"level": row[0], "reported_at": row[1]})
+    return jsonify({"level": None})
 
 
 

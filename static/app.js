@@ -361,6 +361,7 @@ async function selectAirport(code) {
   updateSelectionSourceStatus(code);
   renderAirportChips(livePayloadCache, document.getElementById("airport-search").value);
   renderLiveCards(livePayloadCache, code);
+  fetchCommunityStatus(code);
   scheduleNonCriticalTask(() => loadHistory(code));
 
   // Scroll to results
@@ -390,6 +391,7 @@ async function silentRefresh() {
     // Re-render wait cards for the currently selected airport (no-op if none)
     if (selectedAirportCode) {
       renderLiveCards(livePayloadCache, selectedAirportCode);
+      fetchCommunityStatus(selectedAirportCode);
     }
     lastUpdateTimestamp = new Date();
     updateRefreshText();
@@ -410,6 +412,53 @@ function updateRefreshText() {
   } else {
     const mins = Math.floor(diffSec / 60);
     el.textContent = `${mins}m ago`;
+  }
+}
+
+async function reportWait(level) {
+  if (!selectedAirportCode) return;
+  const btn = event.currentTarget;
+  const originalText = btn.textContent;
+  btn.textContent = "...";
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch("/api/report-wait", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: selectedAirportCode, level })
+    });
+    if (resp.ok) {
+      btn.textContent = "✓";
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        fetchCommunityStatus(selectedAirportCode);
+      }, 2000);
+    }
+  } catch (_e) {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+async function fetchCommunityStatus(code) {
+  const statusEl = document.getElementById("live-community-status");
+  const levelEl = document.getElementById("community-level");
+  if (!code || !statusEl) return;
+  
+  try {
+    const resp = await fetch(`/api/community-status?code=${code}`);
+    const data = await resp.json();
+    if (data.level) {
+      statusEl.style.display = "block";
+      levelEl.textContent = data.level.toUpperCase();
+      levelEl.className = data.level; // css classes: short/med/long
+    } else {
+      statusEl.style.display = "none";
+    }
+  } catch (_e) {
+    if (statusEl) statusEl.style.display = "none";
   }
 }
 

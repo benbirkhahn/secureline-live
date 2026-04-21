@@ -424,6 +424,14 @@ select {
   background: linear-gradient(135deg, #0d2818 0%, #115e2c 100%);
   transform: translateY(-1px);
 }
+.affiliate-cta.kiwi {
+  background: linear-gradient(135deg, #0a2d2d 0%, #0e4a4a 100%);
+  border-color: #00d7b0;
+}
+.affiliate-cta.kiwi:hover {
+  background: linear-gradient(135deg, #0e4a4a 0%, #156b6b 100%);
+  transform: translateY(-1px);
+}
 .affiliate-cta.parking {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   border-color: #334155;
@@ -473,6 +481,44 @@ select {
 .affiliate-sub {
   font-size: 11px;
   color: var(--muted);
+}
+.featured-offer {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  border-color: #4338ca;
+  position: relative;
+}
+.featured-tag {
+  position: absolute; top: 14px; right: 14px;
+  background: #f59e0b; color: #000;
+  font-size: 8px; font-weight: 900; text-transform: uppercase;
+  padding: 3px 6px; border-radius: 4px; letter-spacing: .08em;
+}
+
+/* ── COMMUNITY REPORTS ── */
+.report-content { padding: 4px 0; }
+.report-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.report-btn {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--muted); padding: 14px 8px; border-radius: 10px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease;
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.report-btn:hover { background: var(--surface2); color: #fff; transform: translateY(-1px); }
+.report-btn.short:hover { border-color: var(--green); color: var(--green); }
+.report-btn.med:hover { border-color: var(--amber); color: var(--amber); }
+.report-btn.long:hover { border-color: var(--red); color: var(--red); }
+
+.pulse-mini {
+  display: inline-block; width: 6px; height: 6px; background: var(--amber);
+  border-radius: 50%; margin-right: 6px; vertical-align: middle;
+  box-shadow: 0 0 0 rgba(245, 158, 11, 0.4);
+  animation: miniPulse 2s infinite;
+}
+@keyframes miniPulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 @media (max-width: 600px) {
   .affiliate-cta-grid {
