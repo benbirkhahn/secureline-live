@@ -595,6 +595,7 @@ def init_db() -> None:
             path TEXT NOT NULL,
             airport_code TEXT,
             user_agent TEXT,
+            referrer TEXT,
             captured_at TEXT NOT NULL
         )
         """
@@ -651,13 +652,19 @@ def db_insert_rows(rows: List[Dict]) -> None:
 
 
 def log_page_view(path: str, airport_code: str = None) -> None:
-    """Logs a page view to the internal database for tracking accuracy."""
+    """Logs a page view to the internal database for tracking accuracy, now with referrer tracking."""
     try:
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
         cur.execute(
-            "INSERT INTO page_views (path, airport_code, user_agent, captured_at) VALUES (?, ?, ?, ?)",
-            (path, airport_code, request.headers.get("User-Agent"), utc_now().isoformat()),
+            "INSERT INTO page_views (path, airport_code, user_agent, referrer, captured_at) VALUES (?, ?, ?, ?, ?)",
+            (
+                path, 
+                airport_code, 
+                request.headers.get("User-Agent"), 
+                request.headers.get("Referer", ""),
+                utc_now().isoformat()
+            ),
         )
         conn.commit()
         conn.close()

@@ -760,7 +760,29 @@ body.ad-blocker-active .featured-offer {
   50%       { transform: translate(10%, 10%); opacity: 0.4; }
 }
 
+/* ── LIVE STATUS UI ── */
+.airport-header-block {
+  display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 8px;
+}
+.live-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(34, 197, 94, 0.1); color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 4px 12px; border-radius: 99px; font-size: 10px; font-weight: 800;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.live-dot {
+  width: 8px; height: 8px; background: #22c55e; border-radius: 50%;
+  box-shadow: 0 0 8px #22c55e; animation: livePulse 2s infinite;
+}
+@keyframes livePulse {
+  0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
 @media (max-width: 600px) {
+  .airport-header-block { flex-direction: column; gap: 10px; }
   .form-row { flex-direction: column; align-items: stretch; }
   .search-btn-premium { width: 100%; border-radius: 8px; }
 }

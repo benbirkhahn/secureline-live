@@ -186,9 +186,17 @@
               {{ f.timeslot }}: {{ f.waittime|round }}m</li>
             {% endif %}
             {% endfor %}
-          </ul>
-        </div>
-        {% endif %}
+          {% if is_airport_page %}
+          <div class="airport-header-block">
+            <h1 class="airport-title">{{ airport_display_name }}</h1>
+            <div class="live-badge">
+              <span class="live-dot"></span>
+              LIVE DATA
+            </div>
+          </div>
+          {% else %}
+          <h1 class="hero-title">Real-Time TSA Wait Times</h1>
+          {% endif %}
       </div>
     </section>
 
