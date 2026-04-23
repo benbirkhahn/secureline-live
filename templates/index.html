@@ -5,9 +5,6 @@
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <script id="monetag-vignette">
-    (function(s){s.dataset.zone='10908377',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
-  </script>
   <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
   <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
   <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
@@ -229,12 +226,34 @@
     <section class="ad-slot top-ad">
       <div class="ad-label">Advertisement</div>
       <div class="ad-slot-frame">
-        {% if monetization.enable_adsense %}
-        <ins class="adsbygoogle" style="display:block" data-ad-client="{{ monetization.adsense_client }}"
-          data-ad-slot="{{ monetization.adsense_slot_top }}" data-ad-format="auto"
-          data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        {% else %}
+        <div class="security-toolkit">
+          <div class="toolkit-header">
+            <span class="toolkit-icon">🛡️</span>
+            <div class="toolkit-title-group">
+              <span class="toolkit-main-title">Security Shortcuts</span>
+              <span class="toolkit-sub-title">Save time at {{ initial_airport_code if is_airport_page else 'the airport' }}</span>
+            </div>
+          </div>
+          <div class="toolkit-list">
+            <a href="{{ monetization.clear_url }}" target="_blank" rel="noopener" class="toolkit-item clear-item" onclick="logAdClick('CLEAR')">
+              <div class="toolkit-item-info">
+                <span class="toolkit-item-title">CLEAR Plus</span>
+                <span class="toolkit-item-desc">Skip the lines entirely</span>
+              </div>
+              <span class="toolkit-badge gold">Fastest</span>
+              <span class="toolkit-arrow">→</span>
+            </a>
+            <a href="{{ monetization.precheck_url }}" target="_blank" rel="noopener" class="toolkit-item precheck-item" onclick="logAdClick('PRECHECK')">
+              <div class="toolkit-item-info">
+                <span class="toolkit-item-title">TSA PreCheck®</span>
+                <span class="toolkit-item-desc">Keep shoes & light jackets on</span>
+              </div>
+              <span class="toolkit-badge blue">Most Popular</span>
+              <span class="toolkit-arrow">→</span>
+            </a>
+          </div>
+        </div>
+
         <div class="featured-offer-container" id="ad-featured-container" style="margin-bottom: 20px; {% if not monetization.local_offer %}display:none;{% endif %}">
           <a class="affiliate-cta featured-offer pulse-glass" id="ad-featured-link" href="{{ monetization.local_offer.url if monetization.local_offer else '#' }}" 
              target="_blank" rel="noopener" onclick="logAdClick('LOCAL_OFFER')">

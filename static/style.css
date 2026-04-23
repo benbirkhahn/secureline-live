@@ -676,6 +676,44 @@ select {
 }
 .search-btn-premium:hover { background: #d97706; transform: translateY(-1px); }
 
+/* ── SECURITY TOOLKIT (NATIVE ADS) ── */
+.security-toolkit {
+  padding: 16px; border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 24px;
+}
+.toolkit-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.toolkit-icon { font-size: 20px; }
+.toolkit-main-title { display: block; font-weight: 700; font-size: 14px; color: #fff; }
+.toolkit-sub-title { display: block; font-size: 11px; color: #94a3b8; }
+
+.toolkit-list { display: flex; flex-direction: column; gap: 8px; }
+.toolkit-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px; text-decoration: none; transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.toolkit-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateX(4px);
+}
+.toolkit-item-info { flex: 1; }
+.toolkit-item-title { display: block; font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 2px; }
+.toolkit-item-desc { display: block; font-size: 11px; color: #94a3b8; }
+
+.toolkit-badge {
+  padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase;
+}
+.toolkit-badge.gold { background: rgba(245, 158, 11, 0.2); color: #facc15; border: 1px solid rgba(245, 158, 11, 0.3); }
+.toolkit-badge.blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.toolkit-arrow { color: #475569; font-size: 14px; transition: color 0.2s; }
+.toolkit-item:hover .toolkit-arrow { color: #fff; }
+
 /* ── AD BLOCKER FALLBACKS ── */
 body.ad-blocker-active .ad-label {
   display: none;

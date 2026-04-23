@@ -42,14 +42,21 @@ SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
 # Travelpayouts / Klook
 TRAVELPAYOUTS_ID = os.getenv("TRAVELPAYOUTS_ID", "").strip()
 TRAVELPAYOUTS_TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN", "").strip()
-# Affiliate monetization links (override via env vars with your affiliate IDs)
+# Affiliate monetization links (standard Travelpayouts redirector format)
+# Using 'p' parameter to ensure tp.media knows the destination and avoids 'missing argument' errors
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
 LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
 PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
 AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.li/iHq6wvHP").strip()
-LOUNGE_AFFILIATE_URL = os.getenv("LOUNGE_AFFILIATE_URL", f"https://www.prioritypass.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.prioritypass.com/").strip()
-KIWI_AFFILIATE_URL = os.getenv("KIWI_AFFILIATE_URL", f"https://www.kiwi.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.kiwi.com/").strip()
-KLOOK_AFFILIATE_URL = os.getenv("KLOOK_AFFILIATE_URL", f"https://www.klook.com/?marker={TRAVELPAYOUTS_ID}" if TRAVELPAYOUTS_ID else "https://www.klook.com/").strip()
+
+def get_tp_link(dest_url: str) -> str:
+    if not TRAVELPAYOUTS_ID: return dest_url
+    # Standard Travelpayouts format: https://tp.media/r?marker=ID&p=DEST_URL
+    return f"https://tp.media/r?marker={TRAVELPAYOUTS_ID}&p={dest_url}"
+
+LOUNGE_AFFILIATE_URL = get_tp_link("https://www.prioritypass.com/")
+KIWI_AFFILIATE_URL = get_tp_link("https://www.kiwi.com/")
+KLOOK_AFFILIATE_URL = get_tp_link("https://www.klook.com/")
 
 def get_lite_brain_insights() -> List[str]:
     """Reads recent notes from the 'Lite Brain' to identify manual optimization cues."""
@@ -104,6 +111,8 @@ def get_monetization_context(airport_code: str = "") -> Dict:
         "travelpayouts_id": TRAVELPAYOUTS_ID,
         "best_offer_id": best_offer,
         "smart_learning_active": True,
+        "clear_url": os.getenv("CLEAR_AFFILIATE_URL", "https://www.clearme.com/").strip(),
+        "precheck_url": os.getenv("PRECHECK_AFFILIATE_URL", "https://www.tsa.gov/precheck").strip(),
         "local_offer": LOCAL_OFFERS.get(airport_code),
         "klook_url": (
             f"https://www.klook.com/en-US/search?query={city.replace(' ', '+')}&marker={TRAVELPAYOUTS_ID}"
@@ -122,19 +131,19 @@ LOCAL_OFFERS = {
     "JFK": {
         "title": "JFK AirTrain & Transfers",
         "sub": "Fastest way to Manhattan — pre-book",
-        "url": f"https://www.klook.com/en-US/activity/7150-jfk-airport-private-transfers-new-york?marker={TRAVELPAYOUTS_ID}",
+        "url": get_tp_link("https://www.klook.com/en-US/activity/7150-jfk-airport-private-transfers-new-york"),
         "icon": "🚈"
     },
     "ORD": {
         "title": "Chicago L Train & Shuttles",
         "sub": "Direct to the Loop — book transfer",
-        "url": f"https://www.klook.com/en-US/search?query=Chicago+Transfer&marker={TRAVELPAYOUTS_ID}",
+        "url": get_tp_link("https://www.klook.com/en-US/search?query=Chicago+Transfer"),
         "icon": "🚆"
     },
     "MCO": {
         "title": "Disney & Universal Shuttles",
         "sub": "Skip the taxi line — pre-book now",
-        "url": f"https://www.klook.com/en-US/search?query=Orlando+Shuttle&marker={TRAVELPAYOUTS_ID}",
+        "url": get_tp_link("https://www.klook.com/en-US/search?query=Orlando+Shuttle"),
         "icon": "🚐"
     }
 }
