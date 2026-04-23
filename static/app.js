@@ -3,7 +3,45 @@ let livePayloadCache = null;
 let selectedAirportCode = null;
 let chartJsPromise = null;
 let lastUpdateTimestamp = null;
+let terminalMap = null;
+let terminalMarkers = {};
 const hasRIC = typeof window !== "undefined" && "requestIdleCallback" in window;
+
+const PHL_CONFIG = {
+  "airportCode": "PHL",
+  "config": { "post_security_connected": true, "default_zoom": 15, "shuttle_active": true, "center": [39.8744, -75.2424] },
+  "terminals": [
+    {
+      "id": "A_WEST", "name": "A-West", "checkpoints": [4377], "coords": [39.8778, -75.2505],
+      "airlines": ["British Airways", "Aer Lingus", "Lufthansa", "Qatar Airways", "American (Intl)"],
+      "notes": "Primary International Terminal."
+    },
+    {
+      "id": "A_EAST", "name": "A-East", "checkpoints": [4386, 4368], "coords": [39.8768, -75.2475],
+      "airlines": ["American Airlines", "Aer Lingus", "Icelandair"],
+      "notes": "Walkable to A-West and B."
+    },
+    {
+      "id": "BC_HUB", "name": "B & C", "checkpoints": [5047, 5052], "coords": [39.8755, -75.2435],
+      "airlines": ["American Airlines"],
+      "notes": "Main domestic hub for American."
+    },
+    {
+      "id": "DE_HUB", "name": "D & E", "checkpoints": [3971, 4126], "coords": [39.8725, -75.2395],
+      "airlines": ["Delta", "Southwest", "United", "Frontier", "Spirit", "JetBlue", "Alaska"],
+      "notes": "Use the D/E Connector."
+    },
+    {
+      "id": "F_REGIONAL", "name": "F", "checkpoints": [5068], "coords": [39.8705, -75.2345],
+      "airlines": ["American Eagle"],
+      "notes": "Regional flights. Shuttle from C."
+    }
+  ],
+  "routing_logic": [
+    { "from": "F_REGIONAL", "to": "BC_HUB", "mode": "shuttle", "instruction": "Take the airside shuttle near Gate F10 to Terminal C." },
+    { "from": "A_WEST", "to": "A_EAST", "mode": "walk", "instruction": "Direct airside walking path available." }
+  ]
+};
 
 function scheduleNonCriticalTask(fn, timeout = 800) {
   if (hasRIC) {
@@ -208,6 +246,122 @@ function renderLiveCards(payload, selectedCode) {
       </a>
     `;
     host.appendChild(tip);
+  }
+
+  // Update map if visible
+  if (selectedCode === "PHL") {
+    updateMapTerminalStatus(rows);
+  }
+}
+
+function initTerminalMap(airportCode) {
+  const mapSection = document.getElementById("terminal-map-section");
+  if (airportCode !== "PHL") {
+    mapSection.style.display = "none";
+    return;
+  }
+  
+  mapSection.style.display = "block";
+  if (terminalMap) return; // Already init
+
+  const cfg = PHL_CONFIG.config;
+  terminalMap = L.map('terminal-map', {
+    center: cfg.center,
+    zoom: cfg.default_zoom,
+    zoomControl: false,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(terminalMap);
+
+  // Add Terminal Markers
+  PHL_CONFIG.terminals.forEach(t => {
+    const icon = L.divIcon({
+      className: 'terminal-marker-icon',
+      html: `<div class="terminal-marker-inner" id="marker-${t.id}">${t.name}</div>`,
+      iconSize: [32, 32]
+    });
+
+    const marker = L.marker(t.coords, { icon: icon }).addTo(terminalMap);
+    marker.bindPopup(`<strong>${t.name}</strong><br>${t.notes}`);
+    terminalMarkers[t.id] = marker;
+  });
+
+  // Populate Airline Lookup
+  const airlineSelect = document.getElementById("airline-search-select");
+  const allAirlines = [...new Set(PHL_CONFIG.terminals.flatMap(t => t.airlines))].sort();
+  allAirlines.forEach(air => {
+    const opt = document.createElement("option");
+    opt.value = air;
+    opt.textContent = air;
+    airlineSelect.appendChild(opt);
+  });
+
+  airlineSelect.addEventListener("change", (e) => {
+    highlightTerminalForAirline(e.target.value);
+  });
+}
+
+function updateMapTerminalStatus(rows) {
+  if (!terminalMap || selectedAirportCode !== "PHL") return;
+
+  PHL_CONFIG.terminals.forEach(t => {
+    const cpRows = rows.filter(r => t.checkpoints.includes(Number(r.checkpoint_id)));
+    if (cpRows.length) {
+      const bestWait = Math.min(...cpRows.map(r => Number(r.wait_minutes) || 999));
+      const tier = waitTierClass(bestWait);
+      const el = document.getElementById(`marker-${t.id}`);
+      if (el) {
+        el.className = `terminal-marker-inner tier-${tier}`;
+      }
+    }
+  });
+}
+
+function highlightTerminalForAirline(airline) {
+  const overlay = document.getElementById("map-overlay-info");
+  if (!airline) {
+    document.querySelectorAll('.terminal-marker-inner').forEach(el => el.classList.remove('highlight'));
+    overlay.classList.remove('active');
+    return;
+  }
+
+  const terminal = PHL_CONFIG.terminals.find(t => t.airlines.includes(airline));
+  if (terminal) {
+    document.querySelectorAll('.terminal-marker-inner').forEach(el => el.classList.remove('highlight'));
+    const el = document.getElementById(`marker-${terminal.id}`);
+    if (el) el.classList.add('highlight');
+
+    terminalMap.setView(terminal.coords, 16);
+    
+    const routing = PHL_CONFIG.routing_logic.find(r => r.from === terminal.id);
+    
+    let content = `
+      <div style="margin-bottom:12px;">
+        <span style="font-size: 11px; color: var(--amber); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Recommended Priority</span>
+        <div style="font-size:16px; font-weight:700; color:#fff; margin-top:2px;">Go to ${terminal.name} Security</div>
+      </div>
+    `;
+
+    if (routing) {
+      content += `
+        <div class="routing-step">
+          <div class="routing-icon">${routing.mode === 'shuttle' ? '🚌' : '🚶'}</div>
+          <div class="routing-text">
+            <strong>Transfer Route:</strong> ${routing.instruction}
+          </div>
+        </div>
+      `;
+    } else {
+      content += `
+        <div style="font-size:12px; color:var(--muted);">All ${airline} flights depart from here. Airside connections available to other terminals.</div>
+      `;
+    }
+
+    overlay.innerHTML = content;
+    overlay.classList.add('active');
   }
 }
 
@@ -429,6 +583,7 @@ async function selectAirport(code, shouldPush = true) {
   renderAirportChips(livePayloadCache, document.getElementById("airport-search").value);
   renderLiveCards(livePayloadCache, code);
   fetchCommunityStatus(code);
+  initTerminalMap(code);
   scheduleNonCriticalTask(() => loadHistory(code));
 
   // Scroll to results (only if the user explicitly clicked)

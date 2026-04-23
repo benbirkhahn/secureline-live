@@ -42,6 +42,8 @@
       rel="stylesheet">
   </noscript>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script async src="https://tp.st/drive/{{ monetization.emerald_id }}"></script>
     <script>
       window.MONETIZATION_CONFIG = {
@@ -112,6 +114,17 @@
     <div style="width:100%; text-align:center; padding: 10px 0;">
       <div id="ezoic-pub-ad-placeholder-102"> </div>
     </div>
+
+    <!-- ── TERMINAL MAP ── -->
+    <section id="terminal-map-section" class="card" style="display:none; padding: 0; overflow: hidden; height: 350px; margin-bottom: 12px; position: relative;">
+      <div id="terminal-map" style="width: 100%; height: 100%; background: var(--bg);"></div>
+      <div id="map-overlay-info" class="map-overlay-info" style="display:none;"></div>
+      <div class="map-airline-lookup">
+        <select id="airline-search-select">
+          <option value="">Search Airline Terminal...</option>
+        </select>
+      </div>
+    </section>
 
     <!-- ── WAIT TIME RESULTS ── -->
     <section class="results-card" id="results-section">

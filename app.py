@@ -697,6 +697,7 @@ def fetch_phl_rows() -> List[Dict]:
             {
                 "airport_code": "PHL",
                 "checkpoint": zone_map[zone_id],
+                "checkpoint_id": zone_id,
                 "wait_minutes": wait_minutes,
                 "source": url,
                 "captured_at": stamp,
