@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
 import requests
-from flask import Flask, Response, jsonify, render_template, request, send_from_directory
+from flask import Flask, Response, jsonify, redirect, render_template, request, send_from_directory
 
 APP_TZ = timezone.utc
 # Bulletproof DB Path: Check for Render Disk, fallback to local

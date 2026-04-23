@@ -47,7 +47,7 @@
       window.MONETIZATION_CONFIG = {
         tpMarker: "{{ monetization.travelpayouts_id }}"
       };
-      window.LOCAL_OFFERS = {{ LOCAL_OFFERS_JSON | safe }};
+      window.LOCAL_OFFERS = {{ LOCAL_OFFERS_JSON | safe if LOCAL_OFFERS_JSON else '{}' }};
     </script>
   <meta name="impact-site-verification" value="a7c6345f-fdfe-4f7a-ad65-63d3c7797558">
 </head>
