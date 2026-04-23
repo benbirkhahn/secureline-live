@@ -88,8 +88,16 @@ def get_best_offer_id(airport_code: str = None) -> str:
     try:
         conn = sqlite3.connect(DB_PATH)
         cur = conn.cursor()
-        # Simple CTR calculation: clicks / views (simplified here to just count clicks)
-        cur.execute("SELECT offer_id, COUNT(*) as c FROM ad_clicks GROUP BY offer_id ORDER BY c DESC LIMIT 1")
+        
+        # Local Sort: What do users at THIS airport click most?
+        if airport_code:
+            cur.execute(
+                "SELECT offer_id, COUNT(*) as c FROM ad_clicks WHERE airport_code = ? GROUP BY offer_id ORDER BY c DESC LIMIT 1", 
+                (airport_code,)
+            )
+        else:
+            cur.execute("SELECT offer_id, COUNT(*) as c FROM ad_clicks GROUP BY offer_id ORDER BY c DESC LIMIT 1")
+            
         row = cur.fetchone()
         conn.close()
         return row[0] if row else "KIWI"
@@ -128,6 +136,8 @@ def get_monetization_context(airport_code: str = "") -> Dict:
             if is_airport_page and TRAVELPAYOUTS_ID
             else KIWI_AFFILIATE_URL
         ),
+        "airhelp_url": AIRHELP_AFFILIATE_URL,
+        "lounge_url": LOUNGE_AFFILIATE_URL,
     }
 
 # Top Airport Personalized Offers (Revenue Boosters)

@@ -445,6 +445,25 @@ async function selectAirport(code, shouldPush = true) {
 }
 
 /**
+ * Sends ad-click data back to the server to feed the self-learning "Lite Brain" engine.
+ * @param {string} offerId The ID of the ad clicked (e.g., 'CLEAR', 'KLOOK')
+ */
+function logAdClick(offerId) {
+  if (!offerId) return;
+  
+  // Fire and forget: we don't want to block the user's navigation
+  fetch("/api/log-click", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ 
+      offer_id: offerId, 
+      code: selectedAirportCode || "HOME" 
+    })
+  }).catch(err => console.warn("Ad log failed", err));
+}
+
+
+/**
  * Robust flight search handler using the official tp.media/r redirect handshake
  * to prevent 404s and ensure 100% affiliate tracking.
  */
