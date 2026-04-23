@@ -584,12 +584,12 @@
       scheduleThirdPartyLoad(function () {
         var ga = document.createElement("script");
         ga.async = true;
-        ga.src = "https://www.googletagmanager.com/gtag/js?id=G-9MN7W14PC1";
+        ga.src = "https://www.googletagmanager.com/gtag/js?id={{ monetization.ga_id }}";
         ga.onload = function () {
           window.dataLayer = window.dataLayer || [];
           function gtag() { dataLayer.push(arguments); }
           gtag("js", new Date());
-          gtag("config", "G-9MN7W14PC1");
+          gtag("config", "{{ monetization.ga_id }}");
         };
         document.head.appendChild(ga);
 
@@ -750,6 +750,28 @@
       ]
     }
   </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "{{ seo.site_url }}/"
+        }
+        {% if is_airport_page %}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "{{ initial_airport_code }} TSA Wait Times",
+          "item": "{{ seo.canonical_url }}"
+        }
+        {% endif %}
+      ]
+    }
+  </script>
   {% endif %}
 
   <script>
@@ -759,6 +781,8 @@
       });
     }
   </script>
+  <!-- Monetag Vignette -->
+  <script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://alwingulla.com/tag.min.js',10908318,document.body||document.documentElement)</script>
 </body>
 
 </html>
