@@ -1087,14 +1087,19 @@ def fetch_den_rows() -> List[Dict]:
     url = "https://api.denverairport.com/wait-times/checkpoint/DEN"
     resp = requests.get(url, headers={**UA, "Api-Key": "87856E0636AA4BF282150FCBE1AD63DE", "Api-Version": "170"}, timeout=20)
     resp.raise_for_status()
-    body = resp.json()
+    try:
+        body = resp.json()
+    except requests.exceptions.JSONDecodeError:
+        logger.warning("DEN: non-JSON response from upstream. Skipping this cycle.")
+        return []
     items = body.get("data", {}).get("wait_times", [])
     if not items:
         # Fallback: check if the data key itself is a list
         items = body.get("data", []) if isinstance(body.get("data"), list) else []
     
     if not items:
-        raise RuntimeError("DEN: empty wait_times in response")
+        logger.warning("DEN: empty wait_times in response. Skipping this cycle.")
+        return []
         
     stamp = utc_now().isoformat()
     rows = []
