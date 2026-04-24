@@ -132,7 +132,7 @@ def get_monetization_context(airport_code: str = "") -> Dict:
         "precheck_url": os.getenv("PRECHECK_AFFILIATE_URL", "https://www.tsa.gov/precheck").strip(),
         "local_offer": LOCAL_OFFERS.get(airport_code),
         "klook_url": (
-            get_tp_link(f"https://www.klook.com/en-US/search?query={quote(city)}")
+            get_tp_link(f"https://www.klook.com/en-US/search?query={city}")
             if is_airport_page and city and TRAVELPAYOUTS_ID
             else KLOOK_AFFILIATE_URL
         ),
@@ -141,6 +141,8 @@ def get_monetization_context(airport_code: str = "") -> Dict:
             if is_airport_page and TRAVELPAYOUTS_ID
             else KIWI_AFFILIATE_URL
         ),
+        "lyft_url": LYFT_AFFILIATE_URL,
+        "parking_url": PARKING_AFFILIATE_URL,
         "airhelp_url": AIRHELP_AFFILIATE_URL,
         "lounge_url": LOUNGE_AFFILIATE_URL,
     }
@@ -369,6 +371,26 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
             initial_checkpoints = latest_for_code(initial_airport_code)
         except Exception as e:
             logger.error("Error fetching initial data for %s: %s", initial_airport_code, e)
+        if initial_data is None:
+            estimated = round(estimated_wait_for_hour(utc_now().hour, AIRPORT_FACTORS.get(initial_airport_code, 1.0)), 1)
+            initial_data = {
+                "available": True,
+                "sourceType": "estimated_fallback",
+                "sourceReason": "initial_page_fallback",
+                "currentWait": {
+                    "standard": estimated,
+                    "standardDescription": wait_description(estimated),
+                    "userReported": None,
+                    "precheck": False,
+                    "timestamp": utc_now().isoformat(),
+                },
+                "hourlyForecast": normalize_hourly_forecast(initial_airport_code, estimated),
+            }
+    try:
+        monetization = get_monetization_context(initial_airport_code)
+    except Exception as e:
+        logger.error("Error building monetization context for %s: %s", initial_airport_code or "HOME", e)
+        monetization = get_monetization_context("")
     return {
         "live_airports": LIVE_AIRPORTS,
         "pipeline_airports": PIPELINE_AIRPORTS,
@@ -380,7 +402,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "seo": seo,
         "initial_data": initial_data,
         "initial_checkpoints": initial_checkpoints,
-        "monetization": get_monetization_context(initial_airport_code),
+        "monetization": monetization,
         "LOCAL_OFFERS_JSON": json.dumps(LOCAL_OFFERS),
     }
 
