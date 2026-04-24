@@ -52,6 +52,9 @@ UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").st
 LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
 PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
 AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.li/iHq6wvHP").strip()
+KIWI_AIRPORT_PAGE_URLS = {
+    "JFK": "https://www.kiwi.com/us/airport/jfk/john-f-kennedy-international-new-york-city-new-york-united-states/",
+}
 
 def get_tp_link(dest_url: str) -> str:
     if not TRAVELPAYOUTS_ID:
@@ -60,6 +63,15 @@ def get_tp_link(dest_url: str) -> str:
     params = dict(parse_qsl(parsed.query, keep_blank_values=True))
     params.setdefault("marker", TRAVELPAYOUTS_ID)
     return urlunparse(parsed._replace(query=urlencode(params)))
+
+
+def get_kiwi_link(airport_code: str = "") -> str:
+    code = airport_code.upper().strip()
+    base = KIWI_AIRPORT_PAGE_URLS.get(
+        code,
+        f"https://www.kiwi.com/us/?destination=anywhere&inboundDate=-&origin={code or '-'}&outboundDate=anytime",
+    )
+    return get_tp_link(base)
 
 LOUNGE_AFFILIATE_URL = get_tp_link("https://www.prioritypass.com/")
 KIWI_AFFILIATE_URL = get_tp_link("https://www.kiwi.com/")
@@ -136,11 +148,7 @@ def get_monetization_context(airport_code: str = "") -> Dict:
             if is_airport_page and city and TRAVELPAYOUTS_ID
             else KLOOK_AFFILIATE_URL
         ),
-        "kiwi_url": (
-            get_tp_link(f"https://www.kiwi.com/en/search/tiles/{airport_code.lower()}/anywhere")
-            if is_airport_page and TRAVELPAYOUTS_ID
-            else KIWI_AFFILIATE_URL
-        ),
+        "kiwi_url": get_kiwi_link(airport_code) if is_airport_page else KIWI_AFFILIATE_URL,
         "lyft_url": LYFT_AFFILIATE_URL,
         "parking_url": PARKING_AFFILIATE_URL,
         "airhelp_url": AIRHELP_AFFILIATE_URL,
@@ -152,7 +160,7 @@ LOCAL_OFFERS = {
     "JFK": {
         "title": "JFK AirTrain & Transfers",
         "sub": "Fastest way to Manhattan — pre-book",
-        "url": get_tp_link("https://www.klook.com/en-US/activity/7150-jfk-airport-private-transfers-new-york"),
+        "url": get_tp_link("https://www.klook.com/en-US/search?query=JFK airport transfer"),
         "icon": "🚈"
     },
     "ORD": {
@@ -422,6 +430,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "initial_checkpoints": initial_checkpoints,
         "monetization": monetization,
         "LOCAL_OFFERS_JSON": json.dumps(LOCAL_OFFERS),
+        "KIWI_AIRPORT_URLS_JSON": json.dumps(KIWI_AIRPORT_PAGE_URLS),
     }
 
 

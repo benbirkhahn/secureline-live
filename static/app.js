@@ -581,7 +581,7 @@ async function selectAirport(code, shouldPush = true) {
   const kiwiLink = document.getElementById("ad-kiwi-link");
   const kiwiTitle = document.getElementById("ad-kiwi-title");
   if (kiwiLink) {
-    kiwiLink.href = buildTravelpayoutsUrl(`https://www.kiwi.com/en/search/tiles/${code.toLowerCase()}/anywhere`);
+    kiwiLink.href = buildKiwiAirportUrl(code);
     if (kiwiTitle) kiwiTitle.innerText = `Cheap Flights from ${code}`;
   }
 
@@ -641,6 +641,13 @@ function buildTravelpayoutsUrl(targetUrl) {
     url.searchParams.set("marker", marker);
   }
   return url.toString();
+}
+
+function buildKiwiAirportUrl(code) {
+  const upper = String(code || "").toUpperCase();
+  const overrides = window.KIWI_AIRPORT_URLS || {};
+  const fallback = `https://www.kiwi.com/us/?destination=anywhere&inboundDate=-&origin=${encodeURIComponent(upper || "-")}&outboundDate=anytime`;
+  return buildTravelpayoutsUrl(overrides[upper] || fallback);
 }
 
 
