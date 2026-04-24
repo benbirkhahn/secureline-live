@@ -27,7 +27,7 @@ else:
 _poll_env = os.getenv("POLL_SECONDS", "").strip()
 POLL_SECONDS = int(_poll_env) if _poll_env.isdigit() else 120
 COLLECT_NOW_TOKEN = os.getenv("COLLECT_NOW_TOKEN")
-# ENABLE_POLLER is now handled by the collector.py process
+ENABLE_POLLER = os.getenv("ENABLE_POLLER", "true").lower() == "true"
 ENABLE_ADSENSE = os.getenv("ENABLE_ADSENSE", "false").lower() == "true"
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "").strip()
 ADSENSE_SLOT_TOP = os.getenv("ADSENSE_SLOT_TOP", "").strip()
@@ -292,13 +292,31 @@ logger = logging.getLogger("tsa-tracker")
 _db_init_lock = threading.Lock()
 _db_initialized = False
 _poll_lock = threading.Lock()
+_poller_started = False
+
+
+def poll_forever() -> None:
+    logger.info("poller_started poll_seconds=%s db_path=%s", POLL_SECONDS, DB_PATH)
+    while True:
+        try:
+            with _poll_lock:
+                collect_once()
+        except Exception:
+            logger.exception("poller_cycle_failed")
+        time.sleep(POLL_SECONDS)
 
 def start_web_runtime_once() -> None:
-    global _db_initialized
+    global _db_initialized, _poller_started
     with _db_init_lock:
         if _db_initialized:
             return
-        init_db() # Only initialize DB schema, no data collection
+        init_db()
+        with _poll_lock:
+            collect_once()
+        if ENABLE_POLLER and not _poller_started:
+            thread = threading.Thread(target=poll_forever, name="tsa-poller", daemon=True)
+            thread.start()
+            _poller_started = True
         _db_initialized = True
     logger.info("web_runtime_started db_path=%s", DB_PATH)
 
