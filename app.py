@@ -1020,9 +1020,9 @@ _PANYNJ_GQL = "https://api.jfkairport.com/graphql"
 def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
     """Shared PANYNJ GraphQL fetcher for JFK, EWR, and LGA.
 
-    PANYNJ does not expose explicit lane types. When multiple rows appear for the
-    same terminal, treat them as unlabeled security rows instead of guessing
-    Standard vs PreCheck.
+    PANYNJ does not expose explicit lane types. For terminals with exactly two
+    rows, assume the shorter wait is TSA PreCheck and the longer wait is Regular.
+    Any extra rows remain unlabeled alternates.
     """
     query = f'{{ securityWaitTimes(airportCode: "{airport_code}") {{ checkPoint waitTime terminal }} }}'
     resp = requests.post(
@@ -1036,26 +1036,70 @@ def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
     if not items:
         raise RuntimeError(f"{airport_code}: empty securityWaitTimes in response")
     stamp = utc_now().isoformat()
-    rows: List[Dict] = []
-    terminal_seen: Dict[str, int] = {}
+    grouped: Dict[str, List[Dict]] = {}
+    terminal_labels: Dict[str, str] = {}
+    singles: List[Dict] = []
     for item in items:
         terminal = item.get("terminal", "")
         checkpoint = item.get("checkPoint", "Checkpoint")
         wait_minutes = float(item.get("waitTime") or 0)
         label = f"Terminal {terminal}" if terminal else checkpoint
-        count = terminal_seen.get(terminal, 0)
-        terminal_seen[terminal] = count + 1
-        lane_type = "STANDARD"
-        if count >= 1:
-            label = f"{label} Alternate"
+        if terminal:
+            grouped.setdefault(terminal, []).append({"wait_minutes": wait_minutes, "source_label": label})
+            terminal_labels[terminal] = label
+        else:
+            singles.append({"label": label, "wait_minutes": wait_minutes})
+    rows: List[Dict] = []
+    for item in singles:
         rows.append({
             "airport_code": airport_code,
-            "checkpoint": label,
-            "wait_minutes": wait_minutes,
-            "lane_type": lane_type,
+            "checkpoint": item["label"],
+            "wait_minutes": item["wait_minutes"],
+            "lane_type": "STANDARD",
             "source": _PANYNJ_GQL,
             "captured_at": stamp,
         })
+    for terminal, terminal_rows in grouped.items():
+        label = terminal_labels[terminal]
+        if len(terminal_rows) == 1:
+            rows.append({
+                "airport_code": airport_code,
+                "checkpoint": label,
+                "wait_minutes": terminal_rows[0]["wait_minutes"],
+                "lane_type": "STANDARD",
+                "source": _PANYNJ_GQL,
+                "captured_at": stamp,
+            })
+            continue
+        if len(terminal_rows) == 2:
+            ordered = sorted(terminal_rows, key=lambda row: row["wait_minutes"])
+            rows.append({
+                "airport_code": airport_code,
+                "checkpoint": label,
+                "wait_minutes": ordered[1]["wait_minutes"],
+                "lane_type": "STANDARD",
+                "source": _PANYNJ_GQL,
+                "captured_at": stamp,
+            })
+            rows.append({
+                "airport_code": airport_code,
+                "checkpoint": label,
+                "wait_minutes": ordered[0]["wait_minutes"],
+                "lane_type": "PRECHECK",
+                "source": _PANYNJ_GQL,
+                "captured_at": stamp,
+            })
+            continue
+        for index, terminal_row in enumerate(terminal_rows):
+            checkpoint_label = label if index == 0 else f"{label} Alternate"
+            rows.append({
+                "airport_code": airport_code,
+                "checkpoint": checkpoint_label,
+                "wait_minutes": terminal_row["wait_minutes"],
+                "lane_type": "STANDARD",
+                "source": _PANYNJ_GQL,
+                "captured_at": stamp,
+            })
     return rows
 
 
