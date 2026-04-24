@@ -6,6 +6,7 @@ import sqlite3
 import json
 import threading
 import time
+from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
@@ -54,7 +55,7 @@ AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.
 def get_tp_link(dest_url: str) -> str:
     if not TRAVELPAYOUTS_ID: return dest_url
     # Standard Travelpayouts format: https://tp.media/r?marker=ID&p=DEST_URL
-    return f"https://tp.media/r?marker={TRAVELPAYOUTS_ID}&p={dest_url}"
+    return f"https://tp.media/r?marker={TRAVELPAYOUTS_ID}&p={quote(dest_url, safe='')}"
 
 LOUNGE_AFFILIATE_URL = get_tp_link("https://www.prioritypass.com/")
 KIWI_AFFILIATE_URL = get_tp_link("https://www.kiwi.com/")
@@ -127,12 +128,12 @@ def get_monetization_context(airport_code: str = "") -> Dict:
         "precheck_url": os.getenv("PRECHECK_AFFILIATE_URL", "https://www.tsa.gov/precheck").strip(),
         "local_offer": LOCAL_OFFERS.get(airport_code),
         "klook_url": (
-            f"https://www.klook.com/en-US/search?query={city.replace(' ', '+')}&marker={TRAVELPAYOUTS_ID}"
+            get_tp_link(f"https://www.klook.com/en-US/search?query={quote(city)}")
             if is_airport_page and city and TRAVELPAYOUTS_ID
             else KLOOK_AFFILIATE_URL
         ),
         "kiwi_url": (
-            f"https://www.kiwi.com/en/search/tiles/{airport_code.lower()}/anywhere?marker={TRAVELPAYOUTS_ID}"
+            get_tp_link(f"https://www.kiwi.com/en/search/tiles/{airport_code.lower()}/anywhere")
             if is_airport_page and TRAVELPAYOUTS_ID
             else KIWI_AFFILIATE_URL
         ),

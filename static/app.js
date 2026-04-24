@@ -580,7 +580,7 @@ async function selectAirport(code, shouldPush = true) {
   const kiwiLink = document.getElementById("ad-kiwi-link");
   const kiwiTitle = document.getElementById("ad-kiwi-title");
   if (kiwiLink) {
-    kiwiLink.href = `https://www.kiwi.com/en/search/tiles/${code.toLowerCase()}/anywhere?marker=${marker}`;
+    kiwiLink.href = buildTravelpayoutsUrl(`https://www.kiwi.com/en/search/tiles/${code.toLowerCase()}/anywhere`);
     if (kiwiTitle) kiwiTitle.innerText = `Cheap Flights from ${code}`;
   }
 
@@ -589,7 +589,7 @@ async function selectAirport(code, shouldPush = true) {
   const klookTitle = document.getElementById("ad-klook-title");
   if (klookLink) {
     const klookTarget = `https://www.klook.com/en-US/search?query=${encodeURIComponent(cityName)}`;
-    klookLink.href = `https://tp.media/r?marker=${marker}&u=${encodeURIComponent(klookTarget)}`;
+    klookLink.href = buildTravelpayoutsUrl(klookTarget);
     if (klookTitle) klookTitle.innerText = `Activities in ${cityName || 'selection'}`;
   }
   // --- END DYNAMIC AD UPDATE ---
@@ -630,6 +630,12 @@ function logAdClick(offerId) {
       code: selectedAirportCode || "HOME" 
     })
   }).catch(err => console.warn("Ad log failed", err));
+}
+
+function buildTravelpayoutsUrl(targetUrl) {
+  const marker = window.MONETIZATION_CONFIG && window.MONETIZATION_CONFIG.tpMarker;
+  if (!marker) return targetUrl;
+  return `https://tp.media/r?marker=${encodeURIComponent(marker)}&p=${encodeURIComponent(targetUrl)}`;
 }
 
 
