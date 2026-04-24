@@ -849,9 +849,8 @@ async function bootstrap() {
       // no-op
     }
   }, 1200);
+}
 
-  // Kick off silent background refresh every 2 minutes (matching server poll interval)
-  scheduleNonCriticalTask(() => {
 // Pull-to-Refresh for Mobile Users
 let touchStart = 0;
 const refreshThreshold = 80;
@@ -883,10 +882,7 @@ window.addEventListener('touchend', (e) => {
 
 // Auto-refresh every 2 min
 setInterval(silentRefresh, 120000);
-init();
-    // Update the "Last Updated" text every 30 seconds
-    setInterval(updateRefreshText, 30 * 1000);
-  }, 1000);
-}
+// Update the "Last Updated" text every 30 seconds
+setInterval(updateRefreshText, 30 * 1000);
 
 bootstrap();

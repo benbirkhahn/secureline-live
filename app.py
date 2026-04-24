@@ -1020,9 +1020,9 @@ _PANYNJ_GQL = "https://api.jfkairport.com/graphql"
 def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
     """Shared PANYNJ GraphQL fetcher for JFK, EWR, and LGA.
 
-    PANYNJ returns 2 rows per terminal checkpoint: the first is the Standard lane,
-    the second is the PreCheck lane. Lane type is inferred from occurrence order
-    since the API has no explicit lane_type field.
+    PANYNJ does not expose explicit lane types. When multiple rows appear for the
+    same terminal, treat them as unlabeled security rows instead of guessing
+    Standard vs PreCheck.
     """
     query = f'{{ securityWaitTimes(airportCode: "{airport_code}") {{ checkPoint waitTime terminal }} }}'
     resp = requests.post(
@@ -1043,10 +1043,11 @@ def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
         checkpoint = item.get("checkPoint", "Checkpoint")
         wait_minutes = float(item.get("waitTime") or 0)
         label = f"Terminal {terminal}" if terminal else checkpoint
-        # Infer lane: first occurrence per terminal = Standard, second = PreCheck
         count = terminal_seen.get(terminal, 0)
         terminal_seen[terminal] = count + 1
-        lane_type = "PRECHECK" if count >= 1 else "STANDARD"
+        lane_type = "STANDARD"
+        if count >= 1:
+            label = f"{label} Alternate"
         rows.append({
             "airport_code": airport_code,
             "checkpoint": label,
