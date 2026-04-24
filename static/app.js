@@ -635,7 +635,11 @@ function logAdClick(offerId) {
 function buildTravelpayoutsUrl(targetUrl) {
   const marker = window.MONETIZATION_CONFIG && window.MONETIZATION_CONFIG.tpMarker;
   if (!marker) return targetUrl;
-  return `https://tp.media/r?marker=${encodeURIComponent(marker)}&p=${encodeURIComponent(targetUrl)}`;
+  const url = new URL(targetUrl);
+  if (!url.searchParams.has("marker")) {
+    url.searchParams.set("marker", marker);
+  }
+  return url.toString();
 }
 
 

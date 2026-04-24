@@ -6,7 +6,7 @@ import sqlite3
 import json
 import threading
 import time
-from urllib.parse import quote
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List
 
@@ -45,17 +45,21 @@ SPONSOR_CTA_TEXT = os.getenv("SPONSOR_CTA_TEXT", "Advertise here").strip()
 # Travelpayouts / Klook
 TRAVELPAYOUTS_ID = os.getenv("TRAVELPAYOUTS_ID", "").strip()
 TRAVELPAYOUTS_TOKEN = os.getenv("TRAVELPAYOUTS_TOKEN", "").strip()
-# Affiliate monetization links (standard Travelpayouts redirector format)
-# Using 'p' parameter to ensure tp.media knows the destination and avoids 'missing argument' errors
+# Affiliate monetization links.
+# We append the marker directly because tp.media deep links require extra program-specific ids
+# that are not configured in this app.
 UBER_AFFILIATE_URL = os.getenv("UBER_AFFILIATE_URL", "https://www.uber.com/").strip()
 LYFT_AFFILIATE_URL = os.getenv("LYFT_AFFILIATE_URL", "https://www.lyft.com/").strip()
 PARKING_AFFILIATE_URL = os.getenv("PARKING_AFFILIATE_URL", "https://parking.com/").strip()
 AIRHELP_AFFILIATE_URL = os.getenv("AIRHELP_AFFILIATE_URL", "https://airhelp.tpo.li/iHq6wvHP").strip()
 
 def get_tp_link(dest_url: str) -> str:
-    if not TRAVELPAYOUTS_ID: return dest_url
-    # Standard Travelpayouts format: https://tp.media/r?marker=ID&p=DEST_URL
-    return f"https://tp.media/r?marker={TRAVELPAYOUTS_ID}&p={quote(dest_url, safe='')}"
+    if not TRAVELPAYOUTS_ID:
+        return dest_url
+    parsed = urlparse(dest_url)
+    params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    params.setdefault("marker", TRAVELPAYOUTS_ID)
+    return urlunparse(parsed._replace(query=urlencode(params)))
 
 LOUNGE_AFFILIATE_URL = get_tp_link("https://www.prioritypass.com/")
 KIWI_AFFILIATE_URL = get_tp_link("https://www.kiwi.com/")
