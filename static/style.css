@@ -323,6 +323,7 @@ body {
   padding: 3px 9px; border-radius: 5px; white-space: nowrap;
 }
 .lane-std    { background: #1e1e2a; color: #9090cc; border: 1px solid #2a2a40; }
+.lane-pri    { background: #2b1802; color: #fbbf24; border: 1px solid #713f12; }
 .lane-pre    { background: #0f2040; color: #93c5fd; border: 1px solid #1e3a5f; }
 .lane-clr    { background: #2a1500; color: #fb923c; border: 1px solid #451a03; }
 .lane-clrpre { background: #0a2020; color: #34d399; border: 1px solid #064e3b; }

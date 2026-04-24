@@ -98,6 +98,52 @@ function cleanCheckpointLabel(label) {
     .trim();
 }
 
+function inferredLaneType(label) {
+  const s = String(label || "").trim().toLowerCase();
+  if (!s) return null;
+  if (s.includes("clear") && (s.includes("pre") || s.includes("tsa"))) return "CLEAR_PRECHECK";
+  if (s.includes("clear")) return "CLEAR";
+  if (s.includes("priority") || s.includes("premier")) return "PRIORITY";
+  if (s.includes("pre")) return "PRECHECK";
+  if (s.includes("general") || s.includes("regular") || s.includes("standard")) return "STANDARD";
+  return null;
+}
+
+function normalizeCheckpointRow(row) {
+  const rawCheckpoint = cleanCheckpointLabel(row.checkpoint);
+  let checkpoint = rawCheckpoint;
+  let laneType = row.lane_type || "STANDARD";
+
+  const leadingNumberMatch = rawCheckpoint.match(/^(\d+)\s+(.+)$/);
+  if (leadingNumberMatch) {
+    const inferred = inferredLaneType(leadingNumberMatch[2]);
+    if (inferred) {
+      checkpoint = `Checkpoint ${leadingNumberMatch[1]}`;
+      laneType = inferred;
+    }
+  }
+
+  const parenLaneMatch = checkpoint.match(/^(.*?)\s*\(([^)]+)\)$/);
+  if (parenLaneMatch) {
+    const inferred = inferredLaneType(parenLaneMatch[2]);
+    if (inferred) {
+      checkpoint = parenLaneMatch[1].trim();
+      laneType = inferred;
+    }
+  }
+
+  const trailingLaneMatch = checkpoint.match(/^(.*?)(?:\s+|-)(General|Regular|Standard|Priority|Premier|Clear|TSA[- ]?Pre(?:Check)?|PreCheck)$/i);
+  if (trailingLaneMatch && trailingLaneMatch[1].trim()) {
+    const inferred = inferredLaneType(trailingLaneMatch[2]);
+    if (inferred) {
+      checkpoint = trailingLaneMatch[1].trim();
+      laneType = inferred;
+    }
+  }
+
+  return { ...row, checkpoint, lane_type: laneType };
+}
+
 function latestCapturedAt(rows) {
   if (!rows.length) return null;
   const ts = rows
@@ -110,9 +156,10 @@ function latestCapturedAt(rows) {
 // Lane display config: label, badge CSS class, sort priority
 const LANE_CONFIG = {
   STANDARD:       { label: "Regular",          cls: "lane-std",    order: 0 },
-  PRECHECK:       { label: "TSA Pre\u2714",     cls: "lane-pre",    order: 1 },
-  CLEAR:          { label: "CLEAR",             cls: "lane-clr",    order: 2 },
-  CLEAR_PRECHECK: { label: "CLEAR + Pre\u2714", cls: "lane-clrpre", order: 3 },
+  PRIORITY:       { label: "Priority",         cls: "lane-pri",    order: 1 },
+  PRECHECK:       { label: "TSA Pre\u2714",     cls: "lane-pre",    order: 2 },
+  CLEAR:          { label: "CLEAR",             cls: "lane-clr",    order: 3 },
+  CLEAR_PRECHECK: { label: "CLEAR + Pre\u2714", cls: "lane-clrpre", order: 4 },
 };
 
 function laneConfig(lane_type) {
@@ -152,7 +199,7 @@ function renderLiveCards(payload, selectedCode) {
     return;
   }
 
-  const rows = data[selectedCode] || [];
+  const rows = (data[selectedCode] || []).map(normalizeCheckpointRow);
 
   if (!rows.length) {
     const empty = document.createElement("div");
