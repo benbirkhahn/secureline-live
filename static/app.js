@@ -488,6 +488,19 @@ function renderSelectionSummary(payload) {
   `;
 }
 
+function renderHeaderSourceState(payload) {
+  const badge = document.getElementById("header-live-badge");
+  const badgeText = document.getElementById("header-badge-text");
+  const indicator = document.querySelector(".live-indicator");
+  const liveText = document.getElementById("header-live-text");
+  if (!badge || !badgeText || !indicator || !liveText || !payload) return;
+  const live = payload.sourceType === "live_direct";
+  badge.classList.toggle("is-fallback", !live);
+  indicator.classList.toggle("is-fallback", !live);
+  badgeText.textContent = live ? "Live" : "Estimated";
+  liveText.textContent = live ? "LIVE" : "EST";
+}
+
 async function updateSelectionSourceStatus(airportCode) {
   const el = document.getElementById("selection-source-status");
   if (!airportCode) { el.textContent = ""; el.className = "selection-source-status"; return; }
@@ -498,6 +511,7 @@ async function updateSelectionSourceStatus(airportCode) {
     el.textContent = label;
     el.className = `selection-source-status ${cls}`;
     renderSelectionSummary(payload);
+    renderHeaderSourceState(payload);
   } catch (_e) {
     el.textContent = "";
     el.className = "selection-source-status is-unknown";

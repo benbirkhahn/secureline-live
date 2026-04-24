@@ -119,16 +119,16 @@
           <div class="airport-header-main">
             <h2 class="airport-name" id="current-airport-name">{{ airport_display_name }}</h2>
             <div class="live-indicator">
-              <span class="pulse"></span>
-              <span class="live-text">LIVE</span>
+              <span class="pulse" id="header-pulse"></span>
+              <span class="live-text" id="header-live-text">LIVE</span>
               <span class="refresh-timer" id="last-updated-text">Just now</span>
             </div>
           </div>
           <div class="airport-code-label" id="ap-code"></div>
           <div class="airport-fullname" id="ap-name"></div>
         </div>
-        <div class="live-badge">
-          <span class="live-dot"></span> Live
+        <div class="live-badge" id="header-live-badge">
+          <span class="live-dot" id="header-live-dot"></span> <span id="header-badge-text">Live</span>
         </div>
       </div>
       <div id="selection-source-status" class="selection-source-status"></div>

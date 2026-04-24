@@ -274,6 +274,18 @@ body {
 .selection-source-status.is-live    { color: var(--green); }
 .selection-source-status.is-fallback { color: var(--yellow); }
 .selection-source-status.is-unknown  { color: var(--muted); }
+.live-badge.is-fallback {
+  background: #201a06;
+  border-color: #7c5a10;
+  color: var(--yellow);
+}
+.live-badge.is-fallback .live-dot,
+.live-indicator.is-fallback .pulse,
+.live-indicator.is-fallback .live-text {
+  color: var(--yellow);
+  background: var(--yellow);
+  box-shadow: 0 0 6px var(--yellow);
+}
 
 /* ── CHECKPOINT BLOCKS ── */
 .airport-card { width: 100%; }
