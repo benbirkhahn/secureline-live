@@ -617,6 +617,67 @@ select {
   text-transform: none; letter-spacing: 0; margin-bottom: 4px; font-family: inherit;
 }
 .faq-item p { font-size: 13px; color: var(--muted); line-height: 1.65; margin: 0; }
+.utility-card { padding: 18px 20px; }
+.utility-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.utility-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.utility-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.utility-copy {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.utility-status {
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+.compact-search .form-row {
+  align-items: flex-end;
+}
+.compact-search .input-wrap input {
+  min-height: 44px;
+}
+.content-disclosure {
+  padding: 0;
+  overflow: hidden;
+}
+.content-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 18px 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.content-summary::-webkit-details-marker { display: none; }
+.content-summary::after {
+  content: "+";
+  float: right;
+  color: var(--amber);
+  font-size: 16px;
+  line-height: 1;
+}
+.content-disclosure[open] .content-summary::after {
+  content: "−";
+}
+.content-body {
+  padding: 0 20px 20px;
+}
 
 /* ── CONTENT / SEO CARD ── */
 .content-card h2 { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
@@ -659,6 +720,7 @@ select {
   .big-num { font-size: 44px; }
   .cp-block { padding: 14px 16px 14px 18px; }
   .content-columns { grid-template-columns: 1fr; }
+  .utility-grid { grid-template-columns: 1fr; }
   .footer { padding: 0 20px; }
   /* ── AIRPORT CHIPS MOBILE TWEAK ── */
   .airport-chips-hero {

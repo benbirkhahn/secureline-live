@@ -341,43 +341,35 @@
       </div>
     </section>
 
-    <!-- ── CROWDSOURCED REPORTS ── -->
-    <section class="card report-card">
-      <div class="section-divider">Community Verification</div>
-      <div class="report-content">
-        <div id="live-community-status" class="muted" style="font-size: 12px; margin-bottom: 12px; display: none;">
-          <span class="pulse-mini"></span> Community members recently reported lines as <span id="community-level"
-            style="font-weight:700; color:#fff;">...</span>
-        </div>
-        <p class="muted" style="font-size: 13px; margin-bottom: 16px;">At the airport? Help fellow travelers by
-          reporting the current line status.</p>
-        <div class="report-actions">
-          <button class="report-btn short" onclick="reportWait('short')"
-            aria-label="Report short wait time">Short</button>
-          <button class="report-btn med" onclick="reportWait('med')"
-            aria-label="Report moderate wait time">Moderate</button>
-          <button class="report-btn long" onclick="reportWait('long')" aria-label="Report long wait time">Long</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="card widget-card" style="padding:0; background:transparent; border:none; box-shadow:none; margin-top: 2.5rem;">
-      <div class="section-divider">Track Your Next Adventure</div>
-      <div class="custom-flight-search">
-        <div class="search-header">
-          <span class="search-icon">✈️</span>
-          <div class="search-text">
-            <h4>Find Cheap Flights from <span id="flight-origin-text">{{ initial_airport_code }}</span></h4>
-            <p>Guaranteed lowest prices via Kiwi.com</p>
+    <section class="card utility-card">
+      <div class="section-divider">Traveler Tools</div>
+      <div class="utility-grid">
+        <div class="utility-panel">
+          <h3 class="utility-title">Community Verification</h3>
+          <div id="live-community-status" class="muted utility-status" style="display: none;">
+            <span class="pulse-mini"></span> Community members recently reported lines as <span id="community-level"
+              style="font-weight:700; color:#fff;">...</span>
+          </div>
+          <p class="muted utility-copy">At the airport? Help fellow travelers by reporting the current line status.</p>
+          <div class="report-actions">
+            <button class="report-btn short" onclick="reportWait('short')"
+              aria-label="Report short wait time">Short</button>
+            <button class="report-btn med" onclick="reportWait('med')"
+              aria-label="Report moderate wait time">Moderate</button>
+            <button class="report-btn long" onclick="reportWait('long')" aria-label="Report long wait time">Long</button>
           </div>
         </div>
-        <div class="search-form-inline">
-          <div class="form-row">
-            <div class="input-wrap">
-              <label>Destination</label>
-              <input type="text" id="flight-destination-input" placeholder="Where to?" required>
+        <div class="utility-panel">
+          <h3 class="utility-title">Find Cheap Flights</h3>
+          <p class="muted utility-copy">Search flights from <span id="flight-origin-text">{{ initial_airport_code }}</span> without leaving this page flow.</p>
+          <div class="search-form-inline compact-search">
+            <div class="form-row">
+              <div class="input-wrap">
+                <label>Destination</label>
+                <input type="text" id="flight-destination-input" placeholder="Where to?" required>
+              </div>
+              <button type="button" onclick="performFlightSearch()" class="search-btn-premium">Search Flights →</button>
             </div>
-            <button type="button" onclick="performFlightSearch()" class="search-btn-premium">Search Flights →</button>
           </div>
         </div>
       </div>
@@ -391,7 +383,9 @@
 
     <!-- ── SEO CONTENT ── -->
     {% if is_airport_page %}
-    <section class="card content-card">
+    <details class="card content-card content-disclosure">
+      <summary class="content-summary">Planning Notes, Airport Links & FAQ</summary>
+      <div class="content-body">
       <h2>About {{ initial_airport_code }} TSA Security Wait Times</h2>
       <p class="muted">TSA Tracker provides live TSA checkpoint wait times for {{ airport_display_name }} ({{
         initial_airport_code }}). Data is pulled directly from official {{ initial_airport_code }} airport security
@@ -464,7 +458,8 @@
             fresh data directly from the airport's live security feed.</p>
         </div>
       </div>
-    </section>
+      </div>
+    </details>
     {% else %}
     <section class="card content-card">
       <h2>About TSA Tracker</h2>
