@@ -153,6 +153,35 @@ body {
 
 /* ── RESULTS SECTION ── */
 .results-card { margin-bottom: 12px; }
+.selection-summary {
+  margin: 0 0 16px;
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #181825 0%, #11111a 100%);
+  border: 1px solid var(--border2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.selection-summary-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.selection-summary-value {
+  font-family: var(--display);
+  font-size: 48px;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.selection-summary-meta {
+  font-size: 13px;
+  color: #a8a8c0;
+}
 
 /* Airport header: code/name + live badge */
 .airport-header {
@@ -363,7 +392,7 @@ select {
 }
 
 /* ── AD SLOTS ── */
-.ad-slot { margin: 0 0 24px; }
+.ad-slot { margin: 12px 0 24px; }
 .ad-label {
   color: var(--muted); font-size: 10px; font-family: var(--mono);
   margin: 0 0 10px; letter-spacing: .12em; text-transform: uppercase;
@@ -681,7 +710,7 @@ select {
   padding: 16px; border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 .toolkit-header {
   display: flex; align-items: center; gap: 12px; margin-bottom: 16px;

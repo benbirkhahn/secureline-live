@@ -111,22 +111,6 @@
       </div>
     </section>
 
-    <!-- Ezoic Placeholder [102] - Mid Content -->
-    <div style="width:100%; text-align:center; padding: 10px 0;">
-      <div id="ezoic-pub-ad-placeholder-102"> </div>
-    </div>
-
-    <!-- ── TERMINAL MAP ── -->
-    <section id="terminal-map-section" class="card" style="display:none; padding: 0; overflow: hidden; height: 350px; margin-bottom: 12px; position: relative;">
-      <div id="terminal-map" style="width: 100%; height: 100%; background: var(--bg);"></div>
-      <div id="map-overlay-info" class="map-overlay-info" style="display:none;"></div>
-      <div class="map-airline-lookup">
-        <select id="airline-search-select">
-          <option value="">Search Airline Terminal...</option>
-        </select>
-      </div>
-    </section>
-
     <!-- ── WAIT TIME RESULTS ── -->
     <section class="results-card" id="results-section">
       <!-- Airport header (shown once an airport is selected) -->
@@ -148,7 +132,27 @@
         </div>
       </div>
       <div id="selection-source-status" class="selection-source-status"></div>
-      <div id="selection-summary" style="display:none;"></div>
+      {% if is_airport_page and initial_data %}
+      <div id="selection-summary" class="selection-summary">
+        <div class="selection-summary-label">
+          {% if initial_data.sourceType == "live_direct" %}
+          Current checkpoint average
+          {% else %}
+          Current airport estimate
+          {% endif %}
+        </div>
+        <div class="selection-summary-value">{{ initial_data.currentWait.standardDescription }}</div>
+        <div class="selection-summary-meta">
+          {% if initial_data.sourceType == "live_direct" %}
+          Refreshed from official airport checkpoint data
+          {% else %}
+          Planning estimate while live checkpoint data is unavailable
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div id="selection-summary" class="selection-summary" style="display:none;"></div>
+      {% endif %}
       <div id="live-cards">
         {% if is_airport_page and initial_data %}
         <div class="ssr-fallback" style="padding: 1rem; color: var(--text-muted);">
@@ -242,6 +246,17 @@
       </div>
       <div id="chart-empty" class="chart-empty">Select an airport to view recent wait history.</div>
       <canvas id="history-chart" height="135"></canvas>
+    </section>
+
+    <!-- ── TERMINAL MAP ── -->
+    <section id="terminal-map-section" class="card" style="display:none; padding: 0; overflow: hidden; height: 350px; margin-bottom: 12px; position: relative;">
+      <div id="terminal-map" style="width: 100%; height: 100%; background: var(--bg);"></div>
+      <div id="map-overlay-info" class="map-overlay-info" style="display:none;"></div>
+      <div class="map-airline-lookup">
+        <select id="airline-search-select">
+          <option value="">Search Airline Terminal...</option>
+        </select>
+      </div>
     </section>
 
     <!-- ── TOP AD SLOT ── -->

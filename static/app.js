@@ -476,6 +476,18 @@ function sourceStatusLabel(sourceType) {
   return ["", "is-unknown"];
 }
 
+function renderSelectionSummary(payload) {
+  const el = document.getElementById("selection-summary");
+  if (!el || !payload || !payload.currentWait) return;
+  const live = payload.sourceType === "live_direct";
+  el.style.display = "";
+  el.innerHTML = `
+    <div class="selection-summary-label">${live ? "Current checkpoint average" : "Current airport estimate"}</div>
+    <div class="selection-summary-value">${payload.currentWait.standardDescription || ""}</div>
+    <div class="selection-summary-meta">${live ? "Refreshed from official airport checkpoint data" : "Planning estimate while live checkpoint data is unavailable"}</div>
+  `;
+}
+
 async function updateSelectionSourceStatus(airportCode) {
   const el = document.getElementById("selection-source-status");
   if (!airportCode) { el.textContent = ""; el.className = "selection-source-status"; return; }
@@ -485,6 +497,7 @@ async function updateSelectionSourceStatus(airportCode) {
     const [label, cls] = sourceStatusLabel(payload.sourceType);
     el.textContent = label;
     el.className = `selection-source-status ${cls}`;
+    renderSelectionSummary(payload);
   } catch (_e) {
     el.textContent = "";
     el.className = "selection-source-status is-unknown";
