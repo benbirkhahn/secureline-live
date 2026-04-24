@@ -36,8 +36,24 @@
     .comparison-card p, .cta-card p { margin: 0 0 10px; font-size: 0.92rem; line-height: 1.65; color: var(--text); }
     .comparison-card .eyebrow { color: var(--amber); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
     .cta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
-    .cta-button { display: inline-block; margin-top: 8px; background: var(--amber); color: #0d0d14; font-weight: 700; padding: 10px 16px; border-radius: 8px; text-decoration: none; }
-    .cta-button:hover { text-decoration: none; filter: brightness(1.04); }
+    .cta-button {
+      display: inline-block;
+      margin-top: 8px;
+      background: #f59e0b;
+      color: #111827 !important;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: 1px solid #fbbf24;
+    }
+    .cta-button:visited,
+    .cta-button:hover,
+    .cta-button:active {
+      color: #111827 !important;
+      text-decoration: none;
+      filter: brightness(1.04);
+    }
     .inline-ad-card { background: var(--surface2); border: 1px solid #2a2a40; border-radius: 12px; padding: 14px 16px; margin: 18px 0 28px; }
     .inline-ad-label { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 10px; }
     article.content-card h1 { color: var(--text); line-height: 1.2; }
