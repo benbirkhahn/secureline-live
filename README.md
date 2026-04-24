@@ -71,12 +71,17 @@ TSA Tracker is built for production readiness on **Render**, **Heroku**, or **Do
 This repository includes a `render.yaml` Blueprint.
 1. Connect this repo to Render.
 2. Confirm environment variables (refer to `.env.example`).
-3. Deploy.
+3. Deploy the `web` service for Flask and the `collector` worker for polling.
+
+### Processes
+- Web: `gunicorn --workers 1 --threads 4 --bind 0.0.0.0:$PORT wsgi:app`
+- Collector once: `python collector.py --once`
+- Collector loop: `python collector.py --loop`
 
 ### Environment Variables
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `ENABLE_POLLER` | Enables the background data collector | `true` |
+| `ENABLE_POLLER` | Legacy toggle for choosing collector mode outside the web process | `true` |
 | `POLL_SECONDS` | Interval between data refreshes | `120` |
 | `DB_PATH` | Path to SQLite database | `data.db` |
 | `COLLECT_NOW_TOKEN` | Secret token to trigger manual fetch via API | Required |

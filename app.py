@@ -26,7 +26,7 @@ else:
 _poll_env = os.getenv("POLL_SECONDS", "").strip()
 POLL_SECONDS = int(_poll_env) if _poll_env.isdigit() else 120
 COLLECT_NOW_TOKEN = os.getenv("COLLECT_NOW_TOKEN")
-ENABLE_POLLER = os.getenv("ENABLE_POLLER", "true").lower() == "true"
+# ENABLE_POLLER is now handled by the collector.py process
 ENABLE_ADSENSE = os.getenv("ENABLE_ADSENSE", "false").lower() == "true"
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "").strip()
 ADSENSE_SLOT_TOP = os.getenv("ADSENSE_SLOT_TOP", "").strip()
@@ -277,27 +277,23 @@ _mco_cache = {
     "key": os.getenv("MCO_API_KEY", "8eaac7209c824616a8fe58d22268cd59"),
     "version": os.getenv("MCO_API_VERSION", "140"),
 }
-_poll_lock = threading.Lock()
-_runtime_started = False
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 logger = logging.getLogger("tsa-tracker")
+_db_init_lock = threading.Lock()
+_db_initialized = False
+_poll_lock = threading.Lock()
 
-
-def start_runtime_once() -> None:
-    global _runtime_started
-    if _runtime_started:
-        return
-    init_db()
-    with _poll_lock:
-        collect_once()
-    if ENABLE_POLLER:
-        t = threading.Thread(target=poll_forever, daemon=True)
-        t.start()
-    _runtime_started = True
-    logger.info("runtime_started db_path=%s poller=%s", DB_PATH, ENABLE_POLLER)
+def start_web_runtime_once() -> None:
+    global _db_initialized
+    with _db_init_lock:
+        if _db_initialized:
+            return
+        init_db() # Only initialize DB schema, no data collection
+        _db_initialized = True
+    logger.info("web_runtime_started db_path=%s", DB_PATH)
 
 
 def utc_now() -> datetime:
@@ -1209,14 +1205,6 @@ def collect_once() -> Dict:
     return result
 
 
-def poll_forever() -> None:
-    logger.info("poller_started interval_seconds=%s", POLL_SECONDS)
-    while True:
-        with _poll_lock:
-            collect_once()
-        time.sleep(POLL_SECONDS)
-
-
 def latest_snapshot() -> Dict:
     cutoff = (utc_now() - timedelta(minutes=15)).isoformat()
     conn = sqlite3.connect(DB_PATH)
@@ -1330,6 +1318,11 @@ def history_for_airport(airport_code: str, hours: int = 12) -> List[Dict]:
 @app.route("/favicon.ico")
 def favicon_ico():
     return send_from_directory(os.path.join(app.root_path, "static"), "favicon.ico", mimetype="image/vnd.microsoft.icon")
+
+
+@app.before_request
+def ensure_web_runtime_started() -> None:
+    start_web_runtime_once()
 
 @app.route("/sw.js")
 def sw_js():
@@ -1603,10 +1596,6 @@ def log_ad_click():
 
 
 if __name__ == "__main__":
-    start_runtime_once()
+    start_web_runtime_once()
     port = int(os.getenv("PORT", "8080"))
     app.run(host="0.0.0.0", port=port, debug=False)
-else:
-    # Enable initialization when loaded by WSGI servers (e.g. gunicorn).
-    if os.getenv("AUTO_START_RUNTIME", "true").lower() == "true":
-        start_runtime_once()

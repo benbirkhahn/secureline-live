@@ -13,14 +13,26 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
-      - key: ENABLE_POLLER
-        value: "true"
-      - key: AUTO_START_RUNTIME
-        value: "true"
       - key: POLL_SECONDS
         value: "120"
       - key: DB_PATH
         value: /data/data.db
       - key: COLLECT_NOW_TOKEN
         generateValue: true
-
+  - type: worker
+    name: tsatracker-collector
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python collector.py --loop
+    disk:
+      name: tsa-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: POLL_SECONDS
+        value: "120"
+      - key: DB_PATH
+        value: /data/data.db
