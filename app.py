@@ -207,6 +207,53 @@ LIVE_AIRPORTS = {
     "SEA": {"name": "Seattle-Tacoma International (SEA)", "mode": "LIVE_PUBLIC", "city": "Seattle"},
 }
 
+AIRPORT_PAGE_GUIDES = {
+    "LAX": {
+        "tips": [
+            "LAX security timing can vary a lot by terminal, so confirm your airline terminal before heading to the checkpoint.",
+            "If you are getting dropped off, use the terminal-specific checkpoint cards above instead of assuming the whole airport is moving at the same pace.",
+            "Morning departures and evening bank departures tend to be the main stress windows at LAX, so the history chart matters more here than at smaller airports.",
+        ],
+        "notes": [
+            "LAX spreads traffic across multiple terminals, which means one checkpoint can be moving quickly while another is backed up.",
+            "This page is most useful when you are deciding whether to leave now, wait a bit, or build extra buffer for a busy terminal.",
+        ],
+    },
+    "DFW": {
+        "tips": [
+            "DFW has multiple terminal checkpoints, so use the lane-level cards above instead of treating the airport like one single line.",
+            "Checkpoint timing at DFW can swing during early business-travel windows, especially if several terminals ramp up at once.",
+            "If your flight timing is flexible, compare the current checkpoint averages with the 12-hour history before leaving for the airport.",
+        ],
+        "notes": [
+            "DFW is large enough that terminal-specific security timing matters more than the airport-wide average alone.",
+            "Travelers usually get the best value from this page when they pair the live checkpoint cards with terminal confirmation before parking or rideshare drop-off.",
+        ],
+    },
+    "MCO": {
+        "tips": [
+            "MCO gets family and vacation traffic that can bunch up quickly, so line conditions can change faster than travelers expect.",
+            "If you are traveling with checked bags, strollers, or a larger group, treat yellow or red waits at MCO as a sign to leave earlier.",
+            "Use the live cards above to see whether current checkpoint traffic lines up with the usual peak pattern in the history chart.",
+        ],
+        "notes": [
+            "Orlando traffic patterns are less business-travel heavy and more vacation-driven, which can create sharp surges around resort checkout and holiday travel windows.",
+            "That makes same-day live checkpoint data especially useful at MCO compared with relying on generic airport-arrival rules.",
+        ],
+    },
+    "JAX": {
+        "tips": [
+            "JAX is smaller than the biggest hub airports, so short waits can turn into a fast pass-through when the checkpoint is green.",
+            "Even at a smaller airport, early departures can stack up, so check the live reading before assuming security will stay light.",
+            "If the live data shows an unusual spike, use the history chart to see whether it looks temporary or part of the normal departure wave.",
+        ],
+        "notes": [
+            "Jacksonville is usually more straightforward than a major hub, which makes live timing especially helpful for deciding whether you can leave later.",
+            "The main value of this page at JAX is avoiding unnecessary early arrival when checkpoint conditions are actually light.",
+        ],
+    },
+}
+
 
 AIRPORT_FACTORS = {
     "ATL": 1.25, "BOS": 1.05, "CLT": 1.0, "DEN": 1.15, "DFW": 1.2, "DTW": 0.95,
@@ -441,6 +488,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "is_airport_page": is_airport_page,
         "airport_display_name": airport_display_name,
         "airport_city": LIVE_AIRPORTS[initial_airport_code].get("city") if is_airport_page and initial_airport_code in LIVE_AIRPORTS else None,
+        "airport_guide": AIRPORT_PAGE_GUIDES.get(initial_airport_code, {}),
         "airport_pages": [{"code": c, "href": airport_seo_slug(c), "name": v["name"]} for c, v in LIVE_AIRPORTS.items()],
         "seo": seo,
         "initial_data": initial_data,

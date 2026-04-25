@@ -385,6 +385,9 @@
               reading.</li>
             <li>If {{ initial_airport_code }} shows PreCheck or CLEAR lane data, those lines are almost always shorter
               than the standard lane.</li>
+            {% for tip in airport_guide.tips or [] %}
+            <li>{{ tip }}</li>
+            {% endfor %}
           </ul>
         </div>
         <div>
@@ -419,6 +422,16 @@
       </div>
 
       <div class="content-columns" style="margin-top: 16px;">
+        {% if airport_guide.notes %}
+        <div>
+          <h3>{{ initial_airport_code }} airport-specific notes</h3>
+          <ul class="content-list">
+            {% for note in airport_guide.notes %}
+            <li>{{ note }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
         <div>
           <h3>See live TSA wait times for other airports</h3>
           <p class="muted" style="margin-bottom:8px;">Flying from a different city? Check real-time security line wait
