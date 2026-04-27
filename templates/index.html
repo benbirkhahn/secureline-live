@@ -242,6 +242,7 @@
     </section>
 
     <!-- ── TOP AD SLOT ── -->
+    {% if not is_airport_page %}
     <section class="ad-slot top-ad">
       <div class="ad-label">Advertisement</div>
       <div class="ad-slot-frame">
@@ -322,6 +323,7 @@
         {% endif %}
       </div>
     </section>
+    {% endif %}
 
     <section class="card utility-card">
       <div class="section-divider">Traveler Tools</div>
@@ -365,9 +367,7 @@
 
     <!-- ── SEO CONTENT ── -->
     {% if is_airport_page %}
-    <details class="card content-card content-disclosure">
-      <summary class="content-summary">Planning Notes, Airport Links & FAQ</summary>
-      <div class="content-body">
+    <section class="card content-card">
       <h2>About {{ initial_airport_code }} TSA Security Wait Times</h2>
       <p class="muted">TSA Tracker provides live TSA checkpoint wait times for {{ airport_display_name }} ({{
         initial_airport_code }}). Data is pulled directly from official {{ initial_airport_code }} airport security
@@ -392,12 +392,11 @@
           </ul>
         </div>
         <div>
-          <h3>Travel activities & services</h3>
-          <p class="muted" style="margin-bottom:8px;">Planning things to do at your destination? Book skip-the-line
-            tickets, airport transfers, and activities:</p>
+          <h3>How to use this page</h3>
           <ul class="content-list">
-            <li><a href="{{ monetization.klook_url }}" target="_blank" rel="noopener">Klook: Skip-the-line tickets,
-                airport transfers & tours</a> — often cheaper than booking direct</li>
+            <li>Use the live checkpoint cards first to judge current conditions, then use the history chart to see whether the line is following a normal peak.</li>
+            <li>Confirm your terminal or airline before heading to security, since many airports on TSA Tracker have different wait patterns by checkpoint or terminal.</li>
+            <li>Use the official airport links below if you need terminal maps, airport-specific security guidance, or the airport's own traveler tools.</li>
           </ul>
         </div>
       </div>
@@ -505,8 +504,7 @@
             fresh data directly from the airport's live security feed.</p>
         </div>
       </div>
-      </div>
-    </details>
+    </section>
     {% else %}
     <section class="card content-card">
       <h2>About TSA Tracker</h2>
