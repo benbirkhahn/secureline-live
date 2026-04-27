@@ -58,6 +58,7 @@
     </a>
     <nav class="header-nav">
       <a href="/" class="header-nav-link">Home</a>
+      <a href="/airports" class="header-nav-link">Airports</a>
       <a href="/about" class="header-nav-link">About</a>
       <a href="/methodology" class="header-nav-link">Methodology</a>
     </nav>
@@ -429,6 +430,30 @@
         </div>
       </div>
 
+      {% if airport_guide.terminal_notes or airport_guide.airline_notes or airport_guide.links %}
+      <div class="content-columns" style="margin-top: 16px;">
+        <div>
+          <h3>{{ initial_airport_code }} terminal and airline notes</h3>
+          <ul class="content-list">
+            {% for note in airport_guide.terminal_notes or [] %}
+            <li>{{ note }}</li>
+            {% endfor %}
+            {% for note in airport_guide.airline_notes or [] %}
+            <li>{{ note }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3>Official {{ initial_airport_code }} airport resources</h3>
+          <ul class="content-list">
+            {% for link in airport_guide.links or [] %}
+            <li><a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="content-columns" style="margin-top: 16px;">
         {% if airport_guide.notes %}
         <div>
@@ -496,6 +521,14 @@
             <li>Search or tap an airport above to see how long the TSA security line is right now.</li>
             <li>Green = short wait (under 15 min). Yellow = moderate. Red = long — plan ahead!</li>
             <li>Check the 12-hour history chart to see peak times and decide when to head to the airport.</li>
+          </ul>
+          <h3 style="margin-top:18px;">Helpful pages</h3>
+          <ul class="content-list">
+            <li><a href="/airports">Airport directory</a> — every live airport page in one place.</li>
+            <li><a href="/guide/tsa-wait-times">TSA wait times explained</a> — peak hours, line behavior, and arrival timing.</li>
+            <li><a href="/guide/tsa-precheck-clear">PreCheck vs CLEAR</a> — enrollment basics and card perks.</li>
+            <li><a href="/methodology">Methodology</a> — how the live data is sourced and refreshed.</li>
+            <li><a href="/about">About</a> and <a href="/contact">Contact</a> — coverage details, airport requests, and support.</li>
           </ul>
         </div>
         <div>
@@ -583,6 +616,8 @@
   <footer class="footer">
     <div>TSA Tracker — live security wait times. Data refreshes every ~2 minutes.</div>
     <div class="footer-links">
+      <a href="/airports">Airports</a>
+      <span>·</span>
       <a href="/about">About</a>
       <span>·</span>
       <a href="/methodology">Methodology</a>

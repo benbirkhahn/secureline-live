@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ seo.title }}</title>
+  <meta name="description" content="{{ seo.description }}">
+  <link rel="canonical" href="{{ seo.canonical_url }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ seo.title }}">
+  <meta property="og:description" content="{{ seo.description }}">
+  <meta property="og:url" content="{{ seo.canonical_url }}">
+  <meta property="og:image" content="{{ seo.site_url }}/static/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .directory-card {
+      background: var(--surface2);
+      border: 1px solid #2a2a40;
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .directory-card .code {
+      color: var(--amber);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .directory-card .name {
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .directory-card .city {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    .directory-card a {
+      color: var(--amber);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .directory-card a:hover {
+      text-decoration: underline;
+    }
+    .resource-list a {
+      color: var(--amber);
+      text-decoration: none;
+    }
+    .resource-list a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="/" class="header-home-link">
+      <span class="logo-shield">✈️</span>
+      <div>
+        <div class="logo-name">TSA Tracker</div>
+        <div class="logo-tag">Live airport data</div>
+      </div>
+    </a>
+    <nav class="header-nav">
+      <a href="/" class="header-nav-link">Home</a>
+      <a href="/airports" class="header-nav-link active">Airports</a>
+      <a href="/about" class="header-nav-link">About</a>
+      <a href="/methodology" class="header-nav-link">Methodology</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="card content-card" style="max-width:960px;margin:0 auto;">
+      <h1 style="font-size:2rem;font-weight:700;margin-bottom:8px;">Live TSA Wait Times by Airport</h1>
+      <p class="muted" style="margin-bottom:20px;">Browse every live airport page on TSA Tracker. Each airport page is server-rendered and links directly to current checkpoint data, 12-hour trends, and airport-specific planning notes.</p>
+
+      <div class="directory-grid">
+        {% for airport in airport_pages %}
+        <article class="directory-card">
+          <div class="code">{{ airport.code }}</div>
+          <div class="name">{{ airport.name }}</div>
+          {% if airport.city %}
+          <div class="city">{{ airport.city }}</div>
+          {% endif %}
+          <a href="{{ airport.href }}">{{ airport.code }} TSA wait times</a>
+        </article>
+        {% endfor %}
+      </div>
+
+      <h2 style="font-size:1.2rem;font-weight:700;margin:32px 0 12px;">Helpful Planning Pages</h2>
+      <ul class="content-list resource-list">
+        <li><a href="/guide/tsa-wait-times">TSA wait times explained</a> for timing strategy, peak hours, and screening tips.</li>
+        <li><a href="/guide/tsa-precheck-clear">TSA PreCheck vs CLEAR</a> for enrollment and card-benefit guidance.</li>
+        <li><a href="/methodology">Methodology</a> for data sourcing, polling, and limitations.</li>
+        <li><a href="/about">About TSA Tracker</a> for site coverage and how the airport feeds work.</li>
+        <li><a href="/contact">Contact</a> for airport requests, bug reports, and partnerships.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>TSA Tracker — live security wait times. Data refreshes every ~2 minutes.</div>
+    <div class="footer-links">
+      <a href="/airports">Airports</a>
+      <span>·</span>
+      <a href="/about">About</a>
+      <span>·</span>
+      <a href="/methodology">Methodology</a>
+      <span>·</span>
+      <a href="/guide/tsa-wait-times">TSA Guide</a>
+      <span>·</span>
+      <a href="/guide/tsa-precheck-clear">PreCheck vs CLEAR</a>
+      <span>·</span>
+      <a href="/contact">Contact</a>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "{{ seo.title }}",
+    "description": "{{ seo.description }}",
+    "url": "{{ seo.canonical_url }}"
+  }
+  </script>
+  {% include "_affiliate_scripts.html" %}
+</body>
+</html>

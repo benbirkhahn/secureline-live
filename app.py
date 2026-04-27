@@ -211,133 +211,301 @@ AIRPORT_PAGE_GUIDES = {
     "PHL": {
         "tips": [
             "PHL security timing can move quickly between checkpoints, so use the live cards above instead of assuming every terminal is moving the same way.",
-            "If you are flying during the first morning departure wave or late-afternoon push, check the history chart before leaving for the airport.",
-            "PHL is the kind of airport where live checkpoint data can save you from arriving much earlier than you actually need to.",
+            "Terminal D/E is the checkpoint pair most likely to punish a casual arrival, so check the line there before committing to a tight buffer.",
+            "If you are flying American, terminal choice matters more at PHL than at many airports because the hub footprint is spread across A-West, A-East, B, C, and F.",
         ],
         "notes": [
-            "Philadelphia traffic patterns are busy enough for live checkpoint timing to matter, but still compact enough that the page is mainly about making a leave-now vs wait-a-bit decision.",
-            "This page is most useful when you pair the current checkpoint cards with your terminal confirmation before heading to the airport.",
+            "PHL is compact enough to feel manageable, but its checkpoint performance is still terminal-specific rather than airport-wide.",
+            "This page is most useful when you pair the live checkpoint cards with your exact terminal before leaving for the airport.",
+        ],
+        "terminal_notes": [
+            "PHL uses separate checkpoints for A-West, A-East, B, C, D/E, and F rather than one centralized screening zone.",
+            "D and E share a checkpoint and post-security walkway, so that pair behaves differently from the rest of the airport.",
+            "Early-morning and late-afternoon departure banks create the biggest spread between a manageable line and a very slow one.",
+        ],
+        "airline_notes": [
+            "American Airlines dominates A-West, A-East, B, C, and F, which makes terminal confirmation especially important for hub traffic.",
+            "Frontier, Spirit, JetBlue, and Southwest cluster around Terminal E, while Delta and United commonly route through D.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.phl.org/"},
+            {"label": "Official terminal map", "url": "https://maps.phl.org/"},
         ],
     },
     "MIA": {
         "tips": [
             "MIA can swing quickly when international and domestic departure banks overlap, so same-day live checkpoint data matters more than a generic airport rule.",
+            "Checkpoint selection is a real decision at MIA because the official wait-time page can show sharp differences between nearby checkpoints.",
             "If your trip involves checked bags or international document checks, treat yellow and red waits at MIA as a sign to build more buffer.",
-            "Use the history chart to separate a normal Miami peak from a temporary spike before deciding when to leave.",
         ],
         "notes": [
             "Miami traffic is more variable than a smaller airport because international departures, leisure traffic, and connecting passengers can all pressure security at the same time.",
-            "That makes this page more of a timing tool than just a static wait-time lookup.",
+            "That makes this page more of a checkpoint-routing tool than just a static wait-time lookup.",
+        ],
+        "terminal_notes": [
+            "MIA divides departing passengers across the North Terminal, Central Terminal, and South Terminal instead of one shared security zone.",
+            "The airport runs many numbered checkpoints with different hours, including 24-hour options in the North and South zones.",
+            "Concourse D adds walking distance and internal movement overhead on top of the security line itself, so total time to gate matters here.",
+        ],
+        "airline_notes": [
+            "American Airlines dominates the North Terminal and Concourse D, making that side of the airport the most operationally important for same-day planning.",
+            "Central and South Terminal flows matter more for Oneworld partners, Latin American carriers, Delta, and other non-American international departures.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.miami-airport.com/"},
+            {"label": "Official security information", "url": "https://www.miami-airport.com/airport-security.asp"},
+            {"label": "Official live wait times", "url": "https://www.miami-airport.com/tsa-waittimes.asp"},
         ],
     },
     "ORD": {
         "tips": [
             "ORD is large enough that terminal and checkpoint choice matter more than the airport-wide average alone.",
-            "If you are traveling during a heavy morning or evening bank, use the live cards above to see whether your terminal is the problem or the whole airport is busy.",
-            "At ORD, the best move is usually to trust the live checkpoint spread and not the assumption that every line is equally backed up.",
+            "At O'Hare, the best move is usually to trust the live checkpoint spread and not the assumption that every line is equally backed up.",
+            "If you are flying international out of Terminal 5, treat that as its own security workflow rather than an extension of the domestic terminals.",
         ],
         "notes": [
-            "Chicago O'Hare can look calm at one checkpoint and much slower at another, which is why the lane-level data is the main value on this page.",
-            "This page is especially useful for business-travel windows when ORD security can ramp up quickly.",
+            "Chicago O'Hare can look calm at one checkpoint and much slower at another, which is why checkpoint-level data matters here more than a single airport average.",
+            "This page is especially useful for business-travel windows when ORD security can ramp up quickly in Terminals 1 and 3.",
+        ],
+        "terminal_notes": [
+            "O'Hare splits departing passengers across Terminals 1, 2, 3, and 5, with multiple named checkpoints in the busiest terminals.",
+            "Checkpoint numbering matters here because different terminals run very different hours and screening mixes.",
+            "Terminal 5 is operationally separate enough that travelers should plan for its own screening rhythm rather than assuming domestic-terminal behavior.",
+        ],
+        "airline_notes": [
+            "United drives the biggest volume in Terminal 1, while American dominates Terminal 3, so those two terminals shape most same-day congestion.",
+            "Terminal 5 handles the international-carrier workflow, while Terminal 2 carries a smaller mix including Delta, Alaska, Spirit, and Air Canada.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.flychicago.com/ohare/home/pages/default.aspx"},
+            {"label": "Official terminal map", "url": "https://www.flychicago.com/ohare/map/pages/default.aspx"},
+            {"label": "Official security information", "url": "https://www.flychicago.com/ohare/myflight/security/Pages/TSA.aspx"},
         ],
     },
     "LAX": {
         "tips": [
             "LAX security timing can vary a lot by terminal, so confirm your airline terminal before heading to the checkpoint.",
-            "If you are getting dropped off, use the terminal-specific checkpoint cards above instead of assuming the whole airport is moving at the same pace.",
+            "At LAX, total departure friction often includes terminal routing, shuttle time, or post-security busing in addition to the TSA line itself.",
             "Morning departures and evening bank departures tend to be the main stress windows at LAX, so the history chart matters more here than at smaller airports.",
         ],
         "notes": [
             "LAX spreads traffic across multiple terminals, which means one checkpoint can be moving quickly while another is backed up.",
-            "This page is most useful when you are deciding whether to leave now, wait a bit, or build extra buffer for a busy terminal.",
+            "This page is most useful when you are deciding whether your main risk is the line itself, the terminal layout, or the bus-to-TBIT workflow.",
+        ],
+        "terminal_notes": [
+            "LAX divides departing passengers across Terminals 1 through 8 plus Terminal B, so there is no single airport-wide security experience.",
+            "Some low-cost and international workflows still involve domestic-terminal check-in followed by post-security transport toward Terminal B.",
+            "Walking time between adjacent terminals and shuttle time between non-adjacent terminals should be part of your arrival buffer here.",
+        ],
+        "airline_notes": [
+            "Delta concentrates in Terminal 3, American in Terminals 4 and 5, United in Terminals 7 and 8, Southwest in Terminal 1, and Alaska in Terminal 6.",
+            "Terminal B remains the core international screening environment even when the check-in step starts elsewhere.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.flylax.com/"},
+            {"label": "Official terminal maps", "url": "https://www.flylax.com/lax-terminal-maps"},
+            {"label": "Official wait-time page", "url": "https://www.flylax.com/wait-times"},
         ],
     },
     "DFW": {
         "tips": [
             "DFW has multiple terminal checkpoints, so use the lane-level cards above instead of treating the airport like one single line.",
+            "DFW is one of the few big airports where clearing in a different terminal can be rational because Skylink lets you move airside after security.",
             "Checkpoint timing at DFW can swing during early business-travel windows, especially if several terminals ramp up at once.",
-            "If your flight timing is flexible, compare the current checkpoint averages with the 12-hour history before leaving for the airport.",
         ],
         "notes": [
             "DFW is large enough that terminal-specific security timing matters more than the airport-wide average alone.",
             "Travelers usually get the best value from this page when they pair the live checkpoint cards with terminal confirmation before parking or rideshare drop-off.",
         ],
+        "terminal_notes": [
+            "DFW runs five active passenger terminals: A, B, C, D, and E, with multiple labeled checkpoints in each.",
+            "Because Skylink runs airside, you can sometimes beat your own terminal's line by clearing elsewhere and riding to your gate after security.",
+            "Terminal D and Terminal E are the most important pressure points for international and mixed-carrier traffic.",
+        ],
+        "airline_notes": [
+            "American dominates Terminals A through D, with Terminal D carrying the main American international flow.",
+            "Terminal E is the key terminal for non-American carriers such as United, Delta, Southwest, Spirit, and Frontier.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.dfwairport.com/"},
+            {"label": "Official terminal map", "url": "https://www.dfwairport.com/map/"},
+            {"label": "Official security information", "url": "https://www.dfwairport.com/security/"},
+        ],
     },
     "MCO": {
         "tips": [
             "MCO gets family and vacation traffic that can bunch up quickly, so line conditions can change faster than travelers expect.",
-            "If you are traveling with checked bags, strollers, or a larger group, treat yellow or red waits at MCO as a sign to leave earlier.",
+            "Checkpoint choice matters at MCO because West, East, and Terminal C all serve different gate flows rather than one common post-security path.",
             "Use the live cards above to see whether current checkpoint traffic lines up with the usual peak pattern in the history chart.",
         ],
         "notes": [
-            "Orlando traffic patterns are less business-travel heavy and more vacation-driven, which can create sharp surges around resort checkout and holiday travel windows.",
+            "Orlando traffic patterns are less business-travel heavy and more vacation-driven, which can create sharp surges around Saturday mornings, school breaks, and holiday windows.",
             "That makes same-day live checkpoint data especially useful at MCO compared with relying on generic airport-arrival rules.",
+        ],
+        "terminal_notes": [
+            "MCO splits departing passengers between the North Terminal Complex and Terminal C rather than one shared security flow.",
+            "West security feeds Airsides 1 and 3, East security feeds Airsides 2 and 4, and Terminal C runs its own separate checkpoint.",
+            "At MCO, getting through security is only part of the time budget because many flights still require an airside train ride after screening.",
+        ],
+        "airline_notes": [
+            "The North Terminal handles the main domestic volume, while Terminal C carries selected domestic service plus a meaningful share of international activity.",
+            "Southwest-heavy west-side flows and Spirit/Frontier-heavy east-side flows can behave differently enough that the correct checkpoint choice matters.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://flymco.com/"},
+            {"label": "Official terminal maps", "url": "https://flymco.com/terminal-maps/"},
+            {"label": "Official security information", "url": "https://flymco.com/security/"},
+            {"label": "MCO Reserve", "url": "https://flymco.com/airport-info/mco-reserve/"},
         ],
     },
     "JAX": {
         "tips": [
-            "JAX is smaller than the biggest hub airports, so short waits can turn into a fast pass-through when the checkpoint is green.",
+            "JAX is smaller than the biggest hub airports, so short waits can turn into a true fast pass-through when the checkpoint is green.",
             "Even at a smaller airport, early departures can stack up, so check the live reading before assuming security will stay light.",
-            "If the live data shows an unusual spike, use the history chart to see whether it looks temporary or part of the normal departure wave.",
+            "JAX becomes a different airport after the PreCheck and special-needs lanes close in the evening, so departure time matters more than total airport size.",
         ],
         "notes": [
             "Jacksonville is usually more straightforward than a major hub, which makes live timing especially helpful for deciding whether you can leave later.",
-            "The main value of this page at JAX is avoiding unnecessary early arrival when checkpoint conditions are actually light.",
+            "The main value of this page at JAX is avoiding unnecessary early arrival when checkpoint conditions are actually light, while still respecting the evening lane cutoffs.",
+        ],
+        "terminal_notes": [
+            "JAX uses one main terminal with concourses A and C rather than a multi-terminal screening layout.",
+            "Because there is one main checkpoint, the whole airport shares the same security mood instead of splitting across competing checkpoint options.",
+            "The biggest same-day operational wrinkle is that PreCheck and special-needs lane availability tightens earlier than the terminal itself closes.",
+        ],
+        "airline_notes": [
+            "Concourse A is the main Delta/JetBlue/United side, while Concourse C carries much of the American, Southwest, Spirit, Frontier, and Allegiant flow.",
+            "The airport is simple enough that airline-to-concourse pairing mainly matters for post-security walking rather than checkpoint choice.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.flyjax.com/"},
+            {"label": "Official airport services page", "url": "https://www.flyjax.com/services"},
         ],
     },
     "CLT": {
         "tips": [
             "CLT often rewards checking the live reading before leaving because one busy departure wave can change the whole feel of the airport quickly.",
             "If your travel window overlaps an early-morning push, use the checkpoint cards and history chart together instead of relying on normal two-hour rules alone.",
-            "At Charlotte, live checkpoint conditions matter most when the airport is dealing with concentrated bank departures.",
+            "At Charlotte, the right checkpoint matters almost as much as the total line because the airport's flow is driven by banked hub departures.",
         ],
         "notes": [
             "Charlotte traffic tends to bunch around major departure windows, so the timing signal from live security data is more useful than a static airport arrival rule.",
-            "This page helps most when you are deciding whether current lines justify extra buffer right now.",
+            "This page helps most when you are deciding whether current lines justify extra buffer right now and which checkpoint is least punitive.",
+        ],
+        "terminal_notes": [
+            "CLT works as one terminal building with five concourses, but security is divided across three separate checkpoints rather than one central screening hall.",
+            "Checkpoint 1 sits closest to B, Checkpoint 2 is the main PreCheck-heavy option near C, and Checkpoint 3 gives the most direct access toward D and E.",
+            "Because the airport is built around connecting-bank pressure, one checkpoint can surge while another stays more manageable.",
+        ],
+        "airline_notes": [
+            "American drives most of the operational rhythm at CLT, so concentrated departure banks shape the line more than a simple local-origin pattern.",
+            "Even without classic multi-terminal airline silos, gate assignment and checkpoint choice still matter because CLT's concourse reach is large.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.cltairport.com/"},
+            {"label": "Official terminal map", "url": "https://www.cltairport.com/airport-info/terminal-map/"},
+            {"label": "Official security information", "url": "https://www.cltairport.com/airport-info/security/"},
         ],
     },
     "JFK": {
         "tips": [
             "JFK terminal traffic can behave like separate mini-airports, so treat the terminal cards above as more important than the overall airport average.",
             "If your terminal is showing a long line while another looks calm, assume your terminal timing is the one that matters for departure planning.",
-            "JFK is one of the best examples of why live checkpoint data is more useful than generic 'arrive early' advice.",
+            "Changing terminals at JFK means exiting and reclearing security, so the wrong terminal assumption carries a real time penalty.",
         ],
         "notes": [
             "John F. Kennedy can have very different line conditions across terminals because traffic is distributed unevenly across international and domestic departure waves.",
             "This page is designed to help you decide whether your specific terminal is the issue or whether the whole airport is running hot.",
         ],
+        "terminal_notes": [
+            "JFK splits departing passengers across Terminals 1, 4, 5, 7, and 8, each with its own screening flow.",
+            "Terminal 4 and Terminal 8 usually matter most for same-day congestion because of their scale and airline mix.",
+            "There is no useful airport-wide average here if your actual terminal is running much hotter than the others.",
+        ],
+        "airline_notes": [
+            "Terminal 4 is the main Delta-driven volume center, Terminal 5 is JetBlue's terminal, and Terminal 8 carries most American traffic.",
+            "Terminal 1 and Terminal 7 matter most for many international and alliance-partner departures, so terminal verification is critical before you leave.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.jfkairport.com/"},
+            {"label": "Official terminal map", "url": "https://www.jfkairport.com/explore-jfk/airport-map"},
+            {"label": "Official live wait times", "url": "https://www.jfkairport.com/to-and-from/security-wait-times"},
+        ],
     },
     "EWR": {
         "tips": [
             "EWR line conditions can change quickly by terminal, so use the terminal cards above instead of treating Newark as a single line.",
+            "At Newark, the real planning move is often terminal selection and timing, not just deciding whether the airport feels busy in general.",
             "If you are deciding whether to head out now, compare the current terminal spread with the 12-hour chart to see whether this looks like a normal push or an outlier.",
-            "At Newark, live checkpoint data is most useful when you are trying to avoid overreacting to a single airport-wide average.",
         ],
         "notes": [
             "Newark is large enough that terminal-specific congestion matters, especially during business-travel windows and evening departures.",
             "That makes the page strongest as a same-day decision tool rather than a generic planning article.",
         ],
+        "terminal_notes": [
+            "EWR splits traffic across Terminals A, B, and C, each with its own security profile instead of one unified checkpoint experience.",
+            "Terminal C's United-heavy rhythm makes it behave differently from the mixed-carrier flows in A and the segmented concourse structure in B.",
+            "The airport now surfaces live terminal-specific wait indicators again, which makes same-day terminal planning more actionable than a generic average.",
+        ],
+        "airline_notes": [
+            "United dominates Terminal C, making it the core pressure point for many Newark departures.",
+            "Terminal A carries a broad domestic mix, while Terminal B remains the more international and alliance-partner-oriented side of the airport.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.newarkairport.com/"},
+            {"label": "Official airport maps", "url": "https://www.newarkairport.com/at-airport/airport-maps"},
+            {"label": "Port Authority travel tips", "url": "https://www.panynj.gov/airports/en/aviation-safety/travel-tips.html"},
+        ],
     },
     "LGA": {
         "tips": [
             "LGA is smaller than JFK, but checkpoint timing can still vary enough by terminal to make the live cards more useful than the airport average alone.",
-            "If your departure window is tight, check whether your terminal is moving normally before assuming the whole airport is backed up.",
+            "Terminal B is the one most likely to punish a generic arrival assumption, so treat its line as a separate planning problem.",
             "LaGuardia tends to reward quick same-day checks because the difference between a short wait and a stressful one can happen fast.",
         ],
         "notes": [
             "LaGuardia works best with live monitoring because traveler volume can spike around concentrated departure windows without making the whole airport feel consistently busy.",
-            "This page is mainly about timing your arrival well, not just confirming that security exists.",
+            "This page is mainly about timing your arrival well and getting the terminal right before you even enter the building.",
+        ],
+        "terminal_notes": [
+            "LGA uses separate checkpoints for Terminals A, B, and C rather than one common screening zone.",
+            "Terminal B is the largest mixed-carrier terminal and often the hardest one to read correctly without same-day line context.",
+            "Choosing the wrong terminal at LaGuardia is expensive because terminal changes mean exiting and screening again, not just walking a few gates over.",
+        ],
+        "airline_notes": [
+            "Delta's concentration in Terminals A and C gives LaGuardia a very different traffic shape from Terminal B's mixed-carrier pressure.",
+            "American, Southwest, United, JetBlue-related operations, and other non-Delta flows make Terminal B the key general-market checkpoint to watch.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.laguardiaairport.com/"},
+            {"label": "Official airport maps", "url": "https://www.laguardiaairport.com/at-airport/airport-maps"},
+            {"label": "Official traveler tips", "url": "https://www.laguardiaairport.com/at-airport/tips"},
+            {"label": "Terminal B security wait time", "url": "https://laguardiab.com/security-wait-time"},
         ],
     },
     "SEA": {
         "tips": [
             "SEA can build pressure quickly when departures stack into the same window, so use the live checkpoint reading before heading to the terminal.",
-            "If the airport is showing moderate or long waits, compare the current reading with the history chart to judge whether this is the main daily peak.",
+            "At Sea-Tac, checkpoint choice can matter even though the airport is more centralized, because some checkpoints are better aligned with specific gate zones and tools like Spot Saver.",
             "Seattle-Tacoma is a good example of an airport where live data can keep you from either underestimating or overshooting your buffer.",
         ],
         "notes": [
             "Sea-Tac traffic patterns make live same-day checkpoint data more useful than generic arrival advice, especially during concentrated morning and evening windows.",
-            "This page is most valuable when you are deciding whether current conditions justify leaving earlier right now.",
+            "This page is most valuable when you are deciding both when to arrive and which checkpoint gives you the cleanest path to your gate zone.",
+        ],
+        "terminal_notes": [
+            "SEA centralizes screening more than the multi-terminal East Coast hubs, but it still runs multiple distinct checkpoints with different hours and specialties.",
+            "Checkpoint 4's 24-hour operation and Spot Saver support make it operationally different from the others.",
+            "Satellite-gate travelers should remember that security is only step one because post-screening train movement can still add time.",
+        ],
+        "airline_notes": [
+            "Alaska's dominance across Concourse C, Concourse D, and the North Satellite gives the airport a strong same-day traffic pattern around Alaska-heavy banks.",
+            "Delta's South Satellite and Concourse A activity create a different peak rhythm from the United/Southwest side in B.",
+        ],
+        "links": [
+            {"label": "Official airport site", "url": "https://www.portseattle.org/sea"},
+            {"label": "Official security information", "url": "https://www.portseattle.org/Security"},
+            {"label": "Official terminal map", "url": "https://www.portseattle.org/sites/default/files/2022-04/Web-Terminal-Map-Overview_3-28-22.pdf"},
         ],
     },
 }
@@ -521,6 +689,17 @@ def airport_page_seo(code: str, airport_name: str) -> Dict:
     )
 
 
+def airports_directory_seo() -> Dict:
+    return build_page_seo(
+        title="Airport Directory | Live TSA Wait Times by Airport | TSA Tracker",
+        description=(
+            "Browse live TSA wait times by airport. Find real-time security checkpoint pages for major US airports, "
+            "plus links to TSA planning guides and methodology."
+        ),
+        canonical_path="/airports",
+    )
+
+
 def arrival_guidance_for_airport(payload: Dict) -> Dict:
     forecast = payload.get("hourlyForecast", []) if payload else []
     if forecast:
@@ -614,6 +793,24 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "monetization": monetization,
         "LOCAL_OFFERS_JSON": json.dumps(LOCAL_OFFERS),
         "KIWI_AIRPORT_URLS_JSON": json.dumps(KIWI_AIRPORT_PAGE_URLS),
+    }
+
+
+def airport_directory_context() -> Dict:
+    airport_pages = []
+    for code, meta in sorted(LIVE_AIRPORTS.items()):
+        airport_pages.append(
+            {
+                "code": code,
+                "href": airport_seo_slug(code),
+                "name": meta["name"],
+                "city": meta.get("city", ""),
+            }
+        )
+    return {
+        "airport_pages": airport_pages,
+        "seo": airports_directory_seo(),
+        "monetization": get_monetization_context(),
     }
 
 
@@ -1653,6 +1850,11 @@ def about_page():
     return render_template("about.html", seo=seo, monetization=get_monetization_context())
 
 
+@app.route("/airports")
+def airports_page():
+    return render_template("airports.html", **airport_directory_context())
+
+
 @app.route("/privacy")
 def privacy():
     seo = build_page_seo(
@@ -1801,6 +2003,7 @@ def sitemap_xml():
     now = utc_now().date().isoformat()
     pages = (
         [("/", "1.0", "hourly")]
+        + [("/airports", "0.8", "daily")]
         + [(airport_seo_slug(c), "0.9", "always") for c in LIVE_AIRPORTS.keys()]
         + [("/about", "0.6", "monthly"), ("/methodology", "0.8", "weekly"), ("/privacy", "0.3", "monthly"), ("/terms", "0.3", "monthly"), ("/contact", "0.4", "monthly"), ("/guide/tsa-wait-times", "0.7", "monthly"), ("/guide/tsa-precheck-clear", "0.7", "monthly")]
     )
@@ -1824,8 +2027,13 @@ def sitemap_xml():
 
 @app.route("/ads.txt")
 def ads_txt():
-    """Serves the ads.txt file via Ezoic's dynamic manager."""
-    return redirect("https://srv.adstxtmanager.com/19390/tsatracker.com", code=301)
+    """Serve a first-party ads.txt file from the app root."""
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    ads_txt_path = os.path.join(root_dir, "ads.txt")
+    if os.path.exists(ads_txt_path):
+        return send_from_directory(root_dir, "ads.txt", mimetype="text/plain")
+    body = f"{ADS_TXT_LINE}\n" if ADS_TXT_LINE else ""
+    return Response(body, mimetype="text/plain")
 
 @app.route("/healthz")
 def healthz():
