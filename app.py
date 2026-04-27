@@ -78,6 +78,7 @@ def get_kiwi_link(airport_code: str = "") -> str:
 LOUNGE_AFFILIATE_URL = get_tp_link("https://www.prioritypass.com/")
 KIWI_AFFILIATE_URL = get_tp_link("https://www.kiwi.com/")
 KLOOK_AFFILIATE_URL = get_tp_link("https://www.klook.com/")
+APP_JS_VERSION = str(int(os.path.getmtime(os.path.join(os.path.dirname(__file__), "static", "app.js"))))
 
 def get_lite_brain_insights() -> List[str]:
     """Reads recent notes from the 'Lite Brain' to identify manual optimization cues."""
@@ -793,6 +794,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "monetization": monetization,
         "LOCAL_OFFERS_JSON": json.dumps(LOCAL_OFFERS),
         "KIWI_AIRPORT_URLS_JSON": json.dumps(KIWI_AIRPORT_PAGE_URLS),
+        "app_js_version": APP_JS_VERSION,
     }
 
 
@@ -811,6 +813,7 @@ def airport_directory_context() -> Dict:
         "airport_pages": airport_pages,
         "seo": airports_directory_seo(),
         "monetization": get_monetization_context(),
+        "app_js_version": APP_JS_VERSION,
     }
 
 
