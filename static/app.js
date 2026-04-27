@@ -556,6 +556,27 @@ function renderAirportChips(payload, filterText = "") {
     link.textContent = code;
     link.title = `${code} TSA wait times — ${info.name}`;
     link.setAttribute("aria-label", `View live TSA wait times at ${info.name} (${code})`);
+    link.addEventListener("click", (event) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+      event.preventDefault();
+      if (selectedAirportCode === code) {
+        const resultsEl = document.getElementById("results-section");
+        if (resultsEl) {
+          resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        return;
+      }
+      selectAirport(code);
+    });
     host.appendChild(link);
   });
 }
@@ -837,7 +858,10 @@ async function bootstrap() {
     const match = Object.keys(livePayloadCache.live_airports || {}).find(
       (c) => c.toLowerCase() === q || livePayloadCache.live_airports[c].name.toLowerCase().includes(q)
     );
-    if (match) window.location.href = `/airports/${match.toLowerCase()}-tsa-wait-times`;
+    if (match) {
+      e.preventDefault();
+      selectAirport(match);
+    }
   });
 
   renderAirportChips(livePayloadCache);
@@ -858,7 +882,11 @@ async function bootstrap() {
       select.appendChild(opt);
     });
     select.addEventListener("change", (e) => selectAirport(e.target.value));
-    await loadHistory(null);
+    if (selectedAirportCode && livePayloadCache.live_airports?.[selectedAirportCode]) {
+      select.value = selectedAirportCode;
+    } else {
+      await loadHistory(null);
+    }
   });
 
   scheduleNonCriticalTask(async () => {
