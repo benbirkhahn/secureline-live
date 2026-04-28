@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
   <title>Terms of Service | TSA Tracker</title>
   <meta name="description" content="TSA Tracker terms of service — the rules and conditions for using our live airport TSA wait time service.">
   <link rel="canonical" href="{{ seo.canonical_url }}">

@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
   <title>About TSA Tracker | Real-Time Airport Security Wait Times</title>
   <meta name="description" content="TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowd-sourced guesses. Learn how it works, which airports are covered, and why it's the most accurate source for airport security wait times.">
   <link rel="canonical" href="{{ seo.canonical_url }}">

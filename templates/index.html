@@ -7,6 +7,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
   <meta name="google-site-verification" content="BrgIHs-VGqw0TKjsx0U-HzG_tED2LE_9kwy3qR58ObQ" />
   <meta name="fo-verify" content="2e38fbfa-7430-401b-9aff-ed0c496d850c" />
   <title>{{ seo.title }}</title>
