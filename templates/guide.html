@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
+  <meta name="robots" content="index, follow, max-snippet:150, max-image-preview:large">
   <title>{{ seo.title }}</title>
   <meta name="description" content="{{ seo.description }}">
   <link rel="canonical" href="{{ seo.canonical_url }}">
@@ -440,6 +441,7 @@
     "author": {
       "@type": "Organization",
       "name": "TSA Tracker",
+      "url": "{{ seo.site_url }}",
       "sameAs": [
         "https://x.com/tsatrackerr",
         "https://twitter.com/tsatrackerr"
