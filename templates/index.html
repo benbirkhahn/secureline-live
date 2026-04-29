@@ -10,6 +10,7 @@
   {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
   <meta name="google-site-verification" content="BrgIHs-VGqw0TKjsx0U-HzG_tED2LE_9kwy3qR58ObQ" />
   <meta name="fo-verify" content="2e38fbfa-7430-401b-9aff-ed0c496d850c" />
+  <meta name="robots" content="index, follow, max-snippet:150, max-image-preview:large">
   <title>{{ seo.title }}</title>
   <meta name="description" content="{{ seo.description }}">
   <link rel="canonical" href="{{ seo.canonical_url }}">
@@ -703,6 +704,10 @@
       "name": "TSA Tracker",
       "url": "{{ seo.site_url }}",
       "description": "Real-time TSA security wait times for major US airports, pulled directly from official airport systems.",
+      "sameAs": [
+        "https://twitter.com/tsatracker",
+        "https://www.linkedin.com/company/tsatracker"
+      ],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer support",

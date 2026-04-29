@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {% if monetization.adsense_client %}<meta name="google-adsense-account" content="{{ monetization.adsense_client }}">{% endif %}
+  <meta name="robots" content="index, follow, max-snippet:150, max-image-preview:large">
   <title>About TSA Tracker | Real-Time Airport Security Wait Times</title>
   <meta name="description" content="TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowd-sourced guesses. Learn how it works, which airports are covered, and why it's the most accurate source for airport security wait times.">
   <link rel="canonical" href="{{ seo.canonical_url }}">
@@ -11,6 +12,13 @@
   <meta property="og:title" content="About TSA Tracker | Real-Time Airport Security Wait Times">
   <meta property="og:description" content="Learn how TSA Tracker sources live checkpoint wait times directly from official airport feeds, updated every 2 minutes.">
   <meta property="og:url" content="{{ seo.canonical_url }}">
+  <meta property="og:image" content="{{ seo.site_url }}/static/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="About TSA Tracker | Real-Time Airport Security Wait Times">
+  <meta name="twitter:description" content="Learn how TSA Tracker sources live checkpoint wait times directly from official airport feeds, updated every 2 minutes.">
+  <meta name="twitter:image" content="{{ seo.site_url }}/static/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -170,10 +178,15 @@
     "name": "About TSA Tracker",
     "description": "TSA Tracker pulls live TSA checkpoint wait times directly from official airport systems — not estimates, not crowdsourced guesses.",
     "url": "{{ seo.canonical_url }}",
+    "dateModified": "2025-04-01",
     "publisher": {
       "@type": "Organization",
       "name": "TSA Tracker",
-      "url": "{{ seo.site_url }}"
+      "url": "{{ seo.site_url }}",
+      "sameAs": [
+        "https://twitter.com/tsatracker",
+        "https://www.linkedin.com/company/tsatracker"
+      ]
     }
   }
   </script>
