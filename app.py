@@ -712,10 +712,10 @@ def airport_page_seo(code: str, airport_name: str) -> Dict:
 
 def airports_directory_seo() -> Dict:
     return build_page_seo(
-        title="Airport Directory | Live TSA Wait Times by Airport | TSA Tracker",
+        title="Airport Overview | Live TSA Wait Times by Airport | TSA Tracker",
         description=(
-            "Browse live TSA wait times by airport. Find real-time security checkpoint pages for major US airports, "
-            "plus links to TSA planning guides and methodology."
+            "See live TSA wait times for all major airports at once, sorted by current average wait. "
+            "Open any airport page for checkpoint detail, trends, and planning notes."
         ),
         canonical_path="/airports",
     )
@@ -819,6 +819,50 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
 
 
 def airport_directory_context() -> Dict:
+    snapshot = latest_snapshot()
+    airport_summaries = []
+    total_wait = 0.0
+    live_count = 0
+    estimated_count = 0
+
+    for code, meta in sorted(LIVE_AIRPORTS.items()):
+        rows = snapshot.get(code, [])
+        if rows:
+            current_wait = average_wait_from_rows(rows)
+            updated_at = max(rows, key=lambda r: r.get("captured_at", ""))["captured_at"]
+            source_type = "live_direct"
+            source_label = f"{len(rows)} checkpoint{'s' if len(rows) != 1 else ''}"
+            live_count += 1
+        else:
+            payload = normalized_current_wait_for_code(code)
+            current = payload.get("currentWait", {})
+            current_wait = float(current.get("standard", 0) or 0)
+            updated_at = current.get("timestamp", utc_now().isoformat())
+            source_type = payload.get("sourceType", "estimated_fallback")
+            source_label = "Estimated fallback"
+            estimated_count += 1
+
+        total_wait += current_wait
+        airport_summaries.append(
+            {
+                "code": code,
+                "name": meta["name"],
+                "city": meta.get("city", ""),
+                "href": airport_seo_slug(code),
+                "current_wait": current_wait,
+                "wait_description": wait_description(current_wait),
+                "tier": wait_tier_class_for_minutes(current_wait),
+                "updated_at": format_utc_timestamp(updated_at),
+                "source_type": source_type,
+                "source_label": source_label,
+            }
+        )
+
+    airport_summaries.sort(key=lambda item: (-item["current_wait"], item["code"]))
+    fastest_airport = min(airport_summaries, key=lambda item: item["current_wait"], default=None)
+    slowest_airport = max(airport_summaries, key=lambda item: item["current_wait"], default=None)
+    overall_average = round(total_wait / len(airport_summaries), 1) if airport_summaries else 0.0
+
     airport_pages = []
     for code, meta in sorted(LIVE_AIRPORTS.items()):
         airport_pages.append(
@@ -831,6 +875,12 @@ def airport_directory_context() -> Dict:
         )
     return {
         "airport_pages": airport_pages,
+        "airport_summaries": airport_summaries,
+        "overall_average": overall_average,
+        "fastest_airport": fastest_airport,
+        "slowest_airport": slowest_airport,
+        "live_count": live_count,
+        "estimated_count": estimated_count,
         "seo": airports_directory_seo(),
         "monetization": get_monetization_context(),
         "app_js_version": APP_JS_VERSION,
@@ -846,6 +896,27 @@ def wait_description(minutes: float) -> str:
     if m <= 0:
         return "Closed"
     return f"{m} minutes"
+
+
+def wait_tier_class_for_minutes(minutes: float) -> str:
+    m = float(minutes or 0)
+    if m <= 15:
+        return "low"
+    if m <= 30:
+        return "med"
+    if m <= 45:
+        return "high"
+    return "crit"
+
+
+def format_utc_timestamp(iso_value: str) -> str:
+    try:
+        dt = datetime.fromisoformat(iso_value)
+    except Exception:
+        return iso_value
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=APP_TZ)
+    return dt.astimezone(APP_TZ).strftime("%b %d, %I:%M %p UTC").replace(" 0", " ")
 
 
 def estimated_wait_for_hour(hour: int, factor: float) -> float:
