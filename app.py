@@ -662,8 +662,6 @@ def start_web_runtime_once() -> None:
         if _db_initialized:
             return
         init_db()
-        with _poll_lock:
-            collect_once()
         if ENABLE_POLLER and not _poller_started:
             thread = threading.Thread(target=poll_forever, name="tsa-poller", daemon=True)
             thread.start()
@@ -1448,6 +1446,9 @@ def _fetch_panynj_rows(airport_code: str) -> List[Dict]:
         headers={**UA, "Content-Type": "application/json", "Accept": "application/json"},
         timeout=20,
     )
+    if resp.status_code in (401, 403):
+        logger.warning("collector_skipped airport=%s status=%s upstream_auth_failed", airport_code, resp.status_code)
+        return []
     resp.raise_for_status()
     items = resp.json().get("data", {}).get("securityWaitTimes", [])
     if not items:
