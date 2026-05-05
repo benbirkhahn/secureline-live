@@ -36,6 +36,187 @@
       rel="stylesheet">
   </noscript>
   <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .snapshot-section {
+      max-width: 1060px;
+      margin: 18px auto 22px;
+      padding: 22px;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background:
+        radial-gradient(circle at top left, rgba(245, 158, 11, 0.16), transparent 32%),
+        linear-gradient(135deg, rgba(18, 18, 28, 0.98), rgba(9, 9, 15, 0.98));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+    .snapshot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .snapshot-kicker {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--amber);
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .snapshot-title {
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+      line-height: 1.05;
+      color: #fff;
+      margin: 0;
+    }
+    .snapshot-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px 14px;
+      border-radius: 999px;
+      transition: transform 0.12s ease, background 0.12s ease;
+    }
+    .snapshot-link:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .snapshot-card {
+      padding: 16px 16px 15px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .snapshot-label {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-size: 0.7rem;
+      margin-bottom: 8px;
+    }
+    .snapshot-value {
+      color: #fff;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .snapshot-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .snapshot-rank {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .snapshot-airport {
+      position: relative;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .snapshot-airport.low { box-shadow: inset 4px 0 0 var(--green); }
+    .snapshot-airport.med { box-shadow: inset 4px 0 0 var(--yellow); }
+    .snapshot-airport.high { box-shadow: inset 4px 0 0 var(--orange); }
+    .snapshot-airport.crit { box-shadow: inset 4px 0 0 var(--red); }
+    .snapshot-airport-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .snapshot-code {
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      letter-spacing: 0.08em;
+      color: var(--amber);
+      font-weight: 700;
+    }
+    .snapshot-time {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .snapshot-airport-name {
+      font-size: 1rem;
+      color: #fff;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      min-height: 2.7em;
+    }
+    .snapshot-airport-wait {
+      font-family: var(--display);
+      font-size: 2rem;
+      line-height: 1;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .snapshot-airport-meta {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .snapshot-airport a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .snapshot-airport a:hover .snapshot-airport-name {
+      text-decoration: underline;
+      text-decoration-color: rgba(245, 158, 11, 0.75);
+    }
+    .how-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .how-step {
+      background: var(--surface2);
+      border: 1px solid #2a2a40;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .how-step .step-label {
+      color: var(--amber);
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .how-step h3 {
+      margin: 0 0 8px;
+      color: #fff;
+      font-size: 1rem;
+    }
+    .how-step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.94rem;
+    }
+  </style>
     <script>
       window.MONETIZATION_CONFIG = {
         tpMarker: "{{ monetization.travelpayouts_id }}"
@@ -92,21 +273,73 @@
       <div id="airport-chips" class="airport-chips-hero"></div>
     </section>
 
+    {% if not is_airport_page %}
+    <section class="snapshot-section">
+      <div class="snapshot-header">
+        <div>
+          <div class="snapshot-kicker">Live snapshot</div>
+          <h2 class="snapshot-title">Today's TSA picture at a glance</h2>
+        </div>
+        <a class="snapshot-link" href="/airports">Open all airports</a>
+      </div>
+      <div class="snapshot-grid">
+        <div class="snapshot-card">
+          <div class="snapshot-label">Live airports</div>
+          <div class="snapshot-value">{{ live_count }}</div>
+          <div class="snapshot-sub">{{ estimated_count }} fallback airport{{ 's' if estimated_count != 1 else '' }} are also listed</div>
+        </div>
+        <div class="snapshot-card">
+          <div class="snapshot-label">Fastest right now</div>
+          <div class="snapshot-value">{{ fastest_airport.code if fastest_airport else '--' }}</div>
+          <div class="snapshot-sub">{{ fastest_airport.wait_description if fastest_airport else 'No reading yet' }} average</div>
+        </div>
+        <div class="snapshot-card">
+          <div class="snapshot-label">Slowest right now</div>
+          <div class="snapshot-value">{{ slowest_airport.code if slowest_airport else '--' }}</div>
+          <div class="snapshot-sub">{{ slowest_airport.wait_description if slowest_airport else 'No reading yet' }} average</div>
+        </div>
+        <div class="snapshot-card">
+          <div class="snapshot-label">Network average</div>
+          <div class="snapshot-value">{{ "%.1f"|format(overall_average) }}</div>
+          <div class="snapshot-sub">minutes across live airport feeds</div>
+        </div>
+      </div>
+      <div class="snapshot-rank">
+        {% for airport in airport_summaries[:4] %}
+        <div class="snapshot-airport {{ airport.tier }}">
+          <div class="snapshot-airport-top">
+            <div class="snapshot-code">{{ airport.code }}</div>
+            <div class="snapshot-time">{{ airport.updated_at }}</div>
+          </div>
+          <a href="{{ airport.href }}">
+            <div class="snapshot-airport-name">{{ airport.name }}</div>
+          </a>
+          <div class="snapshot-airport-wait">{{ "%.1f"|format(airport.current_wait) }} min</div>
+          <div class="snapshot-airport-meta">{{ airport.source_label }}{% if airport.city %} · {{ airport.city }}{% endif %}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="card content-card" style="max-width:860px;margin: 0 auto 18px;">
       <h2>How TSA Tracker works</h2>
-      <p class="muted">This site is meant to answer two different questions: what the line looks like right now, and how that airport usually behaves over the course of a day. The homepage gives you the quick read; the airport page gives you checkpoint detail and airport-specific context.</p>
-      <div class="content-columns">
-        <div>
-          <h3>1. Check the live number first</h3>
-          <p>Use the current wait-time cards to see whether the airport is moving normally or if the line has already started to build. If the page shows a live feed, that reading comes from the airport’s own published system rather than a guess or crowd report.</p>
+      <p class="muted">Use the live number for what is happening now, and the trend for when to leave. The airport pages add the specific notes, maps, and terminal guidance that make the reading useful.</p>
+      <div class="how-steps-grid">
+        <div class="how-step">
+          <div class="step-label">Step 1</div>
+          <h3>Check the live number</h3>
+          <p>If the page shows a live feed, that reading comes from the airport’s own published system rather than a guess or crowd report.</p>
         </div>
-        <div>
-          <h3>2. Compare it with the trend</h3>
-          <p>The history chart matters because a short line at the wrong hour can turn into a long line by the time you arrive. The chart gives you the pattern behind the number so you can choose a better departure window.</p>
+        <div class="how-step">
+          <div class="step-label">Step 2</div>
+          <h3>Read the trend</h3>
+          <p>The chart shows whether the line is at a normal lull or entering a peak window before you leave home.</p>
         </div>
-        <div>
-          <h3>3. Use the airport pages for specifics</h3>
-          <p>Open the airport page when you want terminal notes, checkpoint notes, and practical guidance like where PreCheck helps most or which airport links to use for official maps and traveler tools.</p>
+        <div class="how-step">
+          <div class="step-label">Step 3</div>
+          <h3>Open the airport page</h3>
+          <p>Use the airport page for terminal notes, PreCheck context, and official airport links that matter for that specific trip.</p>
         </div>
       </div>
     </section>

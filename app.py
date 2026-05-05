@@ -818,6 +818,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     except Exception as e:
         logger.error("Error building monetization context for %s: %s", initial_airport_code or "HOME", e)
         monetization = get_monetization_context("")
+    airport_overview = build_airport_overview_context()
     return {
         "live_airports": LIVE_AIRPORTS,
         "pipeline_airports": PIPELINE_AIRPORTS,
@@ -829,6 +830,12 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
         "airport_notice": airport_status_notice_for_code(initial_airport_code) if is_airport_page else {},
         "arrival_guidance": arrival_guidance_for_airport(initial_data) if is_airport_page else None,
         "airport_pages": [{"code": c, "href": airport_seo_slug(c), "name": v["name"]} for c, v in LIVE_AIRPORTS.items()],
+        "airport_summaries": airport_overview["airport_summaries"],
+        "overall_average": airport_overview["overall_average"],
+        "fastest_airport": airport_overview["fastest_airport"],
+        "slowest_airport": airport_overview["slowest_airport"],
+        "live_count": airport_overview["live_count"],
+        "estimated_count": airport_overview["estimated_count"],
         "seo": seo,
         "initial_data": initial_data,
         "initial_checkpoints": initial_checkpoints,
@@ -839,7 +846,7 @@ def index_template_context(initial_airport_code: str, seo: Dict) -> Dict:
     }
 
 
-def airport_directory_context() -> Dict:
+def build_airport_overview_context() -> Dict:
     snapshot = latest_snapshot()
     airport_summaries = []
     total_wait = 0.0
@@ -902,6 +909,19 @@ def airport_directory_context() -> Dict:
         "slowest_airport": slowest_airport,
         "live_count": live_count,
         "estimated_count": estimated_count,
+    }
+
+
+def airport_directory_context() -> Dict:
+    overview = build_airport_overview_context()
+    return {
+        "airport_pages": overview["airport_pages"],
+        "airport_summaries": overview["airport_summaries"],
+        "overall_average": overview["overall_average"],
+        "fastest_airport": overview["fastest_airport"],
+        "slowest_airport": overview["slowest_airport"],
+        "live_count": overview["live_count"],
+        "estimated_count": overview["estimated_count"],
         "seo": airports_directory_seo(),
         "monetization": get_monetization_context(),
         "app_js_version": APP_JS_VERSION,
